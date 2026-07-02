@@ -19,7 +19,20 @@ git log --oneline
 git ls-files | grep -x ".env" && echo "!! KEY IS TRACKED — STOP" || echo "ok: key not tracked"
 ```
 
-**What's left is the part only you can do: putting it on *your* GitHub account.**
+## ✅ Remote — DONE (SSH deploy key, scoped to this repo)
+
+Live at **github.com/katestange/alchemy-textbook**; pushes go over an **SSH
+deploy key** scoped to this one repository:
+
+- Remote: `git@github.com:katestange/alchemy-textbook.git`
+- Auth: an ed25519 **deploy key** (write-enabled) on the repo. The private half
+  lives in the container (`~/.ssh/id_ed25519`, claude-owned, never committed);
+  only the public half is on GitHub.
+- Scope: **this repository only** — revoke anytime via the repo's
+  Settings → Deploy keys (one click; nothing else is affected).
+
+No tokens, no secrets in chat. The Path A / Path B sections below are kept as
+reference (how the remote could be set up, and alternatives).
 
 ---
 
