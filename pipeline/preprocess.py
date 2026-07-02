@@ -2,21 +2,23 @@
 """
 Pre-process the textbook .tex into a LaTeXML-safe copy.
 
-LaTeXML 0.8.7 hangs for many minutes when it has to load the expl3 kernel,
-which three lightly-used packages drag in.  Each has a trivial, faithful
-replacement (see spec.md Q1):
+PRINCIPLE: this file only adapts *valid* LaTeX that the web converter (LaTeXML)
+can't handle -- constructs that compile fine to PDF but that LaTeXML mis-parses.
+Genuine LaTeX *bugs* (things that also break a normal pdflatex build) are fixed
+in the author's source, NOT masked here -- otherwise a later source edit could
+silently un-fix them.  The author keeps writing standard, portable LaTeX
+(spec.md Q11); this step only bridges LaTeXML's limitations.
 
-  * lipsum      -> deleted (only ever loaded; \\lipsum is never called)
-  * tcolorbox   -> its sole use is \\tcbhighmath inside the \\card macro; shim
-                   it to \\boxed
-  * nicematrix  -> its sole use is one NiceTabular with \\Block bordered cells;
-                   map NiceTabular -> tabular and stub the two commands
+Two "fancy" packages work in pdflatex but make LaTeXML 0.8.7 hang for minutes
+(they drag in the expl3 kernel), so we drop them and shim their few uses.  Both
+target the preamble, so editing content never disturbs them:
 
-We also fix two author typos that break *any* LaTeX engine (surfaced by the
-conversion, not caused by it):
+  * tcolorbox   -> its sole use is \\tcbhighmath inside \\card; shim to \\boxed
+  * nicematrix  -> its sole use is one NiceTabular with \\Block cells; map
+                   NiceTabular -> tabular and stub the two commands
 
-  * \\footenote -> \\footnote
-  * \\mathcbf   -> \\mathbf
+(Other LaTeXML snags -- an unused lipsum import, a dcolumn D-column, and a few
+genuine typos -- were fixed in the source itself, so no shim is needed here.)
 
 Nothing here is destructive: the author's source is untouched; we emit a
 build-only copy.  This keeps the build pipeline AI-free and deterministic
@@ -40,14 +42,11 @@ PREAMBLE_SHIMS = r"""
 
 # (pattern, replacement, human-readable label). Order matters.
 SUBSTITUTIONS = [
-    (r"\\usepackage\{lipsum\}", "", "drop lipsum (unused; pulls expl3)"),
     (r"\\usepackage\[theorems,skins\]\{tcolorbox\}", "",
      "drop tcolorbox (pulls expl3; shimmed)"),
     (r"\\usepackage\{nicematrix\}", "",
      "drop nicematrix (pulls expl3; shimmed)"),
     (r"NiceTabular", "tabular", "map NiceTabular -> tabular"),
-    (r"\\footenote", r"\\footnote", "typo: \\footenote -> \\footnote"),
-    (r"\\mathcbf", r"\\mathbf", "typo: \\mathcbf -> \\mathbf"),
 ]
 
 
