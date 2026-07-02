@@ -19,7 +19,7 @@
 %\usepackage{tikz-cd}
 %\usepackage{amsfonts}
 \usepackage{graphicx}
-\usepackage{lipsum}
+%\usepackage{lipsum}  % removed: unused, and its expl3 dependency makes LaTeXML hang
 %\usepackage{xcolor}
 %\usepackage{mathrsfs}
 \usepackage[margin=1in]{geometry}
@@ -36,7 +36,7 @@
 % To make the multiplication tables / Vig square we need this
 \usepackage{dcolumn}
 \usepackage[table]{xcolor}
-\newcolumntype{2}{D{.}{}{1.0}}
+\newcolumntype{2}{c}  % simple centred column (was dcolumn's D{.}{}{1.0}; these tables have no decimals)
 
 
 %%%%%%%% Set Up Theorem-Style Formats %%%%%%%%%%%%%% 
@@ -6849,7 +6849,7 @@ Ciphertext:
 
 \subsection{Principles and terminology}
 
-\KS{terminology & basic ideas like code, codeword, length, error correction, etc.}
+\KS{terminology \& basic ideas like code, codeword, length, error correction, etc.}
 
 \subsection{Hamming distance}
 
@@ -6966,7 +6966,7 @@ Consider this code in the vector space $\FF_2^4$:
 \]
 We will adopt the convention of writing vectors as strings (without the parentheses and commas) to save space.
 
-This is a linear code.  This can be checked adding the vectors in all possible pairs to check they remain in the code\footenote{Another way to see this is to observe that $\mathbf{C}$ is exactly all the strings satisfying the linear conditions $v_1 = v_4$, $v_2+v_3+v_4 = 0$.}.
+This is a linear code.  This can be checked adding the vectors in all possible pairs to check they remain in the code\footnote{Another way to see this is to observe that $\mathbf{C}$ is exactly all the strings satisfying the linear conditions $v_1 = v_4$, $v_2+v_3+v_4 = 0$.}.
 \end{example}
 
 \subsubsection{Cosets}
@@ -6999,7 +6999,7 @@ Cosets have some very nice properties.
 \end{proposition}
 
 \begin{proof}
-    Suppose that $\mathbf{u} \in \mathbf{v} + \mathcbf{C}$.  Then $\mathbf{u} = \mathbf{v} + \mathbf{c}$ for some codeword $\mathbf{c} \in \mathbf{C}$.  So we have
+    Suppose that $\mathbf{u} \in \mathbf{v} + \mathbf{C}$.  Then $\mathbf{u} = \mathbf{v} + \mathbf{c}$ for some codeword $\mathbf{c} \in \mathbf{C}$.  So we have
     \[
     \mathbf{u} + \mathbf{C} = 
     \mathbf{v} + \mathbf{c} + \mathbf{C} = \mathbf{v} + \mathbf{C}.
@@ -7010,8 +7010,6 @@ Cosets have some very nice properties.
 
 
 
-
-\end{example}
 
 \subsection{Cyclic Codes}
 
