@@ -1,0 +1,160 @@
+================================================================================
+HELPCLAUDE.txt  —  Host/root setup for the Interactive Textbook project
+================================================================================
+
+WHY THIS FILE EXISTS
+--------------------
+Claude runs inside this container as the non-root user `claude` (uid 1000) and
+CANNOT install system software (no sudo). You (root) need to install the
+toolchain once. After that, Claude can do everything else (create Python venvs,
+install project-local pip/npm packages, run builds) on its own.
+
+Run every command in the "YOU RUN (as root)" sections below from inside this
+container as root. The "CLAUDE WILL DO" sections are listed only so you know
+what happens next — you do NOT need to run those.
+
+Current state of the box (probed 2026-07-02):
+  present : git, curl, perl
+  MISSING : python3, pip, node, npm, latexml, TeX, build tools, gcc/make
+  ANTHROPIC_API_KEY : not set
+
+IMPORTANT — Docker persistence
+  Anything you `apt-get install` into a *running* container is lost if the
+  container is later removed/recreated. If you want this to survive, either
+  (a) commit the container image after setup, or (b) bake these installs into a
+  Dockerfile. For now, installing into the running container is fine to get
+  going.
+
+
+================================================================================
+STEP 1 — YOU RUN (as root):  Required toolchain
+================================================================================
+This is the minimum needed to prototype the LaTeXML pipeline, the Python
+backend, and the Svelte frontend.
+
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get update
+  apt-get install -y \
+      latexml \
+      python3 python3-venv python3-pip python3-dev \
+      nodejs npm \
+      build-essential
+
+Notes:
+  - `latexml` pulls in Perl + its XML deps automatically.
+  - Debian 12 ships Node 18 and npm 9 — fine for Vite/SvelteKit. (Optional
+    upgrade to Node 20 LTS is in the APPENDIX if you'd rather.)
+  - `build-essential` (gcc/make) is there so any native pip/npm modules can
+    compile.
+
+
+================================================================================
+STEP 2 — YOU RUN (as root):  TeX + image tools  (recommended)
+================================================================================
+LaTeXML converts most math on its own and does NOT strictly require TeX. But
+the source uses a few things that fall back to rendering a real image:
+`tikz` (3 diagrams), `tcolorbox` (3 boxes), and `\includegraphics`. Installing
+a TeX subset + image converters lets those fall back cleanly instead of
+breaking the build. You can skip this to start faster and add it later if the
+pipeline prototype flags missing packages.
+
+  apt-get install -y \
+      texlive-latex-recommended \
+      texlive-latex-extra \
+      texlive-science \
+      texlive-pictures \
+      texlive-fonts-recommended \
+      texlive-plain-generic \
+      ghostscript dvisvgm imagemagick pdf2svg
+
+Package -> why:
+  texlive-latex-recommended  amsmath, amsthm, amssymb, hyperref, dcolumn
+  texlive-latex-extra        nicematrix, tcolorbox, xcolor[table]
+  texlive-science            physics (\ket, \bra in the quantum chapter)
+  texlive-pictures           tikz / pgf
+  texlive-fonts-recommended  standard fonts
+  ghostscript/dvisvgm/       raster+SVG conversion for image fallbacks
+    imagemagick/pdf2svg
+
+Heads up: this pulls ~1–2 GB.
+
+ImageMagick PDF policy (only if image conversion errors with "not authorized"):
+Debian's ImageMagick blocks PDF/PS by default. If Claude reports that, run:
+  sed -i 's/rights="none" pattern="PDF"/rights="read|write" pattern="PDF"/' \
+      /etc/ImageMagick-6/policy.xml
+
+
+================================================================================
+STEP 3 — YOU RUN (as root):  Anthropic API key
+================================================================================
+Claude cannot see or set this — you must provide it. The backend will read it
+from a project .env file. Replace sk-ant-... with the real key:
+
+  printf 'ANTHROPIC_API_KEY=%s\n' 'sk-ant-REPLACE-ME' > /workspace/.env
+  chown claude:claude /workspace/.env
+  chmod 600 /workspace/.env
+
+That's it — the file is owned by `claude` and readable only by that user, and
+the app loads it via python-dotenv. (Do not paste the key into the chat.)
+
+Optional, if you also want the key available in Claude's own shell for ad-hoc
+tests, append it to Claude's shell profile too:
+  printf "export ANTHROPIC_API_KEY='sk-ant-REPLACE-ME'\n" >> /home/claude/.bashrc
+
+
+================================================================================
+STEP 4 — YOU RUN (as root):  Verify, then hand back to Claude
+================================================================================
+Run this block and paste the output back into the chat so Claude knows what
+succeeded:
+
+  echo "== versions =="
+  for c in latexml latexmlpost python3 pip3 node npm gcc make; do
+    printf "%-12s " "$c"; command -v "$c" >/dev/null 2>&1 \
+      && { "$c" --version 2>&1 | head -1; } || echo MISSING
+  done
+  echo "== tex/image (optional) =="
+  for c in pdflatex kpsewhich dvisvgm gs convert pdf2svg; do
+    printf "%-10s " "$c"; command -v "$c" >/dev/null 2>&1 && echo ok || echo MISSING
+  done
+  echo "== api key file =="
+  [ -f /workspace/.env ] && echo ".env present, owner: $(stat -c '%U' /workspace/.env)" \
+    || echo ".env MISSING"
+
+
+================================================================================
+WHAT CLAUDE WILL DO AFTER (no action from you)
+================================================================================
+Once the above is installed, Claude will, as user `claude`, run things like:
+
+  # Python backend, isolated in a venv Claude owns
+  cd /workspace
+  python3 -m venv .venv
+  . .venv/bin/activate
+  pip install anthropic flask python-dotenv     # (+ fastapi/uvicorn if chosen)
+
+  # First real test of the pipeline against the actual textbook source
+  latexml  --dest=build/book.xml  textbook_source/introduction-to-crypto.tex
+  latexmlpost --dest=build/book.html  build/book.xml
+
+  # Svelte frontend scaffold
+  npm create vite@latest frontend -- --template svelte
+  cd frontend && npm install
+
+No global (system-wide) pip or npm installs are needed from you — Debian 12
+blocks global pip by design (PEP 668), and Claude will keep Python deps inside
+the venv and Node deps inside the project folder.
+
+
+================================================================================
+APPENDIX — Optional: Node 20 LTS instead of Debian's Node 18
+================================================================================
+Only if you want a newer Node. Otherwise skip.
+
+  apt-get install -y curl ca-certificates
+  curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+  apt-get install -y nodejs
+
+================================================================================
+END
+================================================================================
