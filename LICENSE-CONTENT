@@ -1,0 +1,36 @@
+Textbook Content License — Creative Commons Attribution-ShareAlike 4.0
+
+The textbook content in this repository — principally the files under
+`textbook_source/` (the LaTeX source and images of "The Alchemy of Mathematical
+Cryptography") and any prose excerpts of the book elsewhere in the repo — is:
+
+    Copyright (c) 2026 Katherine Stange
+    Licensed under the Creative Commons Attribution-ShareAlike 4.0
+    International License (CC BY-SA 4.0).
+
+You are free to:
+
+  * Share  — copy and redistribute the material in any medium or format.
+  * Adapt  — remix, transform, and build upon the material for any purpose,
+             even commercially.
+
+Under the following terms:
+
+  * Attribution — You must give appropriate credit to Katherine Stange, provide
+    a link to the license, and indicate if changes were made. You may do so in
+    any reasonable manner, but not in any way that suggests the licensor
+    endorses you or your use.
+  * ShareAlike  — If you remix, transform, or build upon the material, you must
+    distribute your contributions under this same license (CC BY-SA 4.0).
+  * No additional restrictions — You may not apply legal terms or technological
+    measures that legally restrict others from doing anything the license
+    permits.
+
+Full legal text:      https://creativecommons.org/licenses/by-sa/4.0/legalcode
+Human-readable deed:  https://creativecommons.org/licenses/by-sa/4.0/
+
+-------------------------------------------------------------------------------
+Scope: This CC BY-SA 4.0 license applies ONLY to the textbook content described
+above. The software in this repository — the build pipeline (`pipeline/`), the
+backend (`backend/`), and any other source code — is licensed separately under
+the MIT License; see the `LICENSE` file.

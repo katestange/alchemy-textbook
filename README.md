@@ -68,6 +68,14 @@ see `HELPCLAUDE.txt` and `GIT_SETUP.md`.
 
 ## License
 
-TODO — choose before making the repository public (the spec intends the
-reference implementation to be publicly distributable; MIT or CC-BY are common
-fits for an open educational project).
+Dual-licensed by the kind of file:
+
+- **Code** — the build pipeline (`pipeline/`), the backend (`backend/`), and any
+  other source code — is under the **MIT License** ([`LICENSE`](LICENSE)).
+- **Textbook content** — the LaTeX source and images under `textbook_source/`,
+  and prose excerpts of the book — is under **CC BY-SA 4.0**
+  (Attribution-ShareAlike; [`LICENSE-CONTENT`](LICENSE-CONTENT)).
+
+In short: reuse the code freely with attribution; reuse and adapt the textbook
+freely with attribution, but keep derivatives of the textbook under the same
+CC BY-SA 4.0 license. © 2026 Katherine Stange.
