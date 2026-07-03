@@ -68,6 +68,14 @@ export function fetchCachedContent(blockHash) {
   return getJSON(`/api/content/${blockHash}`);
 }
 
+// One request per chapter view (NOT per block): all artifacts visible to the
+// caller anchored anywhere in chapter n, so existing AI content appears as
+// soon as the chapter renders (Q13: "place any cached creatures that already
+// exist for the loaded chapter").
+export function fetchChapterContent(n) {
+  return getJSON(`/api/chapter-content/${n}`);
+}
+
 // Streams a generation over SSE-over-fetch. EventSource cannot POST, so the
 // response body is consumed manually via ReadableStream + SSEParser (see
 // sse.js) rather than the browser's built-in EventSource.

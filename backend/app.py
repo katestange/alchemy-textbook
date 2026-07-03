@@ -353,7 +353,14 @@ def caller_code(request: Request) -> str | None:
 
 @app.get("/api/manifest")
 def api_manifest():
-    return {"build_version": BUILD_VERSION, **MANIFEST}
+    # build_version served BOTH top-level and inside build{} — the two slice
+    # agents were handed slightly different contracts and the mismatch cost a
+    # real bug; belt and suspenders from here on.
+    return {
+        "build_version": BUILD_VERSION,
+        **MANIFEST,
+        "build": {**MANIFEST.get("build", {}), "build_version": BUILD_VERSION},
+    }
 
 
 @app.get("/api/chapters")
@@ -418,6 +425,34 @@ async def api_claim(request: Request, response: Response):
 
 
 # --- cached content --------------------------------------------------------
+
+
+@app.get("/api/chapter-content/{n}")
+def api_chapter_content(n: str, request: Request):
+    """All artifacts visible to the caller anchored anywhere in chapter n —
+    one request per chapter view, so existing content renders on load."""
+    if n not in CHAPTERS:
+        raise HTTPException(status_code=404, detail="no such chapter")
+    code = caller_code(request)
+    rows = db_query(
+        "SELECT id, content_hash, creature_type, response, status, created_at, "
+        "       created_by_code FROM cached_content "
+        "WHERE (section_id = ? OR section_id LIKE ?) AND status != 'removed' "
+        "  AND (status = 'approved' OR (? IS NOT NULL AND created_by_code = ?))",
+        (n, n + ".%", code, code),
+    )
+    return [
+        {
+            "id": r["id"],
+            "content_hash": r["content_hash"],
+            "creature_type": r["creature_type"],
+            "response": r["response"],
+            "status": r["status"],
+            "created_at": r["created_at"],
+            "own": bool(code) and r["created_by_code"] == code,
+        }
+        for r in rows
+    ]
 
 
 @app.get("/api/whoami")

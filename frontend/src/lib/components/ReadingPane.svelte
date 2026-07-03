@@ -3,7 +3,7 @@
   import { manifestStore } from '../stores/manifestStore.js';
   import { session } from '../stores/session.js';
   import { refreshRequired, budgetNotice } from '../stores/banners.js';
-  import { fetchChapterHtml, fetchCachedContent, streamGenerate } from '../api.js';
+  import { fetchChapterHtml, fetchCachedContent, fetchChapterContent, streamGenerate } from '../api.js';
   import { resolveSelectionAnchor } from '../selectionWalker.js';
   import { ensureResultBox, updateResultBox, showResultError } from '../inSituResult.js';
   import SelectionToolbar from './SelectionToolbar.svelte';
@@ -45,6 +45,37 @@
       loadError = `Could not load chapter ${n} from the backend.`;
     } finally {
       loading = false;
+    }
+    // After the chapter HTML is in the DOM, surface any existing AI content
+    // for this chapter (one request, not one per block).
+    await tick();
+    hydrateChapterContent(n);
+  }
+
+  async function hydrateChapterContent(n) {
+    let entries;
+    try {
+      entries = await fetchChapterContent(n);
+    } catch {
+      return; // best-effort: reading never depends on this
+    }
+    if (!entries || !entries.length) return;
+    // hash -> xml_id lookup from the manifest
+    const hashToId = new Map($manifestStore.blocks.map((b) => [b.content_hash, b.xml_id]));
+    // latest artifact per (block, creature)
+    const latest = new Map();
+    for (const e of entries) {
+      if (!(e.status === 'approved' || e.own)) continue;
+      const key = `${e.content_hash}:${e.creature_type}`;
+      const prev = latest.get(key);
+      if (!prev || new Date(e.created_at) > new Date(prev.created_at)) latest.set(key, e);
+    }
+    for (const e of latest.values()) {
+      const xmlId = hashToId.get(e.content_hash);
+      const anchorEl = xmlId && document.getElementById(xmlId);
+      if (!anchorEl) continue;
+      const box = ensureResultBox(anchorEl, e.creature_type, e.content_hash, e.status);
+      updateResultBox(box, e.response);
     }
   }
 

@@ -21,7 +21,13 @@ function createManifestStore() {
         sections: manifest.sections || [],
         blocks: manifest.blocks || [],
         blockMap: buildBlockMap(manifest),
-        buildVersion: manifest.build && manifest.build.build_version,
+        // Accept the version at top level (what the backend serves) or under
+        // build{} — the two agents were given slightly different contracts
+        // and this cost a real bug (every generate -> refresh_required).
+        buildVersion:
+          manifest.build_version ||
+          (manifest.build && manifest.build.build_version) ||
+          null,
         chapters: chapters || {}
       });
     }
