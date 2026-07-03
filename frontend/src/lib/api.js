@@ -84,8 +84,16 @@ export function fetchChapterContent(n) {
 // JSON.parse of the frame's `data:` payload ({event: 'delta', data: {text}},
 // {event: 'done', data: {content_id, cost_microdollars, ...}}, or
 // {event: 'error', data: {code}}).
+//
+// `messages` and `scope` are the chat/quiz panel's additions to the contract
+// (spec's BUILD section, Decision 65/66): `messages` is the client-held
+// conversation history (`[{role, content}]`, resent every turn since nothing
+// is persisted server-side), and `scope` is `"chapter"|"book"` (Decision 51's
+// "amp up" toggle). Both are omitted from the request body entirely
+// (JSON.stringify drops `undefined`) when not supplied, so the existing
+// in-situ tools (example/intuition) are unaffected.
 export async function streamGenerate(
-  { creatureType, blockHash, selectionText, prompt, buildVersion },
+  { creatureType, blockHash, selectionText, prompt, buildVersion, messages, scope },
   onEvent
 ) {
   let res;
@@ -99,7 +107,9 @@ export async function streamGenerate(
         block_hash: blockHash,
         selection_text: selectionText,
         prompt,
-        build_version: buildVersion
+        build_version: buildVersion,
+        messages,
+        scope
       })
     });
   } catch (networkErr) {

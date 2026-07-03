@@ -45,6 +45,15 @@ SESSION_LIFETIME_DAYS = 180  # "end of semester" (Decision 58 drops sessions the
 # v1 output cap: generous enough for one worked example, cheap enough to test.
 # Tune per creature once real usage is measured (Q14 action item).
 MAX_OUTPUT_TOKENS = 700
+# Conversational turns (chat/quiz) are a dialogue, not an essay -- shorter cap.
+MAX_OUTPUT_TOKENS_CONVERSATIONAL = 600
+
+# Creatures that hold a client-side conversation (Decision 66): history is
+# resent per turn, nothing is written to cached_content, no content_id.
+CONVERSATIONAL_CREATURES = {"chat", "quiz"}
+# Guardrail: reject absurdly long resent histories (client should have started
+# a new conversation long before this).
+MAX_CONVERSATION_MESSAGES = 40
 
 # ---------------------------------------------------------------------------
 # Model selection and pricing (Q3 / Q14, Decision 53)
@@ -140,7 +149,10 @@ CREATURE_INSTRUCTIONS = {
         "solution wrapped EXACTLY between the markers [[solution]] and "
         "[[/solution]] (the reader hides it behind a 'Show solution' toggle, "
         "so the student can attempt the variation first and then check "
-        "their work)."
+        "their work). Never begin your response with a title or a bold "
+        "header line of any kind (no \"**Worked Example: ...**\" or "
+        "similar) -- begin mid-thought, with the mathematics itself or a "
+        "plain sentence of prose."
     ),
     # V1 PROMPT -- intuition creature (dashboard deliverable; iterate after
     # quality testing like the example prompt above).
@@ -153,6 +165,43 @@ CREATURE_INSTRUCTIONS = {
         "re-deriving it; small concrete numbers are welcome, full formal "
         "proofs are not. Write flowing prose only: no headings, no lists of "
         "steps, and no [[solution]] markers."
+    ),
+    # V1 PROMPT -- chat creature (the Cat): open-ended conversation panel.
+    "chat": (
+        "You are the Cat, a warm and curious study companion who lives in "
+        "the margins of this textbook. The student has opened a chat with "
+        "you; the quoted selection below (if any) is what they were reading "
+        "when they called you over. This is a live dialogue, not an essay: "
+        "keep each turn short -- a few sentences up to one short paragraph "
+        "-- and end turns in a way that invites the student to think or "
+        "respond, in the Socratic spirit of the core instructions. Stay "
+        "grounded in the provided text: base what you say on the chapter "
+        "(or book) text you were given, and say so honestly when something "
+        "is outside it. You may use the table of contents to point forward "
+        "(\"that's coming in Chapter 5\") when the student asks about "
+        "something the current chapter doesn't cover. The student may paste "
+        "new quoted passages from the book into the conversation; treat "
+        "those as fresh context. Never use headings, never title your "
+        "responses, and never use [[solution]] markers."
+    ),
+    # V1 PROMPT -- quiz creature (the Raven): interactive quiz dialogue.
+    "quiz": (
+        "You are the Raven, who runs an interactive quiz as a dialogue. "
+        "On your FIRST turn do not ask any quiz question yet: briefly ask "
+        "the student what kind of quiz they want (concept checks, worked "
+        "problems, or proof sketches) and how many questions, then wait. "
+        "Once they choose, ask exactly ONE question at a time, grounded in "
+        "the quoted selection and the chapter text, and stop -- wait for "
+        "the student's answer before saying anything more. After each "
+        "answer, give brief feedback: warm and encouraging, pointing at "
+        "what was right and nudging (not lecturing) on what was off, then "
+        "ask the next question. Keep a running tally, and after the final "
+        "question give the score with a short, kind summary of what to "
+        "review (you may point to sections by number using the table of "
+        "contents). Keep every turn short -- this is a conversation. Never "
+        "use headings, never title your responses, and never use "
+        "[[solution]] markers or reveal an answer before the student has "
+        "attempted it."
     ),
 }
 DEFAULT_CREATURE_INSTRUCTION = (
@@ -169,12 +218,13 @@ BUILD_VERSION: str = ""
 CHAPTERS: dict = {}
 BLOCKS_BY_HASH: dict = {}
 CHAPTER_PREFIX_TEXT: dict = {}  # top-level chapter number -> full chapter text
+BOOK_PREFIX_TEXT: str = ""      # all chapters in order (scope=book, Decision 51)
 TOC_TEXT: str = ""
 
 
 def load_build_artifacts() -> None:
     global MANIFEST, BUILD_VERSION, CHAPTERS, BLOCKS_BY_HASH
-    global CHAPTER_PREFIX_TEXT, TOC_TEXT
+    global CHAPTER_PREFIX_TEXT, BOOK_PREFIX_TEXT, TOC_TEXT
 
     raw = MANIFEST_PATH.read_bytes()
     BUILD_VERSION = hashlib.sha256(raw).hexdigest()[:12]
@@ -200,6 +250,19 @@ def load_build_artifacts() -> None:
             f"FULL TEXT OF CHAPTER {chapter}: {title}\n\n{body}"
         )
 
+    # Full-book prefix (scope=book "amp up", Decision 51): every chapter's
+    # text in reading order. Built once at startup, byte-identical across
+    # requests, so it rides its own shared 1h cache entry like the chapter
+    # prefixes do.
+    chapter_order: list[str] = []
+    for s in MANIFEST.get("sections", []):
+        top = s["id"].split(".")[0]
+        if top not in chapter_order:
+            chapter_order.append(top)
+    BOOK_PREFIX_TEXT = "FULL TEXT OF THE BOOK\n\n" + "\n\n\n".join(
+        CHAPTER_PREFIX_TEXT[c] for c in chapter_order if c in CHAPTER_PREFIX_TEXT
+    )
+
     # Table of contents: every section id + title (Decision 51).
     toc_lines = [
         f"{s['id']}  {s['title']}" for s in MANIFEST.get("sections", [])
@@ -207,13 +270,15 @@ def load_build_artifacts() -> None:
     TOC_TEXT = "TABLE OF CONTENTS OF THE BOOK\n\n" + "\n".join(toc_lines)
 
 
-def build_system_blocks(chapter: str) -> list[dict]:
+def build_system_blocks(chapter: str, scope: str = "chapter") -> list[dict]:
     """Shared prefix (Decision 52): byte-identical across students and
-    creatures for a given chapter + build. Nothing volatile in here.
-    The 1h-TTL cache breakpoint sits on the LAST shared block."""
+    creatures for a given chapter (or, for scope="book", the whole book)
+    + build. Nothing volatile in here. The 1h-TTL cache breakpoint sits
+    on the LAST shared block."""
+    body = BOOK_PREFIX_TEXT if scope == "book" else CHAPTER_PREFIX_TEXT[chapter]
     return [
         {"type": "text", "text": CORE_SYSTEM_PROMPT},
-        {"type": "text", "text": CHAPTER_PREFIX_TEXT[chapter]},
+        {"type": "text", "text": body},
         {
             "type": "text",
             "text": TOC_TEXT,
@@ -570,28 +635,78 @@ async def api_generate(request: Request):
         user_prompt = body.get("prompt") or ""
         chapter = block["section_id"].split(".")[0]
         model = MODEL_BY_CREATURE.get(creature_type, DEFAULT_MODEL)
+        conversational = creature_type in CONVERSATIONAL_CREATURES
+
+        # d2. Conversational fields (Decision 66): the client holds the
+        # conversation and resends it every turn; scope is the amp-up
+        # toggle (Decision 51). Both are ignored for one-shot creatures.
+        scope = body.get("scope") or "chapter"
+        if scope not in ("chapter", "book"):
+            yield sse("error", {"code": "invalid_scope"})
+            return
+        history = body.get("messages") or []
+        if conversational:
+            if len(history) > MAX_CONVERSATION_MESSAGES:
+                yield sse("error", {"code": "conversation_too_long"})
+                return
+            for m in history:
+                if (
+                    not isinstance(m, dict)
+                    or m.get("role") not in ("user", "assistant")
+                    or not isinstance(m.get("content"), str)
+                    or not m["content"].strip()
+                ):
+                    yield sse("error", {"code": "invalid_messages"})
+                    return
 
         # e. Prompt assembly (Decisions 52/59): shared cacheable prefix
         # first (system blocks), volatile per-request content after the
-        # breakpoint as the user message.
-        system_blocks = build_system_blocks(chapter)
+        # breakpoint. For scope=book (chat/quiz amp-up) the prefix is the
+        # full book; one-shot creatures always use the chapter prefix.
+        system_blocks = build_system_blocks(
+            chapter, scope if conversational else "chapter"
+        )
         creature_instruction = CREATURE_INSTRUCTIONS.get(
             creature_type, DEFAULT_CREATURE_INSTRUCTION
         )
-        user_message = (
-            f"{creature_instruction}\n\n"
-            f"Student's request: {user_prompt}\n\n"
-            f"Student's selection from the textbook:\n"
-            f"<selection>\n{selection_text}\n</selection>"
-        )
+        if conversational:
+            # Conversation shape (Decision 66): creature instruction and the
+            # opening quoted selection in the first user turn, then the
+            # client-held history verbatim, then this turn's prompt. Later
+            # quoted passages arrive inside message content itself.
+            if not user_prompt.strip():
+                # e.g. the quiz opener: the student summoned the creature
+                # without typing anything; the model must still get a
+                # non-empty final user turn.
+                user_prompt = "(The student is ready -- please begin.)"
+            opening = (
+                f"{creature_instruction}\n\n"
+                f"Student's selection from the textbook:\n"
+                f"<selection>\n{selection_text}\n</selection>"
+            )
+            api_messages = (
+                [{"role": "user", "content": opening}]
+                + [{"role": m["role"], "content": m["content"]} for m in history]
+                + [{"role": "user", "content": user_prompt}]
+            )
+            max_tokens = MAX_OUTPUT_TOKENS_CONVERSATIONAL
+        else:
+            user_message = (
+                f"{creature_instruction}\n\n"
+                f"Student's request: {user_prompt}\n\n"
+                f"Student's selection from the textbook:\n"
+                f"<selection>\n{selection_text}\n</selection>"
+            )
+            api_messages = [{"role": "user", "content": user_message}]
+            max_tokens = MAX_OUTPUT_TOKENS
 
         # f. Call Anthropic with streaming; forward text deltas.
         try:
             async with anthropic_client.messages.stream(
                 model=model,
-                max_tokens=MAX_OUTPUT_TOKENS,
+                max_tokens=max_tokens,
                 system=system_blocks,
-                messages=[{"role": "user", "content": user_message}],
+                messages=api_messages,
             ) as stream:
                 async for text in stream.text_stream:
                     yield sse("delta", {"text": text})
@@ -626,23 +741,28 @@ async def api_generate(request: Request):
             "WHERE code = ?",
             (student_cost, code),
         )
-        content_id = db_execute(
-            "INSERT INTO cached_content "
-            "(content_hash, selection_text, creature_type, response, model_used, "
-            " cost_microdollars, status, created_at, section_id, created_by_code) "
-            "VALUES (?, ?, ?, ?, ?, ?, 'unreviewed', ?, ?, ?)",
-            (
-                block["content_hash"],
-                selection_text,
-                creature_type,
-                response_text,
-                model,
-                student_cost,
-                ts,
-                block["section_id"],
-                code,
-            ),
-        )
+        # Chat/quiz turns are ephemeral (Decisions 41/66): never written to
+        # cached_content, no content_id -- the client alone holds the
+        # conversation. One-shot creature output is cached as before.
+        content_id = None
+        if not conversational:
+            content_id = db_execute(
+                "INSERT INTO cached_content "
+                "(content_hash, selection_text, creature_type, response, model_used, "
+                " cost_microdollars, status, created_at, section_id, created_by_code) "
+                "VALUES (?, ?, ?, ?, ?, ?, 'unreviewed', ?, ?, ?)",
+                (
+                    block["content_hash"],
+                    selection_text,
+                    creature_type,
+                    response_text,
+                    model,
+                    student_cost,
+                    ts,
+                    block["section_id"],
+                    code,
+                ),
+            )
 
         # h. Terminal event (includes the authoritative remaining budget so
         # the client never has to approximate it).

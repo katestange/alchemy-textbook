@@ -8,6 +8,8 @@
   import { ensureResultBox, updateResultBox, showResultError, removeResultItem } from '../inSituResult.js';
   import SelectionToolbar from './SelectionToolbar.svelte';
   import PromptBox from './PromptBox.svelte';
+  import ChatPanel from './ChatPanel.svelte';
+  import { chatStore } from '../stores/chatStore.js';
 
   export let chapter;
 
@@ -156,6 +158,18 @@
 
   function openPrompt(creatureType) {
     if (!toolbar) return;
+    // Chat and quiz are side-panel creatures (Decision 65) -- they open the
+    // conversation panel rather than the in-situ prompt box.
+    if (creatureType === 'chat' || creatureType === 'quiz') {
+      chatStore.open({
+        creatureType,
+        selectionText: toolbar.selectionText,
+        anchor: toolbar.anchor,
+        chapterNum: chapter
+      });
+      toolbar = null;
+      return;
+    }
     promptBox = {
       top: toolbar.top,
       left: toolbar.left,
@@ -163,6 +177,14 @@
       anchor: toolbar.anchor,
       selectionText: toolbar.selectionText
     };
+    toolbar = null;
+  }
+
+  // While a panel is open, selecting reader text offers "Quote into
+  // conversation" instead of a new panel (Decision 65, item 6).
+  function quoteSelection() {
+    if (!toolbar) return;
+    chatStore.queueQuote(toolbar.selectionText);
     toolbar = null;
   }
 
@@ -256,7 +278,8 @@
   });
 </script>
 
-<div class="reading-pane">
+<div class="reading-pane" class:panel-open={$chatStore.open}>
+ <div class="reading-main">
   {#if loading}
     <div class="page-shell"><p>Loading chapter {chapter}…</p></div>
   {:else if loadError}
@@ -272,7 +295,13 @@
       {@html html}
     </div>
     {#if toolbar}
-      <SelectionToolbar top={toolbar.top} left={toolbar.left} onSelect={openPrompt} />
+      <SelectionToolbar
+        top={toolbar.top}
+        left={toolbar.left}
+        mode={$chatStore.open ? 'quote' : 'creatures'}
+        onSelect={openPrompt}
+        onQuote={quoteSelection}
+      />
     {/if}
     {#if promptBox}
       <PromptBox
@@ -284,4 +313,48 @@
       />
     {/if}
   {/if}
+ </div>
+ {#if $chatStore.open}
+   <aside class="panel-slot">
+     <ChatPanel />
+   </aside>
+ {/if}
 </div>
+
+<style>
+  /* Decision 65: the panel PUSHES the reading column, never overlays. */
+  .reading-pane {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .reading-main {
+    flex: 1 1 auto;
+    min-width: 0;
+    position: relative;
+  }
+  .panel-slot {
+    flex: 0 0 26rem;
+    max-width: 26rem;
+    position: sticky;
+    top: 0;
+    max-height: 100vh;
+    display: flex;
+  }
+  /* Mobile / narrow: the panel becomes a full-width drawer (Q11). */
+  @media (max-width: 60rem) {
+    .reading-pane.panel-open {
+      flex-direction: column;
+    }
+    .panel-slot {
+      position: fixed;
+      inset: auto 0 0 0;
+      max-width: none;
+      flex: none;
+      width: 100%;
+      max-height: 70vh;
+      z-index: 40;
+      box-shadow: 0 -4px 16px rgba(38, 32, 25, 0.25);
+    }
+  }
+</style>
