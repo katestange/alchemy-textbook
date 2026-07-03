@@ -163,17 +163,26 @@ These assignments are starting points; adjust based on quality testing.
 **Context window strategy:**
 
 Each AI call includes:
-- **System prompt:** role, tool-specific instructions, author voice samples,
-  output format constraints.
-- **Textbook context:** the current section + all prior sections in the current
-  chapter.  This means the AI "has read what the student has read."
-- **For chat only:** full textbook (so it can reference later material and
-  give a complete picture).
-- **User's selection:** the specific text the user highlighted or the scope
-  they indicated.
+- **Shared prefix (cacheable):** core system prompt + author voice samples +
+  the **full text of the current chapter** + the book's table of contents
+  (all chapter/section titles, so the AI can point forward: "that's covered in
+  Chapter 5").  Since a reader page *is* a chapter (Q13), "what the student is
+  looking at" and "what the AI sees" coincide.
+- **After the cache breakpoint (per-request):** the creature-specific
+  instructions, the user's selection, and (for chat) the conversation so far.
+- **Chat "amp up":** the chat panel has a toggle that swaps the chapter prefix
+  for the **full textbook** -- for cross-chapter questions.  Costs more (and is
+  labeled as such); it rides its own shared cache entry like any other prefix.
+
+**Prefix ordering is deliberate** (Decision 52): everything stable and shared
+comes *before* the cache breakpoint, everything per-creature/per-student comes
+*after*, so all nine creatures on the same chapter share ONE cache entry, and
+one entry serves the whole class (the cache is organization-scoped -- all
+students ride the instructor key).  The prefix must be byte-identical across
+requests: no timestamps, student IDs, or other volatile content in it.
 
 More context = better answers but higher cost.  The per-chapter approach is the
-sweet spot for most tools.  Monitor costs and adjust if needed.
+sweet spot; the amp-up toggle covers the rest.  Monitor costs and adjust.
 
 **Streaming:** All AI responses are streamed.  The backend proxies the stream
 from the Claude API to the browser via server-sent events (SSE).  Benefits:
@@ -740,9 +749,9 @@ conversations aren't stored.  Only the artifacts that appear in the text are."
 | Column | Type | Notes |
 |--------|------|-------|
 | `code` | TEXT PRIMARY KEY | e.g. "CRYPTO-7X4M-Q2" |
-| `budget_cents` | INTEGER | Total budget in cents |
-| `spent_cents` | INTEGER DEFAULT 0 | Running total |
-| `daily_limit_cents` | INTEGER | Safety cap per day |
+| `budget_microdollars` | INTEGER | Total budget in microdollars ($5 = 5,000,000; sub-cent Haiku calls must not round away -- Decision 53) |
+| `spent_microdollars` | INTEGER DEFAULT 0 | Running total |
+| `daily_limit_microdollars` | INTEGER | Safety cap per day |
 | `created_at` | TIMESTAMP | |
 | `revoked` | BOOLEAN DEFAULT FALSE | |
 
@@ -765,7 +774,7 @@ conversations aren't stored.  Only the artifacts that appear in the text are."
 | `creature_type` | TEXT | "example", "justify", "counterexample", "intuition", "applet", "fun", "quiz", "summarize", "eureka" |
 | `response` | TEXT | The AI's final response (after any refinements) |
 | `model_used` | TEXT | e.g. "claude-haiku-4-5-20251001" |
-| `cost_cents` | INTEGER | What this generation cost |
+| `cost_microdollars` | INTEGER | What this generation cost (student-ledger share) |
 | `status` | TEXT DEFAULT 'unreviewed' | "unreviewed", "approved", "flagged", "removed" |
 | `created_at` | TIMESTAMP | |
 | `section_id` | TEXT | Section from content manifest |
@@ -792,11 +801,16 @@ keeps the privacy posture -- see Q6.  Cost tracking for budget enforcement is in
 | Column | Type | Notes |
 |--------|------|-------|
 | `id` | INTEGER PRIMARY KEY | |
-| `code` | TEXT REFERENCES invite_codes | |
+| `code` | TEXT REFERENCES invite_codes | NULL for instructor-ledger rows |
+| `ledger` | TEXT | "student" or "instructor" (Decision 53) |
 | `creature_type` | TEXT | |
-| `cost_cents` | INTEGER | |
+| `cost_microdollars` | INTEGER | |
 | `section_id` | TEXT | |
 | `created_at` | TIMESTAMP | |
+
+One API response may write two rows: the student's as-if-warm share
+(`ledger='student'`, their code) and, when that request re-warmed a cold
+prefix, the cache-write premium (`ledger='instructor'`, `code=NULL`).
 
 **`content_manifest`** -- snapshot of current build's content blocks
 
@@ -851,14 +865,22 @@ top of it** rather than re-rendering the content itself.  Rationale:
 **Page composition (backend routes consumed by the SPA):**
 ```
 /                     SPA shell (index.html + Svelte bundle)
-/section/<id>         pre-rendered LaTeXML HTML for one section
+/chapter/<n>          pre-rendered LaTeXML HTML for one chapter
 /manifest             JSON: blocks, hashes, section tree, block types
 /content/<hash>       cached AI artifacts anchored to a block
 /api/generate (SSE)   streamed AI generation for a creature
 ```
-The SPA fetches the section HTML + manifest, injects the HTML into the reading
+**A reader page is a chapter** (Decision 50): the build splits the book at
+top-level `\section` boundaries (`latexmlpost --split`), giving ~9 long
+scrolling pages.  Rationale: preserves the continuous-reading "textbook first"
+feel (Q11); page = AI-context unit (Q3), so no cross-page bookkeeping; and with
+native MathML (Decision 49) even the largest chapter is cheap to render.
+Within-chapter navigation uses the LaTeXML `id` anchors (the manifest's
+`xml_id`s double as scroll targets), so the ToC's "3.2" jumps instantly.
+
+The SPA fetches the chapter HTML + manifest, injects the HTML into the reading
 pane, then walks the manifest to wire up selection handling and to place any
-cached creatures that already exist for the loaded section.
+cached creatures that already exist for the loaded chapter.
 
 **Selection -> creature lifecycle (component view):**
 1. `SelectionWatcher` -- listens for text selection and section-number clicks,
@@ -936,31 +958,55 @@ before launch):
 The tool -> tier assignments live in Q3 (Haiku for example/fun/quiz/summarize,
 Sonnet for justify/counterexample/intuition/applet/chat).
 
-**Per-generation estimate.**  Context per call = system prompt + author-voice
-samples + current section + prior sections in the chapter (Q3): ballpark 3-8K
-input tokens, 300-1,500 output tokens for an in-situ tool.
+**The caching architecture is the heart of the cost model** (Decisions 52-53).
+Every request is assembled as `[shared prefix: core prompt + voice samples +
+chapter text + ToC] -> cache breakpoint -> [creature instructions + selection +
+conversation]`.  The shared prefix is identical for every student and every
+creature on a chapter, so the whole class shares ONE cache entry per chapter
+(~15-25K tokens), plus one for the full book (~120-150K, amp-up chat only).
+Cache entries use the **1-hour TTL**, and every hit resets the clock -- so an
+evening of study traffic keeps a prefix warm off a single write.
 
-| Tool class | Typical in / out | Model | Est. cost |
-|------------|------------------|-------|-----------|
-| Haiku tool (example, quiz, fun, summarize) | ~5K / ~800 | Haiku | ~$0.01 |
-| Sonnet tool (justify, counterexample, intuition, applet) | ~6K / ~1,200 | Sonnet | ~$0.035 |
-| Chat turn (full-textbook context) | ~40-80K / ~1,000 | Sonnet | ~$0.15 uncached; **~$0.02 cached** |
+**Two ledgers -- instructor pays for warmth, students pay for usage**
+(Decision 53).  There is no separate "warmup" request.  Every Claude response
+reports its usage split (cache-written / cache-read / fresh / output tokens);
+the backend's ledger applies one rule:
 
-**Prompt caching is the dominant lever.**  The textbook context is stable
-across calls, so caching the shared prefix (system prompt + voice samples +
-textbook context) cuts its input cost by ~90% on every repeat.  For chat
-especially -- full-textbook context -- caching is the difference between viable
-and not.  The backend should cache-tag that stable prefix on every call.
+- **Student ledger:** priced *as if the cache were warm* -- the ~0.1x cache-read
+  rate on the prefix portion, plus their own per-request tokens and the output.
+  Every student pays the same regardless of arrival order; nobody is dinged for
+  being first of the night.
+- **Instructor ledger:** the cache-write premium, whenever a request happens to
+  be the one that (re)warms a cold prefix.  Purely usage-driven: a quiet day
+  costs $0, a due-date evening costs a handful of writes.
+
+Instructor exposure (Sonnet, 1h TTL): ~$0.11 per chapter cold-start, ~$0.68 per
+full-book cold-start; a busy evening with all chapters active ~= $2-3; semester
+~= tens of dollars.  This is the "cost of the textbook being alive."
+
+**Per-generation estimate** (student ledger, chapter prefix warm-priced):
+
+| Tool class | Typical in / out | Model | Est. student cost |
+|------------|------------------|-------|-------------------|
+| Haiku tool (example, quiz, fun, summarize) | ~20K read + ~1K / ~800 | Haiku | ~$0.007 |
+| Sonnet tool (justify, counterexample, intuition, applet) | ~20K read + ~1K / ~1,200 | Sonnet | ~$0.03 |
+| Chat turn (chapter scope) | ~20K read + conv. / ~800 | Sonnet | ~$0.015-0.02 |
+| Chat turn (full-book amp-up) | ~130K read + conv. / ~800 | Sonnet | ~$0.05-0.06 |
+
+A moderate chapter-scoped conversation lands around **$0.10-0.20 all-in**.
 
 **Budget math:**
 
-- At a blended ~$0.02 / generation (caching on, mixed tiers), a $5 student
-  budget funds ~250 generations -- comfortably a semester of exploratory use.
-- 35 students x $5 = **$175 / semester ceiling**, hard-capped by Q5's
-  enforcement.
-- Community caching (Q6) drives realized spend *below* the ceiling: popular
-  content is generated once and served free thereafter.
+- A $5 student budget funds roughly **30-50 real chat conversations** or a few
+  hundred one-shot tool generations -- comfortably a semester of use.
+- 35 students x $5 = **$175 / semester ceiling** on the student side,
+  hard-capped by Q5's enforcement; instructor warmth adds tens of dollars,
+  uncapped but self-limiting (it only accrues when students are active).
+- Community caching (Q6) drives realized spend *below* the ceiling: approved
+  content is generated once and served from the database free thereafter.
 - The per-student daily rate limit (Q5) caps a single runaway user.
+- Ledger precision: costs are stored in **microdollars** (a ~$0.007 Haiku call
+  must not round to 0 or 1 cent) -- see Q12.
 
 **Not a cost factor:** the Batch API's 50% discount doesn't apply (all calls are
 interactive / streamed); SageCell is free (Q4); hosting is free-tier initially
@@ -1048,6 +1094,10 @@ default.
 | 47 | Server is the sole cache writer; BYO keys proxied per-request and never stored; no direct browser->Anthropic path (Q5/Q6) | 2026-07-03 |
 | 48 | Moderate everything: all AI content tagged with its invite code and instructor-approved before public; creator sees their own immediately (Q6/Q12) | 2026-07-03 |
 | 49 | Base math as native MathML (browser MathML Core, no JS, arXiv-style); AI math via client-side Temml (LaTeX->MathML); one pinned math webfont sized to the body; supersedes KaTeX (Q11/Q13) | 2026-07-03 |
+| 50 | Reader pages are chapters: build splits at top-level \section via latexmlpost --split (~9 long scrolling pages); ToC jumps use xml_id anchors (Q13) | 2026-07-03 |
+| 51 | Chat context is chapter-scoped + ToC, same as other tools; chat panel has a labeled "amp up" toggle for full-textbook context (Q3) | 2026-07-03 |
+| 52 | Shared-prefix cache discipline: [core prompt + voice + chapter text + ToC] before the breakpoint, everything per-creature/per-student after; prefix byte-identical, no volatile content; one entry serves all creatures and all students (Q3/Q14) | 2026-07-03 |
+| 53 | Instructor-funded cache warmth via billing attribution: 1-hour TTL; students priced as-if-warm (cache-read rate), the write premium lands on an instructor ledger; no scheduled warmups; ledgers in microdollars (Q14/Q12) | 2026-07-03 |
 
 ---
 
