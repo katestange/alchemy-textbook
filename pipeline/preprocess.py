@@ -40,13 +40,25 @@ PREAMBLE_SHIMS = r"""
 %% ------------------------------------------------------------
 """
 
-# (pattern, replacement, human-readable label). Order matters.
+# (pattern, replacement, human-readable label, min_count, max_count).
+# Order matters.  Counts are FAIL-CLOSED: if a substitution matches fewer
+# than min_count (or more than max_count) times, we abort the build instead
+# of silently emitting a .tex that will hang LaTeXML for ~10 minutes (e.g.
+# because the author reworded a \usepackage line and the expl3-pulling
+# package stayed in).  If a count trips after a legitimate source edit,
+# update the pattern/count here deliberately.
+# Each pattern is anchored to the uncommented part of a line
+# ("^([^%\n]*?)" + keep the prefix), so a commented-out `%\usepackage...`
+# (the source has one at line 11) neither matches nor counts.
 SUBSTITUTIONS = [
-    (r"\\usepackage\[theorems,skins\]\{tcolorbox\}", "",
-     "drop tcolorbox (pulls expl3; shimmed)"),
-    (r"\\usepackage\{nicematrix\}", "",
-     "drop nicematrix (pulls expl3; shimmed)"),
-    (r"NiceTabular", "tabular", "map NiceTabular -> tabular"),
+    (r"(?m)^([^%\n]*?)\\usepackage\[theorems,skins\]\{tcolorbox\}", r"\1",
+     "drop tcolorbox (pulls expl3; shimmed)", 1, 1),
+    (r"(?m)^([^%\n]*?)\\usepackage\{nicematrix\}", r"\1",
+     "drop nicematrix (pulls expl3; shimmed)", 1, 1),
+    # Only rewrite the environment delimiters, never prose that happens to
+    # mention NiceTabular.  \2 keeps begin/end as matched.
+    (r"(?m)^([^%\n]*?)\\(begin|end)\{NiceTabular\}", r"\1\\\2{tabular}",
+     "map NiceTabular env -> tabular", 2, None),
 ]
 
 
@@ -57,9 +69,21 @@ def main() -> int:
     text = SRC.read_text(encoding="utf-8")
 
     print(f"pre-processing {SRC} ({len(text.splitlines())} lines)")
-    for pattern, repl, label in SUBSTITUTIONS:
+    for pattern, repl, label, min_n, max_n in SUBSTITUTIONS:
         text, n = re.subn(pattern, repl, text)
         print(f"  [{n:>2}x] {label}")
+        if n < min_n or (max_n is not None and n > max_n):
+            expected = (f"exactly {min_n}" if max_n == min_n
+                        else f">= {min_n}" + (f", <= {max_n}" if max_n else ""))
+            print(f"ERROR: substitution '{label}' matched {n}x, expected "
+                  f"{expected}.\n"
+                  f"  The source no longer matches this shim's pattern "
+                  f"(pattern: {pattern}).\n"
+                  f"  Refusing to continue: an unshimmed expl3 package would "
+                  f"hang LaTeXML.\n"
+                  f"  Fix: update SUBSTITUTIONS in pipeline/preprocess.py to "
+                  f"match the current source.", file=sys.stderr)
+            return 1
 
     # Inject shims once, right before \begin{document}.  Use str.replace, not
     # re.sub: the replacement contains backslash macros (\providecommand,
