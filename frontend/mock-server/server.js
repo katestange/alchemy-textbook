@@ -56,10 +56,26 @@ async function readBody(req) {
   return Buffer.concat(chunks).toString('utf-8');
 }
 
-const CANNED_DELTAS = [
+// "example" canned response also exercises: math split across two deltas
+// (both inline and display) and a [[solution]]...[[/solution]] block split
+// across a delta boundary (Decision 62), plus a markdown list (Decision 63).
+const CANNED_DELTAS_EXAMPLE = [
   'Sure — here', ' is a worked example', '.\n\nSuppose $a', '=3$ and $b=4$.',
   ' Then by the Pythagorean relation ', '$$a^2 + b', '^2 = c^2$$', ' so ',
-  '$c = 5$', '.\n\nThis is the ', '(3,4,5) triple.'
+  '$c = 5$', '.\n\nThis is the ', '(3,4,5) triple.',
+  '\n\n**Try it yourself:** what is $c$ if $a=6$ and $b=8$?\n\n',
+  '[[solution]]By the same relation, ', '$c = \\sqrt{6^2+8^2} = 10$', '.[[/solution]]',
+  '\n\nSteps used:\n- square each leg\n- add them\n- take the square root'
+];
+
+// "intuition" canned response exercises plain markdown (bold/italic) with no
+// math and no solution marker, to check that path renders exactly as before.
+const CANNED_DELTAS_INTUITION = [
+  'Think of it ', 'this way: a *Pythagorean triple* is just three whole ',
+  'numbers that happen to fit together as the sides of a right triangle.\n\n',
+  'The **key idea** is that ', '$a^2+b^2=c^2$', ' is really just the Pythagorean ',
+  'theorem in disguise — ', 'nothing more than "the areas of the two small ',
+  'squares add up to the area of the big one."'
 ];
 
 async function handleGenerate(req, res) {
@@ -84,7 +100,8 @@ async function handleGenerate(req, res) {
     Connection: 'keep-alive'
   });
 
-  for (const piece of CANNED_DELTAS) {
+  const deltas = payload.creature_type === 'intuition' ? CANNED_DELTAS_INTUITION : CANNED_DELTAS_EXAMPLE;
+  for (const piece of deltas) {
     res.write(`event: delta\ndata: ${JSON.stringify({ text: piece })}\n\n`);
     // eslint-disable-next-line no-await-in-loop
     await new Promise((r) => setTimeout(r, 120));
@@ -137,11 +154,22 @@ const server = http.createServer(async (req, res) => {
       await loadManifest(); // ensures DEMO_HASH is populated
       const hash = decodeURIComponent(contentMatch[1]);
       if (hash === DEMO_HASH) {
+        // Two artifacts on the same block, so the collapsed-chip cluster
+        // (Decision 61) shows two chips side by side on hydrate.
         return sendJSON(res, 200, [
           {
             id: 1,
             creature_type: 'example',
-            response: 'A previously-approved example: $2+2=4$.',
+            response:
+              'A previously-approved example: $2+2=4$.\n\n[[solution]]And doubling again gives $8$.[[/solution]]',
+            status: 'approved',
+            created_at: new Date().toISOString(),
+            own: false
+          },
+          {
+            id: 2,
+            creature_type: 'intuition',
+            response: 'The **intuition**: addition is just *combining* two piles and counting the total.',
             status: 'approved',
             created_at: new Date().toISOString(),
             own: false

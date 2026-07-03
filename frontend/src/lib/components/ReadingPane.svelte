@@ -5,7 +5,7 @@
   import { refreshRequired, budgetNotice } from '../stores/banners.js';
   import { fetchChapterHtml, fetchCachedContent, fetchChapterContent, streamGenerate } from '../api.js';
   import { resolveSelectionAnchor } from '../selectionWalker.js';
-  import { ensureResultBox, updateResultBox, showResultError } from '../inSituResult.js';
+  import { ensureResultBox, updateResultBox, showResultError, removeResultItem } from '../inSituResult.js';
   import SelectionToolbar from './SelectionToolbar.svelte';
   import PromptBox from './PromptBox.svelte';
 
@@ -20,7 +20,8 @@
   let promptBox = null; // { top, left, creatureType }
 
   const DEFAULT_PROMPTS = {
-    example: 'Create a worked example for this.'
+    example: 'Create a worked example for this.',
+    intuition: 'Explain the intuition behind this.'
   };
 
   $: loadChapter(chapter);
@@ -74,7 +75,11 @@
       const xmlId = hashToId.get(e.content_hash);
       const anchorEl = xmlId && document.getElementById(xmlId);
       if (!anchorEl) continue;
-      const box = ensureResultBox(anchorEl, e.creature_type, e.content_hash, e.status);
+      // Decision 61: content hydrated on chapter load rests as a collapsed
+      // chip (book-first) -- only a just-streamed generation opens expanded.
+      const box = ensureResultBox(anchorEl, e.creature_type, e.content_hash, e.status, {
+        collapsed: true
+      });
       updateResultBox(box, e.response);
     }
   }
@@ -112,8 +117,9 @@
     // Slice simplification (spec step 5, and see api.js): fetch cached
     // content on-demand for the block the user just selected, rather than
     // sweeping all ~817 manifest hashes on chapter load. If an approved (or
-    // this reader's own) "example" already exists, surface it immediately
-    // so a click on "Ex." isn't the only way to see it.
+    // this reader's own) artifact of any wired creature type already exists,
+    // surface it immediately (as a resting chip, Decision 61) so clicking
+    // "Ex."/"Int." again isn't the only way to see it.
     hydrateExistingContent(anchor);
   }
 
@@ -125,15 +131,27 @@
     } catch {
       return; // best-effort; selection/toolbar UX doesn't depend on this
     }
-    const displayable = (entries || [])
-      .filter((e) => e.creature_type === 'example' && (e.status === 'approved' || e.own))
-      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
-    if (!displayable) return;
+    // Latest approved-or-own artifact PER creature type (e.g. an example AND
+    // an intuition can both already exist for the same block) -- each gets
+    // its own chip, so surface all of them, not just one.
+    const latestByType = new Map();
+    for (const e of entries || []) {
+      if (!(e.status === 'approved' || e.own)) continue;
+      const prev = latestByType.get(e.creature_type);
+      if (!prev || new Date(e.created_at) > new Date(prev.created_at)) latestByType.set(e.creature_type, e);
+    }
+    if (!latestByType.size) return;
 
     const anchorEl = document.getElementById(anchor.xml_id);
     if (!anchorEl) return;
-    const box = ensureResultBox(anchorEl, 'example', anchor.block.content_hash, displayable.status);
-    updateResultBox(box, displayable.response);
+    for (const e of latestByType.values()) {
+      // Decision 61: surfaced-on-selection existing content also rests
+      // collapsed -- only a fresh generation this session opens expanded.
+      const box = ensureResultBox(anchorEl, e.creature_type, anchor.block.content_hash, e.status, {
+        collapsed: true
+      });
+      updateResultBox(box, e.response);
+    }
   }
 
   function openPrompt(creatureType) {
@@ -179,8 +197,13 @@
       (event, data) => {
         if (event === 'delta') {
           accumulated += data.text || '';
-          updateResultBox(box, accumulated);
+          updateResultBox(box, accumulated, { streaming: true });
         } else if (event === 'done') {
+          // Stream is over: re-render once more with streaming: false so a
+          // dangling, never-closed [[solution]] marker finalizes into a
+          // normal toggle instead of staying a "being written" placeholder
+          // forever (Decision 62: "treat stream-end-without-close as close").
+          updateResultBox(box, accumulated, { streaming: false });
           if (typeof data.budget_remaining_microdollars === 'number') {
             // authoritative figure from the server
             session.updateBudget(data.budget_remaining_microdollars);
@@ -201,7 +224,10 @@
       showResultError(box, 'The textbook was updated — refresh the page to continue.');
     } else if (code === 'budget_exceeded') {
       budgetNotice.set('You have used up your AI budget for this course. Cached content is still available.');
-      box.remove();
+      // Nothing was ever generated here, so unlike a normal dismiss (which
+      // collapses to a chip, Decision 61) there's no content worth resting
+      // as a chip -- remove the attempt entirely.
+      removeResultItem(box);
     } else if (code === 'auth_required') {
       session.reset();
     } else {

@@ -2,8 +2,8 @@
 
 Plain **Svelte + Vite** SPA (no SvelteKit, no Node runtime in production --
 Decision 44) that hydrates an interaction layer over the pre-rendered
-LaTeXML chapter HTML (Decision 45). This slice wires up only the **example**
-creature end-to-end; intuition/chat/quiz are visible in the toolbar but
+LaTeXML chapter HTML (Decision 45). This slice wires up the **example** and
+**intuition** creatures end-to-end; chat/quiz are visible in the toolbar but
 disabled ("coming soon") per Decision 56's launch roster.
 
 ## Scaffold
@@ -81,7 +81,30 @@ testable without a DOM/network:
   no match, and the non-anchorable-block case (`resolveSelectionAnchor`
   returns `null`).
 
-All 28 tests pass as of this writing (`npx vitest run`).
+- `src/lib/solutionSegmenter.js` -- the `[[solution]]`/`[[/solution]]`
+  marker segmentation (`tests/solutionSegmenter.test.js`, Decision 62): no
+  markers, a complete block, multiple blocks, and the streaming edge (an
+  opener with no close yet comes back `closed: false` so the caller can show
+  a placeholder instead of the partial answer).
+- `src/lib/markdown.js` -- the minimal AI-output markdown subset
+  (`tests/markdown.test.js`, Decision 63): `**bold**`, `*italic*`, simple
+  `- ` lists, and heading lines (`#`..`######`) demoted to a bold paragraph
+  (never an `<h1>`-`<h6>`).
+- `src/lib/mathRender.js` -- the full render pipeline end to end
+  (`tests/mathRender.test.js`): the HTML-escape-before-markdown security
+  invariant, math segments left untouched by markdown (a literal `*` inside
+  `$...$` never becomes `<em>`), `[[solution]]` blocks rendering as a reveal
+  toggle, and the streaming-vs-finalized behavior for an unclosed solution
+  marker.
+- `src/lib/inSituResult.js` -- the collapsed-chip resting state
+  (`tests/inSituResult.test.js`, Decision 61, jsdom): fresh generations start
+  expanded, hydrated/existing content starts collapsed, the chip expands on
+  click, the box's dismiss control collapses (never removes) the item, two
+  creature types on one block get separate chips in one cluster, and
+  `removeResultItem` (used only for a budget-exceeded generation that never
+  produced content) removes the pair entirely.
+
+All 67 tests pass as of this writing (`npx vitest run`).
 
 ## Manual smoke check (optional)
 
@@ -89,11 +112,16 @@ All 28 tests pass as of this writing (`npx vitest run`).
 just enough of the contract to drive the full UI: `/api/manifest` (proxies
 `build/manifest.json`, stamping a `build_version`), `/api/chapters`,
 `/chapter/:n` (proxies `build/html/S:n.html`), `/api/claim` (accepts any
-code), `/api/content/:hash` (returns a canned "approved" example for the
-first anchorable block's hash, `[]` otherwise), and `/api/generate` (streams
-canned SSE deltas -- including inline math split *across* two deltas and
-display math split across two more, specifically to exercise the
-chunk-boundary and math-buffering logic against realistic streaming).
+code), `/api/content/:hash` (returns a canned "approved" example AND a
+canned "approved" intuition for the first anchorable block's hash -- so the
+two-chips-side-by-side cluster has something to render on load -- `[]`
+otherwise), and `/api/generate` (streams canned SSE deltas per
+`creature_type`: the example one includes inline math split *across* two
+deltas, display math split across two more, a `[[solution]]` block split
+across a delta boundary, and a markdown list, to exercise chunk-boundary
+handling, math-buffering, the solution toggle, and markdown all under
+realistic streaming; the intuition one is plain markdown with inline math
+and no solution marker).
 
 ```bash
 npm run mock-server   # :8000
@@ -194,14 +222,61 @@ promotes them to real math segments on the next re-render.
    manifest. Flagging this as a likely near-term follow-up rather than
    solving it speculatively here.
 
+## Collapsed-chip resting state, solution toggle, markdown, intuition (Decisions 61-64)
+
+- **Resting state (Decision 61).** `src/lib/inSituResult.js` groups every
+  artifact anchored to a block into one flex-wrap `.ai-cluster` sibling of
+  the anchor, each holding an `.ai-item` (chip + box) pair keyed by
+  `creatureType:contentHash`. A fresh generation (`ReadingPane.submitPrompt`)
+  opens its item expanded and streams into the box; the box's `✕` control
+  now collapses the item back to its chip (`ai-chip`, pale creature-tint
+  pill with a status dot) rather than removing it -- content is never lost,
+  only rested, addressing the author's #1 first-user-test complaint.
+  Content surfaced via `hydrateChapterContent` (chapter load) or
+  `hydrateExistingContent` (on text selection) always starts collapsed
+  (book-first, Q11); clicking a chip expands it. Multiple artifacts on one
+  block (e.g. an example and an intuition) get one chip each, side by side,
+  via `.ai-item.expanded { flex-basis: 100% }` forcing an open item onto its
+  own row while collapsed chips stay inline.
+- **`[[solution]]` reveal toggle (Decision 62).** `src/lib/solutionSegmenter.js`
+  splits streamed text on the example creature's `[[solution]]`/
+  `[[/solution]]` markers; `src/lib/mathRender.js` renders a closed block as
+  a "Show solution ▸" toggle (math inside renders normally when revealed),
+  and shows a subdued "…solution being written" placeholder for an opener
+  with no close yet **while streaming** (`updateResultBox(box, text, {
+  streaming: true })`). The `done` SSE handler in `ReadingPane.svelte`
+  re-renders once more with `streaming: false` so a marker that never closed
+  still finalizes into a normal toggle instead of staying a placeholder
+  forever.
+- **Minimal markdown subset (Decision 63).** `src/lib/markdown.js` applies
+  `**bold**`/`*italic*`/simple `- ` lists to non-math text segments only
+  (math is segmented out first by the existing `mathSegmenter.js`, so a
+  literal `*` inside `$...$` is never touched). Any heading line is demoted
+  to a bold paragraph, never an `<h1>`-`<h6>`. All source text is
+  HTML-escaped (`escapeHtml`, exported from `mathRender.js`) before any
+  markdown/toggle/chip tags are added anywhere in this box -- the only
+  non-Temml HTML in it is tags this code emits itself.
+- **Intuition creature enabled.** `SelectionToolbar.svelte`'s "Int." chip is
+  now enabled (gold/ochre tint, matching the firefly per Q11); its default
+  prompt is "Explain the intuition behind this." (Q3), and it reuses the
+  same generate/hydrate/chip flow as example. Chat/Quiz remain disabled
+  ("coming soon").
+
 ## Known slice limitations (by design, per the brief)
 
-- Only the **example** creature is wired to `/api/generate`; intuition/chat/
-  quiz render as disabled chips with a "coming soon" tooltip.
+- Only **example** and **intuition** are wired to `/api/generate`; chat/quiz
+  render as disabled chips with a "coming soon" tooltip.
 - No refinement flow (clicking a settled result to re-open the prompt box)
-  -- out of scope for "only example is wired" in this pass.
-- No creature *art* / animation / quiet-mode toggle UI -- quiet mode (typed
-  icon chips) **is** the entire UI right now, per Decision 56; there's
-  nothing to toggle yet.
+  -- out of scope for this pass.
+- No creature *art* / animation -- quiet mode (typed icon chips, now with a
+  collapsed/expanded resting state per Decision 61) **is** the entire UI
+  right now, per Decision 56; there's nothing to toggle yet.
 - Section-number click -> section-scoped creature cluster is not
   implemented (only text-selection -> text-scoped cluster).
+- The collapsed/expanded state of an item, and any revealed `[[solution]]`
+  toggle inside it, is reset to its default on the next full re-render of
+  that box's contents (each SSE delta, or a later hydrate call for the same
+  key). In practice this only matters if a reader opens a solution toggle
+  while later content is still streaming in underneath it -- an accepted
+  edge case given these are short, one-shot responses and the box already
+  re-renders wholesale on every delta (see `updateResultBox`).

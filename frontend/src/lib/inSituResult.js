@@ -3,29 +3,94 @@
 // tag). This is plain DOM manipulation rather than a mounted Svelte
 // component: the anchor element lives inside HTML injected via {@html}
 // (the pre-rendered LaTeXML chapter, Decision 45), and Svelte doesn't own
-// that subtree, so we insert a sibling node next to it directly.
-import { renderStreamedMath } from './mathRender.js';
+// that subtree, so the result box is inserted as a plain DOM sibling.
+//
+// Resting state (Decision 61): the box's default/idle appearance is a small
+// collapsed chip at the anchor -- the quiet-mode analog of "the creature
+// settles" -- not the full box. Content hydrated on chapter load starts
+// collapsed (book-first, Q11); a fresh generation streams in expanded, and
+// its dismiss control now COLLAPSES the box back to a chip rather than
+// removing it (the author's #1 first-user-test complaint was AI content
+// vanishing with no way back). Multiple artifacts anchored to the same block
+// (e.g. an example AND an intuition) each get their own chip+box pair,
+// grouped in one flex-wrap "cluster" sibling so the chips sit side by side
+// until one is expanded (CSS: an expanded item takes the full row width,
+// pushing any other chips onto their own line -- see .ai-cluster/.ai-item in
+// theme.css).
+import { renderStreamedMath, escapeHtml } from './mathRender.js';
 
 const CREATURE_LABEL = {
-  example: 'Example'
+  example: 'Example',
+  intuition: 'Intuition'
 };
 
-// Ensures a result box exists immediately after `anchorEl`, keyed by
-// `key` (e.g. the block's content_hash) so repeated calls for the same
-// generation update the same box instead of creating duplicates.
-export function ensureResultBox(anchorEl, creatureType, key, status = 'unreviewed') {
-  const existingId = `ai-result-${cssEscape(key)}`;
-  let box = document.getElementById(existingId);
-  if (box) return box;
+const CREATURE_CHIP_LABEL = {
+  example: 'Ex.',
+  intuition: 'Int.'
+};
 
-  box = document.createElement('div');
-  box.id = existingId;
+// Finds (or creates) the shared cluster sibling that holds every chip+box
+// pair anchored to `anchorEl`.
+function getOrCreateCluster(anchorEl) {
+  const clusterId = `ai-cluster-${cssEscape(anchorEl.id || '')}`;
+  let cluster = document.getElementById(clusterId);
+  if (cluster) return cluster;
+
+  cluster = document.createElement('div');
+  cluster.id = clusterId;
+  cluster.className = 'ai-cluster';
+  anchorEl.insertAdjacentElement('afterend', cluster);
+  return cluster;
+}
+
+function setExpanded(item, expanded) {
+  item.classList.toggle('expanded', expanded);
+  item.classList.toggle('collapsed', !expanded);
+  const chip = item.querySelector('.ai-chip');
+  if (chip) chip.setAttribute('aria-expanded', String(expanded));
+}
+
+// Ensures a result box (and its collapsed-chip counterpart) exists for
+// `creatureType` immediately after `anchorEl`, keyed by `key` (e.g. the
+// block's content_hash) so repeated calls for the same generation update the
+// same box instead of creating duplicates. Returns the `.ai-result` box
+// element (the same shape as before this feature, so existing callers that
+// do `box.querySelector('.body')` / rely on the returned node keep working).
+//
+// `opts.collapsed`: start the item in its collapsed-chip resting state
+// (hydrated/existing content, Decision 61's "book-first" rule) rather than
+// expanded (fresh generation, streams in open).
+export function ensureResultBox(anchorEl, creatureType, key, status = 'unreviewed', opts = {}) {
+  const cluster = getOrCreateCluster(anchorEl);
+  const itemKey = `${creatureType}:${cssEscape(key)}`;
+  let item = cluster.querySelector(`[data-item-key="${itemKey}"]`);
+  if (item) {
+    return item.querySelector('.ai-result');
+  }
+
+  const collapsed = !!opts.collapsed;
+
+  item = document.createElement('div');
+  item.className = `ai-item ${collapsed ? 'collapsed' : 'expanded'}`;
+  item.dataset.itemKey = itemKey;
+
+  const chipLabel = CREATURE_CHIP_LABEL[creatureType] || creatureType;
+  const creatureLabel = CREATURE_LABEL[creatureType] || creatureType;
+
+  const chip = document.createElement('button');
+  chip.type = 'button';
+  chip.className = 'ai-chip';
+  chip.dataset.creature = creatureType;
+  chip.title = `${creatureLabel} — ${status}`;
+  chip.setAttribute('aria-expanded', String(!collapsed));
+  chip.innerHTML =
+    `${escapeHtml(chipLabel)}<span class="ai-chip-dot" data-status="${escapeHtml(status)}" aria-hidden="true"></span>`;
+  chip.addEventListener('click', () => setExpanded(item, true));
+
+  const box = document.createElement('div');
   box.className = 'ai-result';
   box.dataset.creature = creatureType;
-  box.setAttribute(
-    'aria-label',
-    `${CREATURE_LABEL[creatureType] || creatureType}, ${status}, generated content`
-  );
+  box.setAttribute('aria-label', `${creatureLabel}, ${status}, generated content`);
 
   const head = document.createElement('div');
   head.className = 'ai-result-head';
@@ -39,8 +104,9 @@ export function ensureResultBox(anchorEl, creatureType, key, status = 'unreviewe
   dismiss.className = 'dismiss';
   dismiss.type = 'button';
   dismiss.textContent = '✕';
-  dismiss.setAttribute('aria-label', 'Dismiss');
-  dismiss.addEventListener('click', () => box.remove());
+  dismiss.title = 'Collapse to chip';
+  dismiss.setAttribute('aria-label', 'Collapse to chip');
+  dismiss.addEventListener('click', () => setExpanded(item, false));
   head.appendChild(dismiss);
 
   const body = document.createElement('div');
@@ -49,23 +115,56 @@ export function ensureResultBox(anchorEl, creatureType, key, status = 'unreviewe
   box.appendChild(head);
   box.appendChild(body);
 
-  anchorEl.insertAdjacentElement('afterend', box);
+  item.appendChild(chip);
+  item.appendChild(box);
+  cluster.appendChild(item);
+
   return box;
 }
 
-// Re-renders the accumulated text into the box's body on every SSE delta.
-// Buffering strategy (spec Q3/Q13): re-segment the FULL accumulated text
-// each time and let segmentMathSpans() decide what's safe to render as math
-// vs. plain text (an unclosed trailing "$"-span stays literal until its
-// close arrives) -- see lib/mathSegmenter.js for the actual rule.
-export function updateResultBox(box, accumulatedText) {
+// Re-renders the accumulated text into the box's body on every SSE delta (or
+// once, for already-complete hydrated content). See mathRender.js for the
+// `opts.streaming` contract (Decision 62's [[solution]] finalize-on-close-or-
+// stream-end rule).
+export function updateResultBox(box, accumulatedText, opts = {}) {
   const body = box.querySelector('.body');
-  body.innerHTML = renderStreamedMath(accumulatedText);
+  body.innerHTML = renderStreamedMath(accumulatedText, opts);
+  wireSolutionToggles(body);
+}
+
+// innerHTML wipes out any listeners attached on a previous render, so every
+// render re-wires the reveal/hide behavior on whatever ".solution-toggle-btn"
+// elements are currently in the DOM. (Streaming caveat, documented rather
+// than solved here: if a reader opens a solution toggle WHILE later content
+// is still streaming in below it, the next delta's full re-render resets it
+// to collapsed -- an acceptable edge case given these are short one-shot
+// responses and the box already re-renders wholesale on every delta.)
+function wireSolutionToggles(body) {
+  body.querySelectorAll('.solution-toggle-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const wrap = btn.closest('.solution-toggle');
+      if (!wrap) return;
+      const revealed = wrap.classList.toggle('revealed');
+      btn.innerHTML = revealed ? 'Hide solution &#9662;' : 'Show solution &#9656;';
+      btn.setAttribute('aria-expanded', String(revealed));
+      const content = wrap.querySelector('.solution-content');
+      if (content) content.hidden = !revealed;
+    });
+  });
 }
 
 export function showResultError(box, message) {
   const body = box.querySelector('.body');
-  body.innerHTML = `<em>${message.replace(/</g, '&lt;')}</em>`;
+  body.innerHTML = `<em>${escapeHtml(message)}</em>`;
+}
+
+// Fully removes a chip+box pair -- used only when a generation never
+// produced any content at all (e.g. budget_exceeded before/mid-stream), so
+// there is nothing worth resting as a chip. Everything else should collapse,
+// never remove (Decision 61).
+export function removeResultItem(box) {
+  const item = box.closest('.ai-item');
+  (item || box).remove();
 }
 
 function cssEscape(s) {

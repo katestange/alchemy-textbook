@@ -324,10 +324,79 @@ button {
   color: #fff;
 }
 
-/* ---- In-situ AI result box (vanilla-DOM injected; see lib/inSituResult.js) ---- */
+/* ---- In-situ AI result cluster (vanilla-DOM injected; see lib/inSituResult.js) ----
+   Decision 61: resting state is a small collapsed chip at the anchor; click
+   expands the full box, and the box's dismiss control collapses back to the
+   chip (content is never removed by dismissing). Several artifacts anchored
+   to the same block (e.g. example + intuition) share one flex-wrap cluster
+   so their chips sit side by side; an expanded item claims the full row
+   width, pushing any other chips onto their own line. */
+
+.ai-cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin: 0.6rem 0;
+}
+
+.ai-item.expanded {
+  flex: 1 1 100%;
+}
+
+.ai-item.collapsed .ai-result {
+  display: none;
+}
+
+.ai-item.expanded .ai-chip {
+  display: none;
+}
+
+.ai-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border: 1px solid var(--color-rule);
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  font-family: var(--font-serif);
+  font-size: 0.78rem;
+  font-variant-caps: small-caps;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+}
+
+.ai-chip[data-creature='example'] {
+  background: var(--wash-green);
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+}
+.ai-chip[data-creature='intuition'] {
+  background: var(--wash-gold);
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
+
+.ai-chip:hover,
+.ai-chip:focus-visible {
+  filter: brightness(0.95);
+}
+
+.ai-chip-dot {
+  width: 0.45em;
+  height: 0.45em;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  background: transparent;
+}
+
+.ai-chip-dot[data-status='approved'] {
+  background: currentColor;
+}
 
 .ai-result {
-  margin: 0.75rem 0;
+  width: 100%;
+  margin: 0;
   border: 1px solid var(--color-ink-soft);
   border-radius: 10px;
   padding: 0.7rem 1rem;
@@ -349,6 +418,10 @@ button {
 .ai-result[data-creature='example'] {
   background: var(--wash-green);
   border-color: var(--accent-green);
+}
+.ai-result[data-creature='intuition'] {
+  background: var(--wash-gold);
+  border-color: var(--accent-gold);
 }
 
 .ai-result .ai-result-head {
@@ -377,6 +450,56 @@ button {
 
 .ai-result .body math {
   font-size: 1em;
+}
+
+.ai-result .body ul {
+  margin: 0.4em 0;
+  padding-left: 1.4em;
+}
+
+/* ---- [[solution]] reveal toggle (Decision 62) ---- */
+
+.solution-pending {
+  display: inline-block;
+  font-style: italic;
+  color: var(--color-ink-soft);
+  opacity: 0.75;
+}
+
+.solution-toggle {
+  display: block;
+  margin: 0.5rem 0;
+}
+
+.solution-toggle-btn {
+  background: none;
+  border: 1px dashed var(--color-ink-soft);
+  border-radius: 6px;
+  color: var(--color-ink-soft);
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  padding: 0.15rem 0.6rem;
+}
+
+.solution-toggle-btn:hover,
+.solution-toggle-btn:focus-visible {
+  color: var(--color-ink);
+  border-color: var(--color-ink);
+}
+
+.solution-toggle.revealed .solution-toggle-btn {
+  border-style: solid;
+}
+
+.solution-content {
+  display: block;
+  margin-top: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid var(--color-rule);
+}
+
+.solution-content[hidden] {
+  display: none;
 }
 
 /* ---- Banners (Decision 60 / budget / auth) ---- */

@@ -1,14 +1,14 @@
 <script>
   // Quiet-mode typed-icon chips (Decision 56 -- base UI, no creature art yet).
-  // Launch roster (Decision 56): example is wired; intuition/chat/quiz are
-  // visible but disabled ("coming soon") per the task brief.
+  // Launch roster: example and intuition are wired; chat/quiz remain visible
+  // but disabled ("coming soon").
   export let top = 0;
   export let left = 0;
   export let onSelect = (_creatureType) => {};
 
   const creatures = [
     { type: 'example', label: 'Ex.', title: 'Example', enabled: true },
-    { type: 'intuition', label: 'Int.', title: 'Intuition — coming soon', enabled: false },
+    { type: 'intuition', label: 'Int.', title: 'Intuition', enabled: true },
     { type: 'chat', label: 'Chat', title: 'Chat — coming soon', enabled: false },
     { type: 'quiz', label: 'Quiz', title: 'Quiz — coming soon', enabled: false }
   ];
