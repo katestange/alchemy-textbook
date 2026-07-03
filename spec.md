@@ -526,6 +526,25 @@ an exact content hash (of its text).  Cached AI content is keyed to this hash.
   verdicts per editing session, and if the flow is slow, orphans pile up and
   silently rot.
 
+**The authoring loop (Decision 60).**  Heavy semester-long editing is the
+normal case, so the edit cycle is explicit:
+
+1. Edit the `.tex`; run `pipeline/check.sh`.
+2. The structural-snapshot diff is the edit's *receipt* -- "chapter 2:
+   paragraphs 45 -> 52, definitions 12 -> 13".  Eyeball it: if it matches your
+   intent, run `check.sh --update-baseline`; if it doesn't, the pipeline just
+   caught something (yours or its own).
+3. Commit source + updated baselines together, so every structural change is
+   reviewable in git history.  CI treats a snapshot change *without* a source
+   change as a hard failure (a pipeline regression); with one, the committed
+   baseline is authoritative.
+4. Push; CI builds and deploys; open student tabs get a refresh prompt
+   (see Q13, stale tabs); orphaned content lands in the re-anchor queue.
+
+Content edits never require touching the pipeline.  Preamble edits (a
+`\usepackage` line) may trip the fail-closed pre-processor by design -- it
+aborts with instructions rather than hanging the build.
+
 **This keeps the build pipeline AI-free** -- all intelligence about re-anchoring
 is simple text similarity (e.g. difflib or similar), not AI calls.  AI is only
 used at runtime when students interact.
@@ -984,10 +1003,18 @@ expand on Enter (Q11).  Because the reading pane is plain semantic LaTeXML HTML,
 it stays fully navigable even with the interactive layer disabled.
 
 **Frontend <-> backend contract:** AI generation is the single SSE endpoint
-`/api/generate`, taking `{ creature_type, block_hash, selection_text, prompt }`;
-auth is the HttpOnly session cookie (Q5); the backend runs the budget check
-before opening the stream and emits a terminal "budget exceeded" event if the
-cap is hit (Q5).  Cached content is plain JSON from `/content/<hash>`.
+`/api/generate`, taking `{ creature_type, block_hash, selection_text, prompt,
+build_version }`; auth is the HttpOnly session cookie (Q5); the backend runs
+the budget check before opening the stream and emits a terminal "budget
+exceeded" event if the cap is hit (Q5).  Cached content is plain JSON from
+`/content/<hash>`.
+
+**Stale tabs across a deploy (Decision 60):** every request carries the
+`build_version` of the manifest the client loaded.  If the server is on a newer
+build, it rejects the request with a `refresh_required` response and the client
+prompts a soft reload ("The textbook was just updated -- refresh to continue").
+No generation is attempted against a stale anchor; the author can deploy
+mid-evening without producing confusing failures in open tabs.
 
 ---
 
@@ -1155,6 +1182,7 @@ default.
 | 57 | Auth hardening: SameSite=Lax session cookie, rate-limited code entry, admin lockout; "FERPA-clean" softened to privacy-preserving (Q5) | 2026-07-03 |
 | 58 | Data retention: usage_log + sessions dropped and codes revoked at semester end; approved content persists (Q12) | 2026-07-03 |
 | 59 | No curated voice samples: the chapter text in every prefix is the voice exemplar; system prompt carries an explicit imitation instruction naming 2-3 stylistic traits (Q3) | 2026-07-03 |
+| 60 | Heavy editing is the normal case: documented authoring loop (snapshot diff as edit receipt, baselines committed with source); generate requests carry build_version and stale tabs get a refresh prompt, never a silent failure (Q8/Q13) | 2026-07-03 |
 
 ---
 
