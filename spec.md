@@ -1091,8 +1091,24 @@ interactive / streamed); SageCell is free (Q4); hosting is free-tier initially
 (Q7).  The only variable cost is Claude API usage, bounded above by the
 invite-code budgets.
 
-**Action:** instrument real token usage during the prototype phase and replace
-these estimates with measured per-tool averages before committing the $5
+**First measured data (2026-07-03, backend slice, live API):** two Haiku
+`example` generations on chapter 8 (shared prefix 5,942 tokens, ~420-token
+responses): call 1 (cold) wrote the prefix once -- student ledger **2,768
+microdollars (~$0.0028)**, instructor warmth 11,290 microdollars (~$0.011);
+call 2 (different block, same chapter) read the identical 5,942-token prefix --
+student **2,975 microdollars**, no instructor row.  Ledger arithmetic verified
+exact.  At these rates a $5 budget is ~1,700 Haiku generations; the estimates
+above remain for Sonnet tools and chat until measured.
+
+**Caveat (measured):** models have a *minimum cacheable prefix* -- ~4,096
+tokens on Haiku, ~2,048 on Sonnet.  Chapter 4's whole prefix is ~4,216 tokens,
+barely above the Haiku floor; a shorter chapter would silently never cache on
+Haiku (correct output, full price).  The backend should warn when a chapter
+prefix is near the floor; padding the prefix (e.g. with the ToC, which we
+include anyway) helps.
+
+**Action:** continue instrumenting real usage (Sonnet tools, chat
+conversations) and replace the remaining estimates before committing the $5
 default.
 
 ---
