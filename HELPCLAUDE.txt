@@ -158,3 +158,26 @@ Only if you want a newer Node. Otherwise skip.
 ================================================================================
 END
 ================================================================================
+
+================================================================================
+STEP 5 — Browsing the textbook app from your host machine
+================================================================================
+The dev server runs INSIDE the container.  Two ways to reach it from your
+host browser (Linux):
+
+A) No container changes (works today):
+   - Ask Claude to start the server bound to 0.0.0.0, or run (as claude):
+       backend/.venv/bin/uvicorn app:app --app-dir backend --host 0.0.0.0 --port 8000
+   - Find the container IP:  docker inspect -f \
+       '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <container>
+     (or, inside the container: hostname -I)
+   - Browse http://<that-ip>:8000  (e.g. http://172.17.0.2:8000).
+     The docker bridge is host-local, so only your machine can reach it.
+   - Caveat: the IP can change when the container is recreated.
+
+B) Permanent (next time you RECREATE the container):
+   - Add  -p 8000:8000  to the `docker run` command (NOT docker exec — exec
+     has no -p; port mappings exist only at container creation).
+   - Then http://localhost:8000 always works.
+
+Dev invite code: DEV-TEST-1 ($5 budget, seeded on first backend startup).
