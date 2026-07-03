@@ -362,14 +362,13 @@ a secondary option.
 - Available to anyone (students who exhaust their budget, non-students,
   public users).
 - User pastes their Anthropic API key in a settings panel.
-- Key stored in browser localStorage, never sent to the server.
-- AI calls go directly from the browser to the Anthropic API using the SDK's
-  explicit browser-access mode (`dangerouslyAllowBrowser` / the
-  `anthropic-dangerous-direct-browser-access` header).  This is acceptable
-  *only* because the key is the user's own -- the instructor key is never
-  exposed this way.  Alternatively the call is proxied through the backend,
-  which forwards it without persisting the key.
-- Generated content is still cached to the database for all users.
+- Key held in the browser and sent to the backend only per request; the backend
+  forwards it to Anthropic and **never stores or logs it**.
+- AI calls are **always proxied through the backend** -- there is no direct
+  browser-to-Anthropic path.  (A browser-direct path would let any client write
+  arbitrary text into the shared cache; it is deliberately excluded -- see Q6.)
+- Generated content is cached only via the server-only write path (Q6), and
+  becomes public only after instructor approval.
 - This is a secondary option, not prominently featured -- most students will
   use invite codes.
 
@@ -378,20 +377,25 @@ a secondary option.
 ### Q6: Caching and Community-Generated Content
 
 **Core idea:** When any user generates AI content (an example, a justification,
-an applet, etc.), it is cached and made available to all future readers --
-including those not logged in.  The textbook *grows* with usage.
+an applet, etc.), it is cached and -- once the instructor approves it -- made
+available to all future readers, including those not logged in.  The textbook
+*grows* with reviewed usage.
 
 **Decision:** Hybrid caching with review workflow.
 
-**Content lifecycle:**
+**Content lifecycle** (moderate-everything):
 1. User generates AI content (example, justification, remark, applet, etc.).
-2. Content is stored in the database, keyed to the nearest semantic unit in
-   the textbook (section, definition, theorem, paragraph).  Immediately
-   visible to all users, marked as **unreviewed**.
-3. Any user can **flag** content for errors, with a comment.
-4. Instructor **reviews** via a dashboard: approve, edit, or remove.
-5. The best approved content remains as permanent supplementary material
-   alongside the base textbook.
+2. The **server** stores it (only the server ever writes the cache), keyed to
+   the nearest semantic unit (section, definition, theorem, paragraph) and
+   tagged with the generating **invite code**.  It is marked **unreviewed** and
+   is visible **only to its creator** (and the instructor) -- not to other
+   readers.
+3. Instructor **reviews** via the dashboard: approve, edit, or remove.  Per-code
+   generation rate limits and one-click takedown backstop abuse.
+4. **On approval**, the content becomes public -- permanent supplementary
+   material alongside the base textbook, visible to all readers.
+5. Any user can **flag** approved content for errors, with a comment, which
+   returns it to the review queue.
 
 **The user's selection is freeform** -- they can highlight any span of text to
 trigger an AI tool.  But cached results are anchored to the nearest semantic
@@ -677,8 +681,11 @@ even though the creatures and page texture are archaic.
 
 **Typography:** EB Garamond (free, web-safe Google Font).  Old-book feel that
 complements the grimoire aesthetic.  Body text in regular weight; headings in
-small caps variant.  Math rendered by KaTeX (using its default fonts, which
-pair well with Garamond).
+small caps variant.  Math is rendered as **native MathML** (the browser's
+built-in MathML, as arXiv's LaTeXML HTML does -- no math library); AI-generated
+math is converted client-side with **Temml** (LaTeX -> MathML).  One pinned math
+webfont, sized to the body, keeps author and AI math identical across browsers.
+(See Decision 49; supersedes the earlier KaTeX choice.)
 
 #### Review status reflected in creature appearance
 
@@ -762,10 +769,13 @@ conversations aren't stored.  Only the artifacts that appear in the text are."
 | `status` | TEXT DEFAULT 'unreviewed' | "unreviewed", "approved", "flagged", "removed" |
 | `created_at` | TIMESTAMP | |
 | `section_id` | TEXT | Section from content manifest |
+| `created_by_code` | TEXT REFERENCES invite_codes | Which invite code generated this (moderation + revocation; a code, not a name) |
 
-Note: no `prompt` column, no `created_by_code` -- student inputs and
-identity are not stored.  Cost tracking for budget enforcement is in
-`usage_log` only.
+Note: no `prompt` column and no chat/message text -- student *inputs* are never
+stored.  `created_by_code` records which invite code produced an artifact so an
+abuser can be identified and revoked; codes are pseudonymous (not names), which
+keeps the privacy posture -- see Q6.  Cost tracking for budget enforcement is in
+`usage_log`.
 
 **`content_flags`** -- user reports on AI content or base textbook
 
@@ -816,7 +826,7 @@ Svelte is the framework (Decision 38); this section defines how the frontend is
 structured, built, and wired to the backend.  Two choices below -- the
 build/serve model and the content-delivery model -- are taken as **recommended
 defaults** consistent with Q2 and may be revisited by the author; everything
-else follows from earlier decisions (KaTeX and creature art in Q11, SSE
+else follows from earlier decisions (native-MathML math and creature art in Q11, SSE
 streaming and creature UX in Q3).
 
 **Decision (build & serve):** A plain **Svelte single-page app**, built by
@@ -866,11 +876,14 @@ cached creatures that already exist for the loaded section.
 6. On stream end, the final artifact is persisted server-side (Q6/Q12) and the
    creature settles into its resting sprite.
 
-**Math rendering:** KaTeX (Q11).  Base-textbook math is rendered on load (or
-pre-rendered at build for speed).  **Streamed** AI math is rendered
-incrementally: the generation store withholds a `$...$` or `$$...$$` span from
-KaTeX until its closing delimiter arrives, so half-typed formulas never flash
-(matches the streaming note in Q3).
+**Math rendering:** native MathML for the base text and **Temml** for AI math
+(Q11, Decision 49).  Base-textbook math is already MathML in the LaTeXML HTML,
+so the browser renders it with no math library (the arXiv approach -- fastest on
+math-dense pages).  **Streamed** AI math (`$...$` / `$$...$$`) is converted to
+MathML client-side by Temml, incrementally: the generation store withholds a
+span until its closing delimiter arrives, so half-typed formulas never flash
+(matches the streaming note in Q3).  Both paths end as native MathML, so author
+and AI math render identically.
 
 **Creature rendering & animation:** each creature is a sprite sheet (~10 frames)
 driven by CSS `steps()` animation (Q11).  A `Creature` component takes a
@@ -1028,10 +1041,13 @@ default.
 | 40 | Database schema designed; student inputs never stored (privacy principle) (Q12) | 2026-07-02 |
 | 41 | Chat conversations ephemeral; only eureka artifacts persisted (Q12) | 2026-07-02 |
 | 42 | Simple admin password for dashboard auth (Q12) | 2026-07-02 |
-| 43 | EB Garamond font; small caps headings; KaTeX for math (Q11) | 2026-07-02 |
+| 43 | EB Garamond font; small caps headings; math rendering (KaTeX, later superseded by Decision 49) (Q11) | 2026-07-02 |
 | 44 | Frontend is a plain Svelte SPA built with Vite; static assets served by the Python backend, no Node runtime in production (Q13) | 2026-07-02 |
 | 45 | Base textbook served as pre-rendered LaTeXML HTML; Svelte hydrates an interaction layer over it, anchored to block hashes (Q13) | 2026-07-02 |
 | 46 | Dark mode via CSS custom properties: warm near-black parchment, lower-lightness accents, pastel washes as accent tints (Q13) | 2026-07-02 |
+| 47 | Server is the sole cache writer; BYO keys proxied per-request and never stored; no direct browser->Anthropic path (Q5/Q6) | 2026-07-03 |
+| 48 | Moderate everything: all AI content tagged with its invite code and instructor-approved before public; creator sees their own immediately (Q6/Q12) | 2026-07-03 |
+| 49 | Base math as native MathML (browser MathML Core, no JS, arXiv-style); AI math via client-side Temml (LaTeX->MathML); one pinned math webfont sized to the body; supersedes KaTeX (Q11/Q13) | 2026-07-03 |
 
 ---
 
