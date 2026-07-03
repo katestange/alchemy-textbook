@@ -112,7 +112,13 @@ are each used only a handful of times and have straightforward fallbacks.
 - (c) **Full-stack JS framework** (Next.js, SvelteKit) with serverless functions.
 - (d) **BaaS** (Supabase/Firebase + serverless functions).
 
-**Decision:** Option (b) -- **Python backend (Flask or FastAPI) with SQLite.**
+**Decision:** Option (b) -- **Python backend (FastAPI) with SQLite.**
+
+FastAPI specifically (not Flask, Decision 54): all AI responses are streamed
+over SSE (Q3), and an SSE stream holds its connection open for 15-60s.  A sync
+WSGI server ties up one worker per open stream -- a handful of concurrent
+students would stall the whole site.  FastAPI/uvicorn is async, so idle-ish
+streams cost nothing and the reading experience never blocks on AI traffic.
 
 **Rationale:**
 - A backend is required for: securing the instructor API key, auth/token
@@ -204,8 +210,16 @@ Each tool's system prompt includes:
 4. **Output format:** "Render all math as LaTeX between `$...$` (inline) or
    `$$...$$` (display).  For SageMath code, produce valid Sage code that runs
    in a SageCell widget."
-5. **Guardrails:** don't solve homework problems outright (for "test me" and
-   chat); encourage the student to think.
+5. **Guardrails -- pedagogy, not police (Decision 55).**  The prompts steer
+   toward good learning habits: prefer hints, reasoning, and Socratic questions
+   over finished answers; encourage the student to attempt the step first.
+   This is honestly a *tone*, not an enforcement mechanism: creatures are
+   editable prompts, and a determined student can elicit a full solution from
+   any AI tool anywhere -- this one included.  The design goal, in the author's
+   words: "I want to create a tool... to teach good habits and self-discipline
+   for learning.  I am not police."  Academic integrity is carried by course
+   policy; the software contributes visibility (per-code usage logs, Q12's
+   `created_by_code`), never surveillance or blocking.
 
 **AI-powered tools and UX:**
 
@@ -1098,6 +1112,8 @@ default.
 | 51 | Chat context is chapter-scoped + ToC, same as other tools; chat panel has a labeled "amp up" toggle for full-textbook context (Q3) | 2026-07-03 |
 | 52 | Shared-prefix cache discipline: [core prompt + voice + chapter text + ToC] before the breakpoint, everything per-creature/per-student after; prefix byte-identical, no volatile content; one entry serves all creatures and all students (Q3/Q14) | 2026-07-03 |
 | 53 | Instructor-funded cache warmth via billing attribution: 1-hour TTL; students priced as-if-warm (cache-read rate), the write premium lands on an instructor ledger; no scheduled warmups; ledgers in microdollars (Q14/Q12) | 2026-07-03 |
+| 54 | FastAPI (not Flask): async server so long-lived SSE streams never block the reading experience (Q2) | 2026-07-03 |
+| 55 | Guardrails are pedagogy, not police: prompts steer toward hints and self-discipline; integrity is course policy + visibility, never enforcement or surveillance (Q3) | 2026-07-03 |
 
 ---
 
