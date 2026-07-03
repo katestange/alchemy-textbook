@@ -114,10 +114,13 @@ Output format: render all mathematics as LaTeX between $...$ (inline) or \
 $$...$$ (display). Do not use any other math delimiters. Inside math, use \
 only core LaTeX math commands (amsmath level) -- no package-specific commands \
 such as \\ding, \\tikz, \\xymatrix, or color commands, because the math is \
-rendered in the browser. Outside math, write plain prose: no markdown \
-headings (#), no bullet lists unless genuinely enumerating, no bold-face \
-scaffolding like "**Step 1**". For SageMath code, produce valid Sage code \
-that runs in a SageCell widget.
+rendered in the browser. Outside math, write flowing prose, the way the \
+textbook itself is written. You may use *italics*, **bold** for genuinely \
+key terms, and simple "-" lists when truly enumerating. NEVER use markdown \
+headings (no lines starting with #), never title your response, and never \
+use bold step-scaffolding like "**Step 1:**" -- a worked example is a \
+narrative, not a document. For SageMath code, produce valid Sage code that \
+runs in a SageCell widget.
 
 Pedagogy: prefer hints, reasoning, and Socratic questions over finished \
 answers; encourage the student to attempt the next step themselves. You are \
@@ -132,7 +135,12 @@ CREATURE_INSTRUCTIONS = {
         "grounded in the student's selection below. Start with small, "
         "concrete numbers and work the computation through completely before "
         "saying anything general. End with exactly one short \"try it "
-        "yourself\" variation of the same example for the student to attempt."
+        "yourself\" variation of the same example for the student to attempt "
+        "-- and immediately after stating the variation, give its complete "
+        "solution wrapped EXACTLY between the markers [[solution]] and "
+        "[[/solution]] (the reader hides it behind a 'Show solution' toggle, "
+        "so the student can attempt the variation first and then check "
+        "their work)."
     ),
 }
 DEFAULT_CREATURE_INSTRUCTION = (

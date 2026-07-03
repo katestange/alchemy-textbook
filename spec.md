@@ -1199,6 +1199,10 @@ default.
 | 58 | Data retention: usage_log + sessions dropped and codes revoked at semester end; approved content persists (Q12) | 2026-07-03 |
 | 59 | No curated voice samples: the chapter text in every prefix is the voice exemplar; system prompt carries an explicit imitation instruction naming 2-3 stylistic traits (Q3) | 2026-07-03 |
 | 60 | Heavy editing is the normal case: documented authoring loop (snapshot diff as edit receipt, baselines committed with source); generate requests carry build_version and stale tabs get a refresh prompt, never a silent failure (Q8/Q13) | 2026-07-03 |
+| 61 | AI content's resting state is a small collapsed chip at its anchor (the quiet-mode analog of the creature settling); dismissing collapses, never deletes; fresh generations open, everything else rests collapsed on load (Q11/Q13) | 2026-07-03 |
+| 62 | Try-it-yourself solutions are wrapped in [[solution]]...[[/solution]] markers by the AI and rendered as a "Show solution" toggle -- attempt-first pedagogy (Q3, extends Decision 55) | 2026-07-03 |
+| 63 | AI output rendering: minimal markdown subset (italic, bold, simple lists) rendered client-side; headings always demoted to bold; prompts forbid heading/step scaffolding (Q13) | 2026-07-03 |
+| 64 | Deferred: students selecting AI-generated text to summon tools on it (would anchor to the parent block, tagged derived) -- revisit after chat lands, which covers most of the need (Q3) | 2026-07-03 |
 
 ---
 
