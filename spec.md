@@ -1203,6 +1203,8 @@ default.
 | 62 | Try-it-yourself solutions are wrapped in [[solution]]...[[/solution]] markers by the AI and rendered as a "Show solution" toggle -- attempt-first pedagogy (Q3, extends Decision 55) | 2026-07-03 |
 | 63 | AI output rendering: minimal markdown subset (italic, bold, simple lists) rendered client-side; headings always demoted to bold; prompts forbid heading/step scaffolding (Q13) | 2026-07-03 |
 | 64 | Deferred: students selecting AI-generated text to summon tools on it (would anchor to the parent block, tagged derived) -- revisit after chat lands, which covers most of the need (Q3) | 2026-07-03 |
+| 65 | Chat panel design: side panel PUSHES the reading column (never overlays); left/right-aligned transcript without messenger bubbles (student right/narrow/tinted, cat left/full-width for math); context selector "Reading: this chapter / the whole book" with an honest cost hint, toggleable mid-conversation with a transcript note; standing ephemerality signage; selecting text while open quotes it INTO the conversation, plus an explicit new-conversation button; quiz reuses the same panel (teal, raven opening) (Q3/Q13) | 2026-07-03 |
+| 66 | Chat and quiz turns are never written to cached_content and carry no content_id -- conversation history lives only in the client and is resent per turn (corollary of Decisions 41/48); budget/ledger accounting still applies per turn (Q12/Q14) | 2026-07-03 |
 
 ---
 
