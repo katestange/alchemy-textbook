@@ -169,8 +169,9 @@ These assignments are starting points; adjust based on quality testing.
 **Context window strategy:**
 
 Each AI call includes:
-- **Shared prefix (cacheable):** core system prompt + author voice samples +
-  the **full text of the current chapter** + the book's table of contents
+- **Shared prefix (cacheable):** core system prompt (with the voice-imitation
+  instruction, Decision 59) + the **full text of the current chapter** + the
+  book's table of contents
   (all chapter/section titles, so the AI can point forward: "that's covered in
   Chapter 5").  Since a reader page *is* a chapter (Q13), "what the student is
   looking at" and "what the AI sees" coincide.
@@ -202,9 +203,15 @@ from the Claude API to the browser via server-sent events (SSE).  Benefits:
 Each tool's system prompt includes:
 1. **Role:** "You are a mathematics tutor embedded in an interactive textbook
    on coding theory and cryptography."
-2. **Author voice samples:** A few paragraphs of the author's writing showing
-   her explanatory style.  For fun mode, samples of the comic tone.  These
-   samples will be iterated on during development.
+2. **Voice-imitation instruction (Decision 59):** no curated samples -- the
+   chapter text in the shared prefix (15-25K tokens of the author's actual
+   prose, Q3/Decision 52) *is* the voice exemplar.  The system prompt instructs
+   explicitly: "Write in the voice of the textbook provided: match its tone,
+   notation, and explanatory habits," naming 2-3 salient stylistic traits
+   (conversational asides, 'out loud, we say...' readings, concrete
+   small-number examples before generality).  The instruction is required --
+   models don't spontaneously imitate reference material.  (Fun mode
+   deliberately does NOT imitate the author's comic voice -- Q10.)
 3. **Tool-specific instructions:** what to produce, at what level, in what
    format.
 4. **Output format:** "Render all math as LaTeX between `$...$` (inline) or
@@ -1003,8 +1010,8 @@ The tool -> tier assignments live in Q3 (Haiku for example/fun/quiz/summarize,
 Sonnet for justify/counterexample/intuition/applet/chat).
 
 **The caching architecture is the heart of the cost model** (Decisions 52-53).
-Every request is assembled as `[shared prefix: core prompt + voice samples +
-chapter text + ToC] -> cache breakpoint -> [creature instructions + selection +
+Every request is assembled as `[shared prefix: core prompt + chapter text +
+ToC] -> cache breakpoint -> [creature instructions + selection +
 conversation]`.  The shared prefix is identical for every student and every
 creature on a chapter, so the whole class shares ONE cache entry per chapter
 (~15-25K tokens), plus one for the full book (~120-150K, amp-up chat only).
@@ -1147,6 +1154,7 @@ default.
 | 56 | Quiet mode (typed icons) is the base UI, built and shipped first; creatures are progressive enhancement as art lands; launch roster = example, intuition, chat, quiz (Q11) | 2026-07-03 |
 | 57 | Auth hardening: SameSite=Lax session cookie, rate-limited code entry, admin lockout; "FERPA-clean" softened to privacy-preserving (Q5) | 2026-07-03 |
 | 58 | Data retention: usage_log + sessions dropped and codes revoked at semester end; approved content persists (Q12) | 2026-07-03 |
+| 59 | No curated voice samples: the chapter text in every prefix is the voice exemplar; system prompt carries an explicit imitation instruction naming 2-3 stylistic traits (Q3) | 2026-07-03 |
 
 ---
 
@@ -1154,13 +1162,15 @@ default.
 
 **Not yet built:**
 
-- [ ] **Prototype LaTeX-to-web pipeline** -- test LaTeXML with the actual
-  `.tex` files; build the post-processor and JSON manifest.
+- [x] **LaTeX-to-web pipeline** -- BUILT: preprocess -> latexml -> manifest
+  (817 hashed, anchored blocks) -> HTML, 0 errors, regression-gated
+  (`pipeline/check.sh`); chapter-split output per Decision 50.
 - [ ] **Creature art generation** -- take descriptions to an image generator
-  and iterate on style.  Need sprite sheets (~10 frames) per creature per
-  status variant.
+  and iterate on style (prompts ready in `creature_art_prompts.md`; workflow in
+  `creature_art_HOWTO.md`).  Launch needs only the four Decision-56 creatures --
+  quiet-mode icons ship first regardless.
 - [ ] **Detailed prompt engineering** -- craft per-creature system prompts
-  with author voice samples.
+  (voice via imitation instruction, Decision 59 -- no sample curation needed).
 
 **Resolved** (full details in the referenced sections):
 
