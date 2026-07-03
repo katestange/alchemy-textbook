@@ -1,2 +1,5 @@
-flask
+fastapi
+uvicorn[standard]
+anthropic
+python-dotenv
 pytest  # dev/test only (used by tests/; installed in backend/.venv)
