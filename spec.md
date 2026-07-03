@@ -359,10 +359,17 @@ a secondary option.
 - Codes are pre-assigned by instructor to students via a private offline
   record (spreadsheet, text file) that maps codes to names.  **The system
   itself never stores student names** -- the dashboard shows only codes and
-  usage.  This keeps the application FERPA-clean.
+  usage.  This keeps the application **privacy-preserving** (pseudonymous
+  codes, no content, no names -- though `usage_log` is still a reading-behavior
+  trail an instructor could link to students offline, so we don't overclaim
+  "FERPA-clean"; see the retention rule in Q12).
 - Student enters code once in the browser.  Browser receives a session token
-  stored in an HttpOnly cookie (secure against XSS).  Cookie persists until
-  end of semester or revocation.
+  stored in an HttpOnly, **SameSite=Lax** cookie (XSS- and CSRF-resistant --
+  without SameSite, a cross-site request could spend a student's budget).
+  Cookie persists until end of semester or revocation.
+- The code-entry endpoint is **rate-limited** (codes are short enough to
+  brute-force otherwise), and the admin login locks out after repeated
+  failures.
 - Same code works on multiple devices, drawing from one shared budget.
 
 **Dashboard (instructor) capabilities:**
@@ -506,7 +513,11 @@ an exact content hash (of its text).  Cached AI content is keyed to this hash.
     single-letter change could invalidate an example, so all non-exact
     matches require instructor approval.
 - The orphan/re-anchor review is part of the instructor dashboard, shown
-  after each build that changes the content structure.
+  after each build that changes the content structure.  **This screen must be
+  keyboard-fast and batchable** (one keystroke per verdict, bulk-accept for
+  high-confidence matches): an author who rewrites freely faces dozens of
+  verdicts per editing session, and if the flow is slow, orphans pile up and
+  silently rot.
 
 **This keeps the build pipeline AI-free** -- all intelligence about re-anchoring
 is simple text similarity (e.g. difflib or similar), not AI calls.  AI is only
@@ -732,6 +743,20 @@ and performant.
   type and status ("Unreviewed worked example for Definition 3.2.1").
 - **Keyboard navigation:** tab through creatures, enter to expand.
 
+#### Build order: quiet mode first (Decision 56)
+
+Quiet mode is not a fallback bolted on later -- it is **the base UI, built and
+shipped first**.  Every tool works as a simple typed icon before any creature
+art exists; creatures are **progressive enhancement**, layered on as sprite
+sheets land.  This keeps launch independent of art production (~300 hand-drawn
+frames otherwise sit on the critical path) while changing nothing about the
+creature vision itself.
+
+**Launch roster:** the first release ships four tools -- **example
+(dragon-worm), intuition (firefly), chat (cat), quiz (raven)** -- the highest
+pedagogical value per prompt.  The remaining creatures (justify, counterexample,
+applet, fun, summarize, eureka) follow once the core loop is proven.
+
 #### Mobile / narrow screens
 
 Margins collapse on small viewports.  Margin creatures become a collapsible
@@ -755,6 +780,11 @@ requests) are never stored.  Only the AI's final output (the artifact visible
 in the textbook) is stored.  Chat conversations are ephemeral -- only eureka
 creatures that emerge from chat are persisted.  Students can be told: "Your
 conversations aren't stored.  Only the artifacts that appear in the text are."
+
+**Retention rule (Decision 58):** at semester end, `usage_log` and `sessions`
+are dropped and invite codes revoked -- the pseudonymous reading-behavior trail
+does not outlive the course.  Approved content (and its `created_by_code`
+tags) persists as part of the textbook.
 
 **Tables:**
 
@@ -1114,6 +1144,9 @@ default.
 | 53 | Instructor-funded cache warmth via billing attribution: 1-hour TTL; students priced as-if-warm (cache-read rate), the write premium lands on an instructor ledger; no scheduled warmups; ledgers in microdollars (Q14/Q12) | 2026-07-03 |
 | 54 | FastAPI (not Flask): async server so long-lived SSE streams never block the reading experience (Q2) | 2026-07-03 |
 | 55 | Guardrails are pedagogy, not police: prompts steer toward hints and self-discipline; integrity is course policy + visibility, never enforcement or surveillance (Q3) | 2026-07-03 |
+| 56 | Quiet mode (typed icons) is the base UI, built and shipped first; creatures are progressive enhancement as art lands; launch roster = example, intuition, chat, quiz (Q11) | 2026-07-03 |
+| 57 | Auth hardening: SameSite=Lax session cookie, rate-limited code entry, admin lockout; "FERPA-clean" softened to privacy-preserving (Q5) | 2026-07-03 |
+| 58 | Data retention: usage_log + sessions dropped and codes revoked at semester end; approved content persists (Q12) | 2026-07-03 |
 
 ---
 
