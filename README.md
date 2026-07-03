@@ -36,23 +36,57 @@ GIT_SETUP.md             How this repo was set up + how to push to GitHub
 build/                   Generated artifacts (git-ignored; regenerable)
 ```
 
-## Building the web content
+## Editing the textbook and publishing (the authoring loop)
 
-Prerequisites (LaTeXML, TeX, Python, Node) are installed per
-[`HELPCLAUDE.txt`](HELPCLAUDE.txt). Then:
+This is the everyday workflow (spec Decision 60). Edit the LaTeX, then run one
+command:
 
 ```bash
-bash pipeline/build.sh
+# from a terminal in the project directory (as the 'claude' user, or as root —
+# the script drops privileges itself):
+./publish.sh
 ```
 
-This produces, in `build/`:
+It takes ~5–7 minutes (LaTeXML is the slow part) and does everything:
 
-- `book.xml` — LaTeXML semantic XML
-- `manifest.json` — content blocks with type, section, stable content hash, and
-  preview (what the AI tools and cache anchor to)
-- `book.html` — rendered reader HTML
+1. **Rebuilds** the web textbook from `textbook_source/`.
+2. **Runs the regression gates.** Three outcomes:
+   - **All green** → proceeds silently.
+   - **New LaTeXML errors** → **aborts, commits nothing.** Your edit broke
+     something; the `+` lines name it, details in `build/latexml.log`. Fix and
+     re-run.
+   - **Structure/warning diffs** → shows them as your edit's *receipt*
+     ("chapter 2: paragraphs 45 → 52…") and asks you to confirm they match
+     what you intended. `y` accepts them as the new baseline.
+3. **Commits** your source changes together with the updated baselines (so
+   every structural change is reviewable in git history), asks for a commit
+   message (Enter accepts the default), and **pushes to GitHub**.
 
-The author's source is never modified; all fixes live in the pre-processor.
+Options: `./publish.sh -m "rewrote CRT section"` for the message inline;
+`./publish.sh --yes` for non-interactive use (new *errors* still abort).
+
+Notes:
+- Only `textbook_source/` + pipeline baselines are committed; any other
+  uncommitted work is listed and left alone.
+- Content edits never require touching the pipeline. Editing a **preamble**
+  `\usepackage` line may trip the fail-closed pre-processor — it aborts with
+  instructions rather than hanging the build.
+- Once real hosting exists (spec Q7), server deployment hooks in at the end of
+  the same script; today, GitHub is the destination.
+
+## Build pieces (what publish.sh drives)
+
+```bash
+bash pipeline/build.sh    # rebuild only: preprocess -> latexml -> manifest -> HTML
+bash pipeline/check.sh    # rebuild + all gates (errors, warnings, structure)
+```
+
+Artifacts in `build/` (git-ignored, regenerable): `book.xml` (semantic XML),
+`manifest.json` (817 content blocks with type, section, stable content hash,
+DOM anchor — what the AI tools and cache anchor to), `html/S1..S9.html`
+(chapter reader pages + `chapters.json`), `book.html` (single-file book).
+The author's source is never modified by the pipeline; the pre-processor
+adapts a copy.
 
 ## Tech stack (see spec for rationale)
 

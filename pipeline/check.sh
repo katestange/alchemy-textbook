@@ -27,6 +27,10 @@
 #                                         with the current state (use after an
 #                                         intentional change so the new state
 #                                         becomes the accepted baseline)
+#   pipeline/check.sh --accept-current   like --update-baseline but WITHOUT
+#                                         rebuilding: accept the artifacts of the
+#                                         build that just ran (used by publish.sh
+#                                         after showing the author the diff)
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -71,12 +75,24 @@ normalize_warnings() {
 }
 
 UPDATE_BASELINE=0
+SKIP_BUILD=0
 if [ "${1:-}" = "--update-baseline" ]; then
     UPDATE_BASELINE=1
+elif [ "${1:-}" = "--accept-current" ]; then
+    UPDATE_BASELINE=1
+    SKIP_BUILD=1
 fi
 
-echo "===== running build ====="
-bash pipeline/build.sh
+if [ "$SKIP_BUILD" -eq 0 ]; then
+    echo "===== running build ====="
+    bash pipeline/build.sh
+else
+    echo "===== accepting current build artifacts (no rebuild) ====="
+    [ -f "$LOG" ] && [ -f "$MANIFEST" ] || {
+        echo "FATAL: no current build to accept ($LOG / $MANIFEST missing) — run pipeline/check.sh first" >&2
+        exit 1
+    }
+fi
 
 [ -f "$LOG" ] || { echo "FATAL: $LOG not found after build" >&2; exit 1; }
 
