@@ -1,0 +1,62 @@
+{% extends "admin/base.html" %}
+{% block title %}Invite codes{% endblock %}
+{% block content %}
+<h1>Invite codes</h1>
+<p class="hint">Codes are pseudonymous &mdash; map codes to student names in
+your own offline record (Q5). Revoking a code also deletes its sessions.</p>
+
+{% if new_codes %}
+<div class="notice">
+  Generated {{ new_codes|length }} code(s):
+  {% for c in new_codes %}<code>{{ c }}</code> {% endfor %}
+</div>
+{% endif %}
+
+<section class="block card">
+  <h2>Generate a batch</h2>
+  <form method="post" action="/admin/codes/generate" class="inline-form">
+    <label>Count <input type="number" name="count" value="5" min="1" max="500"></label>
+    <label>Budget $ <input type="number" name="budget_dollars" value="5" step="0.01" min="0.01"></label>
+    <label>Daily limit $ <input type="number" name="daily_limit_dollars" value="1" step="0.01" min="0" placeholder="none"></label>
+    <button class="primary">Generate</button>
+  </form>
+</section>
+
+<table>
+  <thead>
+    <tr>
+      <th>Code</th><th class="num">Budget</th><th class="num">Spent</th>
+      <th class="num">Remaining</th><th class="num">Daily limit</th>
+      <th class="num">Sessions</th><th>Created</th><th>Status</th><th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for c in codes %}
+    <tr>
+      <td><code>{{ c.code }}</code></td>
+      <td class="num">{{ c.budget_microdollars|dollars }}</td>
+      <td class="num">{{ c.spent_microdollars|dollars }}</td>
+      <td class="num">{{ (c.budget_microdollars - c.spent_microdollars)|dollars }}</td>
+      <td class="num">{% if c.daily_limit_microdollars %}{{ c.daily_limit_microdollars|dollars }}{% else %}&mdash;{% endif %}</td>
+      <td class="num">{{ c.session_count }}</td>
+      <td>{{ c.created_at[:10] }}</td>
+      <td>{% if c.revoked %}<span class="badge revoked">revoked</span>{% else %}active{% endif %}</td>
+      <td>
+        <div class="inline-form">
+          <form method="post" action="/admin/codes/{{ c.code }}/topup" class="inline-form">
+            <input type="number" name="amount_dollars" step="0.01" min="0.01" placeholder="$">
+            <button>Top up</button>
+          </form>
+          {% if not c.revoked %}
+          <form method="post" action="/admin/codes/{{ c.code }}/revoke">
+            <button class="danger">Revoke</button>
+          </form>
+          {% endif %}
+        </div>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% if not codes %}<p class="empty">No invite codes yet.</p>{% endif %}
+{% endblock %}

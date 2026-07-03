@@ -1,0 +1,145 @@
+{% extends "admin/base.html" %}
+{% block title %}Review queue{% endblock %}
+{% block content %}
+<h1>Review queue</h1>
+<p class="hint">
+  {{ items|length }} awaiting review
+  ({{ counts.get('unreviewed', 0) }} unreviewed, {{ counts.get('flagged', 0) }} flagged;
+  {{ counts.get('approved', 0) }} approved so far) &mdash;
+  <kbd>j</kbd>/<kbd>k</kbd> move &middot; <kbd>a</kbd> approve &middot;
+  <kbd>r</kbd> remove &middot; <kbd>e</kbd> edit &middot; <kbd>Esc</kbd> leave editor
+</p>
+
+{% if not items %}
+  <p class="empty">Nothing to review. The queue is clear.</p>
+{% endif %}
+
+{% for item in items %}
+<article class="item" data-id="{{ item.id }}">
+  <div class="meta">
+    <span class="badge creature">{{ item.creature_type }}</span>
+    <span class="badge status-{{ item.status }}">{{ item.status }}</span>
+    <span>by <code>{{ item.created_by_code or "?" }}</code></span>
+    <span>{{ item.cost_microdollars|dollars }}</span>
+    <span>{{ item.created_at[:16].replace("T", " ") }}</span>
+    <span>{{ item.model_used }}</span>
+  </div>
+
+  <div class="anchor">
+    {% if item.anchor_preview %}
+      Anchored at <strong>&sect;{{ item.anchor_section }}</strong>:
+      {{ item.anchor_preview }}
+    {% else %}
+      <span class="badge status-flagged">orphaned</span>
+      anchor <code>{{ item.content_hash[:12] }}&hellip;</code> is not in the
+      current build (last known section
+      {{ item.section_id or "?" }}) &mdash; handle it in the
+      <a href="/admin/orphans">Orphans queue</a>.
+    {% endif %}
+  </div>
+
+  {% if item.selection_text %}
+  <blockquote class="selection">{{ item.selection_text }}</blockquote>
+  {% endif %}
+
+  {% for f in flags.get(item.id, []) %}
+  <div class="flag">&#9873; {{ f.comment or "(no comment)" }}
+    &mdash; {{ f.created_at[:16].replace("T", " ") }}</div>
+  {% endfor %}
+
+  <div class="response">{{ item.response }}</div>
+
+  <div class="actions">
+    <form method="post" action="/admin/review/{{ item.id }}/approve">
+      <button class="primary">Approve</button>
+    </form>
+    <button type="button" class="edit-toggle">Edit</button>
+    <form method="post" action="/admin/review/{{ item.id }}/remove">
+      <button class="danger">Remove</button>
+    </form>
+  </div>
+
+  <form method="post" action="/admin/review/{{ item.id }}/edit"
+        class="edit-form" hidden>
+    <textarea name="response" rows="12">{{ item.response }}</textarea>
+    <div class="row">
+      <button name="save" value="1">Save (stays unreviewed)</button>
+      <button name="save_approve" value="1" class="primary">Save + approve</button>
+      <button type="button" class="edit-cancel">Cancel</button>
+    </div>
+  </form>
+</article>
+{% endfor %}
+{% endblock %}
+
+{% block script %}
+<script>
+(function () {
+  "use strict";
+  var items = Array.prototype.slice.call(document.querySelectorAll(".item"));
+  var sel = -1;
+
+  function select(i) {
+    if (!items.length) return;
+    i = Math.max(0, Math.min(items.length - 1, i));
+    if (sel >= 0 && items[sel]) items[sel].classList.remove("selected");
+    sel = i;
+    items[sel].classList.add("selected");
+    items[sel].scrollIntoView({ block: "nearest" });
+  }
+
+  function act(action) {
+    if (sel < 0 || !items.length) return;
+    var i = sel, el = items[i];
+    fetch("/admin/review/" + el.dataset.id + "/" + action, { method: "POST" })
+      .then(function (r) {
+        if (!r.ok) return;
+        el.remove();
+        items.splice(i, 1);
+        sel = -1;
+        if (items.length) select(Math.min(i, items.length - 1));
+      });
+  }
+
+  function openEditor(el) {
+    var f = el.querySelector(".edit-form");
+    f.hidden = false;
+    var ta = f.querySelector("textarea");
+    ta.focus();
+    ta.setSelectionRange(0, 0);
+  }
+
+  items.forEach(function (el, i) {
+    el.addEventListener("click", function () { select(i); });
+    el.querySelector(".edit-toggle").addEventListener("click", function () {
+      select(i); openEditor(el);
+    });
+    el.querySelector(".edit-cancel").addEventListener("click", function () {
+      el.querySelector(".edit-form").hidden = true;
+    });
+  });
+
+  document.addEventListener("keydown", function (e) {
+    var t = e.target;
+    if (t.matches("textarea, input")) {
+      if (e.key === "Escape") {
+        t.blur();
+        var f = t.closest(".edit-form");
+        if (f) f.hidden = true;
+      }
+      return;
+    }
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key === "j") { e.preventDefault(); select(sel + 1); }
+    else if (e.key === "k") { e.preventDefault(); select(sel < 0 ? 0 : sel - 1); }
+    else if (e.key === "a") { e.preventDefault(); act("approve"); }
+    else if (e.key === "r") { e.preventDefault(); act("remove"); }
+    else if (e.key === "e") {
+      if (sel >= 0) { e.preventDefault(); openEditor(items[sel]); }
+    }
+  });
+
+  if (items.length) select(0);
+})();
+</script>
+{% endblock %}

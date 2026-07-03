@@ -33,6 +33,47 @@ code: `DEV-TEST-1` ($5.00 budget, seeded on first startup).
 | `GET /api/whoami` | Session check (reload survival) + remaining budget |
 | `GET /api/content/{hash}` | Cached artifacts visible to the caller (approved ∪ own-unreviewed) |
 | `POST /api/generate` | SSE: `delta` events, then `done` (cost, remaining budget, usage) or `error` (`refresh_required`, `budget_exceeded`, `auth_required`, `unknown_block`) |
+| `GET /admin` | Instructor dashboard (see below) |
+
+## Instructor dashboard (`/admin`)
+
+Server-rendered (Jinja2, `backend/templates/admin/`, code in
+`backend/admin.py`), keyboard-first, no CDN assets. Implements Decisions 42
+(admin password), 48 (moderate everything), 53 (two ledgers), 57 (lockout),
+60 (orphan re-anchor, never automatic).
+
+**Setup:** add `ADMIN_PASSWORD=...` to `/workspace/.env` and (re)start the
+server. On startup, if the `admin` table is **empty** and `ADMIN_PASSWORD` is
+set, the password is seeded — stored as a stdlib `hashlib.scrypt` hash
+(memory-hard like argon2, zero extra dependencies). The env var is only read
+for that one-time seed; to change the password, delete the `admin` table row
+and restart with the new value. Login mints a separate HttpOnly SameSite=Lax
+`admin_session` cookie (path `/admin`), distinct from student `session`
+cookies. After 5 consecutive wrong passwords, login refuses attempts for 15
+minutes (counter and lock timestamp persist in the `admin` table across
+restarts).
+
+**Screens** (all guarded by the admin session):
+
+- `/admin/review` — unreviewed + flagged artifacts, newest first, with the
+  anchor block's section + preview (orphaned anchors degrade gracefully and
+  point to the orphans queue), the selection, flag comments, and the full
+  response. Keys: `j`/`k` move, `a` approve, `r` remove, `e` edit, `Esc`
+  closes the editor. Edit can save (stays unreviewed) or save + approve in
+  one step.
+- `/admin/orphans` — artifacts whose `content_hash` is missing from the
+  current build's manifest, each with the top-3 candidate blocks by fuzzy
+  similarity (difflib `SequenceMatcher` ratio of the stored selection —
+  padded with response text when the selection is short — against full
+  block text, `real_quick_ratio`/`quick_ratio` pre-screened; exact
+  containment of the selection scores 1.0). Keys: `j`/`k` move, `1`/`2`/`3`
+  re-anchor to that candidate, `x` delete. Nothing is ever re-anchored
+  automatically (Decision 60).
+- `/admin/codes` — generate batches (`CRYPTO-XXXX-XX`, crypto-random from an
+  unambiguous alphabet), top up, revoke (revoking also deletes the code's
+  sessions). Budgets shown in dollars, stored in microdollars.
+- `/admin/usage` — totals per ledger (student vs instructor), per creature
+  type, per top-level chapter, plus the 50 most recent `usage_log` rows.
 
 ## Data
 

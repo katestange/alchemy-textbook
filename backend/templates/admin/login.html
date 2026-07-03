@@ -1,0 +1,19 @@
+{% extends "admin/base.html" %}
+{% block title %}Log in{% endblock %}
+{% block content %}
+<div class="card" style="max-width: 22rem; margin: 5rem auto;">
+  <h1>Instructor login</h1>
+  {% if not configured %}
+    <p class="error">No admin password is configured yet. Set
+    <code>ADMIN_PASSWORD</code> in <code>.env</code> and restart the server
+    to seed it.</p>
+  {% else %}
+    {% if error %}<p class="error">{{ error }}</p>{% endif %}
+    <form method="post" action="/admin/login">
+      <p><input type="password" name="password" placeholder="Admin password"
+                autofocus autocomplete="current-password"></p>
+      <button class="primary" style="width:100%">Log in</button>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}

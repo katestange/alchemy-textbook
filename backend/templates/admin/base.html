@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Dashboard{% endblock %} &middot; Instructor</title>
+<style>
+  :root {
+    --ink: #1a1d21; --muted: #667085; --line: #e4e7ec; --bg: #f7f8fa;
+    --card: #ffffff; --accent: #3550b0; --ok: #1a7f37; --warn: #b54708;
+    --bad: #b42318; --sel: #3550b0;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { background: var(--card); border-bottom: 1px solid var(--line);
+           padding: 0.6rem 1.2rem; display: flex; align-items: center;
+           gap: 1.2rem; position: sticky; top: 0; z-index: 10; }
+  header .brand { font-weight: 650; }
+  nav { display: flex; gap: 0.2rem; flex: 1; }
+  nav a { color: var(--muted); text-decoration: none; padding: 0.3rem 0.7rem;
+          border-radius: 6px; }
+  nav a:hover { color: var(--ink); background: var(--bg); }
+  nav a.active { color: var(--accent); background: #eef1fb; font-weight: 600; }
+  main { max-width: 62rem; margin: 1.4rem auto 4rem; padding: 0 1.2rem; }
+  h1 { font-size: 1.25rem; margin: 0 0 0.2rem; }
+  .hint { color: var(--muted); font-size: 0.85rem; margin-bottom: 1rem; }
+  kbd { background: #eef1f4; border: 1px solid var(--line);
+        border-bottom-width: 2px; border-radius: 4px; padding: 0 0.35em;
+        font: 0.85em ui-monospace, monospace; }
+  .card, .item { background: var(--card); border: 1px solid var(--line);
+                 border-radius: 10px; padding: 0.9rem 1.1rem;
+                 margin-bottom: 0.9rem; }
+  .item.selected { border-color: var(--sel); box-shadow: 0 0 0 2px var(--sel); }
+  .meta { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; align-items: baseline;
+          color: var(--muted); font-size: 0.85rem; margin-bottom: 0.5rem; }
+  .badge { display: inline-block; border-radius: 999px; padding: 0.05rem 0.6rem;
+           font-size: 0.8rem; font-weight: 600; }
+  .badge.creature { background: #eef1fb; color: var(--accent); }
+  .badge.status-unreviewed { background: #fef0c7; color: var(--warn); }
+  .badge.status-flagged { background: #fee4e2; color: var(--bad); }
+  .badge.status-approved { background: #d3f3df; color: var(--ok); }
+  .badge.revoked { background: #fee4e2; color: var(--bad); }
+  .anchor { font-size: 0.9rem; color: var(--muted); border-left: 3px solid
+            var(--line); padding-left: 0.7rem; margin: 0.4rem 0; }
+  .anchor strong { color: var(--ink); }
+  blockquote.selection { margin: 0.5rem 0; padding: 0.4rem 0.7rem;
+      background: #fbf6e9; border-left: 3px solid #d9c37a; font-size: 0.9rem;
+      white-space: pre-wrap; }
+  .flag { background: #fee4e2; color: var(--bad); border-radius: 6px;
+          padding: 0.3rem 0.7rem; font-size: 0.88rem; margin: 0.4rem 0; }
+  .response { white-space: pre-wrap; margin: 0.6rem 0;
+              border-top: 1px dashed var(--line); padding-top: 0.6rem; }
+  .actions { display: flex; gap: 0.5rem; align-items: center; }
+  .actions form { display: inline; margin: 0; }
+  button { font: inherit; font-size: 0.88rem; padding: 0.32rem 0.85rem;
+           border-radius: 7px; border: 1px solid var(--line);
+           background: var(--card); color: var(--ink); cursor: pointer; }
+  button:hover { border-color: var(--muted); }
+  button.primary { background: var(--accent); border-color: var(--accent);
+                   color: #fff; }
+  button.danger { color: var(--bad); }
+  textarea, input[type=text], input[type=password], input[type=number] {
+      font: inherit; width: 100%; border: 1px solid var(--line);
+      border-radius: 7px; padding: 0.45rem 0.6rem; background: var(--card); }
+  textarea { font-family: ui-monospace, monospace; font-size: 0.85rem; }
+  .edit-form { margin-top: 0.6rem; display: grid; gap: 0.5rem; }
+  .edit-form .row { display: flex; gap: 0.5rem; }
+  table { width: 100%; border-collapse: collapse; background: var(--card);
+          border: 1px solid var(--line); border-radius: 10px;
+          overflow: hidden; font-size: 0.9rem; }
+  th, td { text-align: left; padding: 0.45rem 0.8rem;
+           border-bottom: 1px solid var(--line); }
+  th { background: var(--bg); color: var(--muted); font-weight: 600;
+       font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; }
+  tr:last-child td { border-bottom: none; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  code { font: 0.88em ui-monospace, monospace; background: #eef1f4;
+         padding: 0 0.3em; border-radius: 4px; }
+  .empty { color: var(--muted); font-style: italic; padding: 2rem 0;
+           text-align: center; }
+  .notice { background: #d3f3df; color: var(--ok); border-radius: 8px;
+            padding: 0.5rem 0.9rem; margin-bottom: 1rem; font-size: 0.9rem; }
+  .error { background: #fee4e2; color: var(--bad); border-radius: 8px;
+           padding: 0.5rem 0.9rem; margin-bottom: 1rem; }
+  .inline-form { display: flex; gap: 0.4rem; align-items: center; }
+  .inline-form input { width: 6.5rem; }
+  .candidate { display: flex; gap: 0.7rem; align-items: baseline;
+      border: 1px solid var(--line); border-radius: 8px;
+      padding: 0.45rem 0.7rem; margin: 0.35rem 0; font-size: 0.9rem; }
+  .candidate .ratio { font-variant-numeric: tabular-nums; font-weight: 650;
+      color: var(--accent); min-width: 3.4rem; }
+  .candidate .key { color: var(--muted); }
+  section.block { margin-bottom: 2rem; }
+  h2 { font-size: 1.02rem; margin: 0 0 0.5rem; }
+</style>
+</head>
+<body>
+{% if active is defined %}
+<header>
+  <span class="brand">Instructor dashboard</span>
+  <nav>
+    <a href="/admin/review"  {% if active == 'review'  %}class="active"{% endif %}>Review queue</a>
+    <a href="/admin/orphans" {% if active == 'orphans' %}class="active"{% endif %}>Orphans</a>
+    <a href="/admin/codes"   {% if active == 'codes'   %}class="active"{% endif %}>Invite codes</a>
+    <a href="/admin/usage"   {% if active == 'usage'   %}class="active"{% endif %}>Usage</a>
+  </nav>
+  <form method="post" action="/admin/logout"><button>Log out</button></form>
+</header>
+{% endif %}
+<main>
+{% block content %}{% endblock %}
+</main>
+{% block script %}{% endblock %}
+</body>
+</html>

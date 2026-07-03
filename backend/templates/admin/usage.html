@@ -1,0 +1,68 @@
+{% extends "admin/base.html" %}
+{% block title %}Usage{% endblock %}
+{% block content %}
+<h1>Usage</h1>
+<p class="hint">Two-ledger accounting (Decision 53): students pay the
+as-if-warm rate; the cache-write premium lands on the instructor ledger.
+All amounts stored in microdollars, shown in dollars.</p>
+
+<section class="block">
+  <h2>Totals by ledger &mdash; grand total {{ grand_total|dollars }}</h2>
+  <table>
+    <thead><tr><th>Ledger</th><th class="num">Requests</th><th class="num">Total</th></tr></thead>
+    <tbody>
+    {% for r in by_ledger %}
+      <tr><td>{{ r.ledger }}</td><td class="num">{{ r.n }}</td>
+          <td class="num">{{ r.total|dollars }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="block">
+  <h2>By creature type</h2>
+  <table>
+    <thead><tr><th>Creature</th><th class="num">Requests</th><th class="num">Total</th></tr></thead>
+    <tbody>
+    {% for r in by_creature %}
+      <tr><td>{{ r.creature_type }}</td><td class="num">{{ r.n }}</td>
+          <td class="num">{{ r.total|dollars }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="block">
+  <h2>By chapter</h2>
+  <table>
+    <thead><tr><th>Chapter</th><th class="num">Requests</th><th class="num">Total</th></tr></thead>
+    <tbody>
+    {% for r in by_chapter %}
+      <tr><td>{{ r.chapter }}</td><td class="num">{{ r.n }}</td>
+          <td class="num">{{ r.total|dollars }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="block">
+  <h2>Most recent 50 events</h2>
+  <table>
+    <thead><tr><th>When</th><th>Code</th><th>Ledger</th><th>Creature</th>
+               <th>Section</th><th class="num">Cost</th></tr></thead>
+    <tbody>
+    {% for r in recent %}
+      <tr>
+        <td>{{ r.created_at[:19].replace("T", " ") }}</td>
+        <td>{% if r.code %}<code>{{ r.code }}</code>{% else %}&mdash;{% endif %}</td>
+        <td>{{ r.ledger }}</td>
+        <td>{{ r.creature_type or "" }}</td>
+        <td>{{ r.section_id or "" }}</td>
+        <td class="num">{{ r.cost_microdollars|dollars }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% if not recent %}<p class="empty">No usage yet.</p>{% endif %}
+</section>
+{% endblock %}

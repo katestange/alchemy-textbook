@@ -1,0 +1,128 @@
+{% extends "admin/base.html" %}
+{% block title %}Orphan re-anchor queue{% endblock %}
+{% block content %}
+<h1>Orphan re-anchor queue</h1>
+<p class="hint">
+  {{ orphans|length }} orphaned artifact(s) &mdash; anchors missing from the
+  current build. Nothing is ever re-anchored automatically; every verdict is
+  yours (Decision 60). &nbsp;
+  <kbd>j</kbd>/<kbd>k</kbd> move &middot;
+  <kbd>1</kbd>/<kbd>2</kbd>/<kbd>3</kbd> re-anchor to that candidate &middot;
+  <kbd>x</kbd> delete
+</p>
+
+{% if not orphans %}
+  <p class="empty">No orphans. Every artifact's anchor exists in the current build.</p>
+{% endif %}
+
+{% for o in orphans %}
+{% set item = o.row %}
+<article class="item" data-id="{{ item.id }}">
+  <div class="meta">
+    <span class="badge creature">{{ item.creature_type }}</span>
+    <span class="badge status-{{ item.status }}">{{ item.status }}</span>
+    <span>by <code>{{ item.created_by_code or "?" }}</code></span>
+    <span>{{ item.created_at[:16].replace("T", " ") }}</span>
+    <span>old anchor <code>{{ item.content_hash[:12] }}&hellip;</code>
+          in &sect;{{ item.section_id or "?" }}</span>
+  </div>
+
+  <div class="anchor"><strong>Old anchor context</strong> (the stored selection):</div>
+  {% if item.selection_text %}
+    <blockquote class="selection">{{ item.selection_text }}</blockquote>
+  {% else %}
+    <blockquote class="selection"><em>(no selection stored &mdash; matching on
+    the response text)</em></blockquote>
+  {% endif %}
+
+  <div class="response" style="max-height: 9rem; overflow-y: auto;">{{ item.response }}</div>
+
+  <div class="anchor"><strong>Closest blocks in the current build:</strong></div>
+  {% if not o.candidates %}
+    <p class="hint">No plausible match found &mdash; likely deleted text; consider removing this artifact.</p>
+  {% endif %}
+  {% for c in o.candidates %}
+  <div class="candidate">
+    <span class="key"><kbd>{{ loop.index }}</kbd></span>
+    <span class="ratio">{{ "%.3f"|format(c.ratio) }}</span>
+    <span><strong>&sect;{{ c.section_id }}</strong>
+      <em>({{ c.block_type }})</em> {{ c.text_preview }}</span>
+    <form method="post" action="/admin/orphans/{{ item.id }}/reanchor"
+          class="reanchor-form" style="margin-left:auto">
+      <input type="hidden" name="content_hash" value="{{ c.content_hash }}">
+      <button class="primary">Re-anchor</button>
+    </form>
+  </div>
+  {% endfor %}
+
+  <div class="actions" style="margin-top: 0.6rem;">
+    <form method="post" action="/admin/orphans/{{ item.id }}/delete">
+      <button class="danger">Delete artifact</button>
+    </form>
+  </div>
+</article>
+{% endfor %}
+{% endblock %}
+
+{% block script %}
+<script>
+(function () {
+  "use strict";
+  var items = Array.prototype.slice.call(document.querySelectorAll(".item"));
+  var sel = -1;
+
+  function select(i) {
+    if (!items.length) return;
+    i = Math.max(0, Math.min(items.length - 1, i));
+    if (sel >= 0 && items[sel]) items[sel].classList.remove("selected");
+    sel = i;
+    items[sel].classList.add("selected");
+    items[sel].scrollIntoView({ block: "nearest" });
+  }
+
+  function drop(i) {
+    items[i].remove();
+    items.splice(i, 1);
+    sel = -1;
+    if (items.length) select(Math.min(i, items.length - 1));
+  }
+
+  function reanchor(n) {  // n is 1-based candidate number
+    if (sel < 0) return;
+    var i = sel, el = items[i];
+    var forms = el.querySelectorAll(".reanchor-form");
+    if (n > forms.length) return;
+    var hash = forms[n - 1].querySelector("input[name=content_hash]").value;
+    fetch("/admin/orphans/" + el.dataset.id + "/reanchor", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "content_hash=" + encodeURIComponent(hash)
+    }).then(function (r) { if (r.ok) drop(i); });
+  }
+
+  function del() {
+    if (sel < 0) return;
+    var i = sel, el = items[i];
+    fetch("/admin/orphans/" + el.dataset.id + "/delete", { method: "POST" })
+      .then(function (r) { if (r.ok) drop(i); });
+  }
+
+  items.forEach(function (el, i) {
+    el.addEventListener("click", function () { select(i); });
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.target.matches("textarea, input")) return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key === "j") { e.preventDefault(); select(sel + 1); }
+    else if (e.key === "k") { e.preventDefault(); select(sel < 0 ? 0 : sel - 1); }
+    else if (e.key === "1" || e.key === "2" || e.key === "3") {
+      e.preventDefault(); reanchor(parseInt(e.key, 10));
+    }
+    else if (e.key === "x") { e.preventDefault(); del(); }
+  });
+
+  if (items.length) select(0);
+})();
+</script>
+{% endblock %}

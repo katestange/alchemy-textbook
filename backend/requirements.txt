@@ -2,4 +2,6 @@ fastapi
 uvicorn[standard]
 anthropic
 python-dotenv
+jinja2  # /admin instructor dashboard templates
+python-multipart  # starlette form parsing for /admin login + actions
 pytest  # dev/test only (used by tests/; installed in backend/.venv)

@@ -142,6 +142,18 @@ CREATURE_INSTRUCTIONS = {
         "so the student can attempt the variation first and then check "
         "their work)."
     ),
+    # V1 PROMPT -- intuition creature (dashboard deliverable; iterate after
+    # quality testing like the example prompt above).
+    "intuition": (
+        "You are the Intuition creature. Explain the intuition behind the "
+        "student's selection below: why it is true, why it matters, and give "
+        "one good analogy or mental picture that makes it stick -- grounded "
+        "in the chapter text, using the same notation and running examples "
+        "the chapter uses. Convey the feeling of the idea rather than "
+        "re-deriving it; small concrete numbers are welcome, full formal "
+        "proofs are not. Write flowing prose only: no headings, no lists of "
+        "steps, and no [[solution]] markers."
+    ),
 }
 DEFAULT_CREATURE_INSTRUCTION = (
     "Respond helpfully to the student's request about their selection below, "
@@ -270,7 +282,9 @@ CREATE TABLE IF NOT EXISTS content_manifest (
 );
 CREATE TABLE IF NOT EXISTS admin (
     id INTEGER PRIMARY KEY,
-    password_hash TEXT NOT NULL
+    password_hash TEXT NOT NULL,
+    failed_attempts INTEGER NOT NULL DEFAULT 0,  -- lockout (Decision 57)
+    locked_until TIMESTAMP                       -- lockout (Decision 57)
 );
 """
 
@@ -336,11 +350,23 @@ def db_execute(sql: str, params=()) -> int:
 
 app = FastAPI(title="Interactive textbook backend")
 
+# Instructor dashboard (/admin) -- server-rendered, Decisions 42/48/57/60.
+# admin.init() hands the dashboard this module (db helpers, MANIFEST) so it
+# works both under `uvicorn app:app` and `python backend/app.py`.
+import sys as _sys  # noqa: E402
+
+import admin as _admin  # noqa: E402
+
+_admin.init(_sys.modules[__name__])
+app.include_router(_admin.router)
+
 
 @app.on_event("startup")
 def startup() -> None:
     load_build_artifacts()
     init_db()
+    # Admin table migration + one-time ADMIN_PASSWORD seeding (Decision 42).
+    _admin.startup_admin()
 
 
 def caller_code(request: Request) -> str | None:
