@@ -76,6 +76,25 @@ def has_descendant(elem, tags) -> bool:
     return any(local(d) in tags for d in elem.iter())
 
 
+def block_xml_id(elem) -> str:
+    """xml:id anchoring this block in book.html (spec Q8: DOM mapping).
+
+    Nearly every emitted element carries its own xml:id.  The exception is a
+    proof whose id landed on an inner para; fall back to the first descendant
+    with an id -- that node sits *inside* the block in the rendered DOM, so it
+    still scrolls/highlights to the block (an ancestor id would only anchor
+    the enclosing section).
+    """
+    own = elem.get(XMLID)
+    if own:
+        return own
+    for d in elem.iter():
+        did = d.get(XMLID)
+        if did:
+            return did
+    return ""
+
+
 def main() -> int:
     if not XML.exists():
         print(f"ERROR: {XML} not found (run latexml first)", file=sys.stderr)
@@ -130,10 +149,14 @@ def main() -> int:
             "index": len(blocks),
             "content_hash": hashlib.sha256(text.encode("utf-8")).hexdigest(),
             "block_type": btype,
+            "xml_id": block_xml_id(elem),
             "section_id": secnum,
             "section_title": sectitle,
             "text_length": len(text),
             "text_preview": text[:200],
+            # Full normalized text (the exact hash input): lets a future
+            # re-anchoring pass fuzzy-match old blocks against a new build.
+            "text": text,
         })
 
     walk(root, "", "")
@@ -163,9 +186,10 @@ def main() -> int:
     for b in blocks:
         by_type[b["block_type"]] = by_type.get(b["block_type"], 0) + 1
 
+    no_anchor = sum(1 for b in blocks if not b["xml_id"])
     print(f"wrote {OUT}")
     print(f"  sections: {len(sections)}   blocks: {len(blocks)}"
-          f"   duplicate-hash groups: {dupes}")
+          f"   duplicate-hash groups: {dupes}   blocks w/o xml_id: {no_anchor}")
     print("  blocks by type: " + ", ".join(
         f"{k}={v}" for k, v in sorted(by_type.items(), key=lambda kv: -kv[1])))
     return 0
