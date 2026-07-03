@@ -1,0 +1,47 @@
+<script>
+  import { session } from '../stores/session.js';
+  import { claimCode } from '../api.js';
+
+  let code = '';
+  let submitting = false;
+  let error = null;
+
+  async function submit() {
+    if (!code.trim() || submitting) return;
+    submitting = true;
+    error = null;
+    try {
+      const result = await claimCode(code.trim());
+      session.setClaimed(result.budget_remaining_microdollars);
+    } catch (e) {
+      error = e.status === 401 || e.status === 404
+        ? 'That code was not recognized. Double check it and try again.'
+        : 'Something went wrong claiming that code. Please try again.';
+    } finally {
+      submitting = false;
+    }
+  }
+</script>
+
+<div class="code-entry">
+  <h1>The Alchemy of Mathematical Cryptography</h1>
+  <p>Enter your invite code to unlock AI-assisted study tools. You can also read the base textbook without a code.</p>
+  <form on:submit|preventDefault={submit}>
+    <input
+      type="text"
+      placeholder="CRYPTO-7X4M-Q2"
+      bind:value={code}
+      autocomplete="off"
+      spellcheck="false"
+    />
+    <button type="submit" disabled={submitting}>{submitting ? 'Checking…' : 'Enter'}</button>
+  </form>
+  {#if error}
+    <p class="error">{error}</p>
+  {/if}
+  <p class="hint">
+    No code? <button class="link-btn" type="button" on:click={() => session.continueAnonymous()}>
+      Continue as an anonymous reader
+    </button> (base textbook only — no AI generation).
+  </p>
+</div>

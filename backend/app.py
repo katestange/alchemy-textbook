@@ -111,8 +111,13 @@ explanatory habits -- the conversational asides, the "out loud, we say..." \
 readings, the concrete small-number examples before generality.
 
 Output format: render all mathematics as LaTeX between $...$ (inline) or \
-$$...$$ (display). Do not use any other math delimiters. For SageMath code, \
-produce valid Sage code that runs in a SageCell widget.
+$$...$$ (display). Do not use any other math delimiters. Inside math, use \
+only core LaTeX math commands (amsmath level) -- no package-specific commands \
+such as \\ding, \\tikz, \\xymatrix, or color commands, because the math is \
+rendered in the browser. Outside math, write plain prose: no markdown \
+headings (#), no bullet lists unless genuinely enumerating, no bold-face \
+scaffolding like "**Step 1**". For SageMath code, produce valid Sage code \
+that runs in a SageCell widget.
 
 Pedagogy: prefer hints, reasoning, and Socratic questions over finished \
 answers; encourage the student to attempt the next step themselves. You are \
@@ -415,6 +420,20 @@ async def api_claim(request: Request, response: Response):
 # --- cached content --------------------------------------------------------
 
 
+@app.get("/api/whoami")
+def api_whoami(request: Request):
+    """Session check so a page reload doesn't force re-entering the code."""
+    code = caller_code(request)
+    if not code:
+        return {"ok": False}
+    row = db_query(
+        "SELECT budget_microdollars - spent_microdollars AS remaining "
+        "FROM invite_codes WHERE code = ? AND NOT revoked", (code,))
+    if not row:
+        return {"ok": False}
+    return {"ok": True, "budget_remaining_microdollars": row[0]["remaining"]}
+
+
 @app.get("/api/content/{block_hash}")
 def api_content(block_hash: str, request: Request):
     code = caller_code(request)
@@ -556,12 +575,18 @@ async def api_generate(request: Request):
             ),
         )
 
-        # h. Terminal event.
+        # h. Terminal event (includes the authoritative remaining budget so
+        # the client never has to approximate it).
+        remaining_row = db_query(
+            "SELECT budget_microdollars - spent_microdollars AS remaining "
+            "FROM invite_codes WHERE code = ?", (code,))
         yield sse(
             "done",
             {
                 "content_id": content_id,
                 "cost_microdollars": student_cost,
+                "budget_remaining_microdollars": (
+                    remaining_row[0]["remaining"] if remaining_row else None),
                 "usage": {
                     "input_tokens": usage.input_tokens or 0,
                     "output_tokens": usage.output_tokens or 0,
@@ -572,6 +597,16 @@ async def api_generate(request: Request):
         )
 
     return StreamingResponse(event_stream(), media_type="text/event-stream")
+
+
+# ---------------------------------------------------------------------------
+# Built frontend (single-process serving, Decision 44): if frontend/dist
+# exists, serve it at /.  Mounted last so all API routes above win.
+# ---------------------------------------------------------------------------
+_DIST = Path(__file__).resolve().parent.parent / "frontend" / "dist"
+if _DIST.is_dir():
+    from fastapi.staticfiles import StaticFiles
+    app.mount("/", StaticFiles(directory=str(_DIST), html=True), name="frontend")
 
 
 if __name__ == "__main__":
