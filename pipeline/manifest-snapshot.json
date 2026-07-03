@@ -1,0 +1,67 @@
+{
+ "total_blocks": 817,
+ "total_sections": 154,
+ "duplicate_hash_groups": 2,
+ "chapters": {
+  "1": {
+   "paragraph": 74,
+   "proof": 1,
+   "theorem": 1
+  },
+  "2": {
+   "checkin": 19,
+   "corollary": 1,
+   "definition": 10,
+   "example": 1,
+   "paragraph": 184,
+   "philosophy": 1,
+   "problem": 2,
+   "proof": 7,
+   "proposition": 3,
+   "question": 1,
+   "remark": 1,
+   "solution": 1,
+   "theorem": 6
+  },
+  "3": {
+   "definition": 1,
+   "example": 5,
+   "paragraph": 87,
+   "proof": 4,
+   "quiz": 1,
+   "theorem": 6
+  },
+  "4": {
+   "paragraph": 19
+  },
+  "5": {
+   "checkin": 1,
+   "example": 4,
+   "fact": 3,
+   "paragraph": 93,
+   "quiz": 2
+  },
+  "6": {
+   "definition": 1,
+   "example": 1,
+   "paragraph": 177,
+   "question": 4,
+   "quiz": 5,
+   "remark": 1,
+   "solution": 4
+  },
+  "7": {
+   "paragraph": 47
+  },
+  "8": {
+   "example": 2,
+   "paragraph": 28,
+   "proof": 1,
+   "proposition": 3,
+   "quiz": 3
+  },
+  "9": {
+   "paragraph": 1
+  }
+ }
+}

@@ -20,8 +20,8 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-XML = Path("build/book.xml")
-OUT = Path("build/manifest.json")
+DEFAULT_XML = Path("build/book.xml")
+DEFAULT_OUT = Path("build/manifest.json")
 
 LTX = "{http://dlmf.nist.gov/LaTeXML}"
 XMLID = "{http://www.w3.org/XML/1998/namespace}id"
@@ -95,7 +95,11 @@ def block_xml_id(elem) -> str:
     return ""
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    argv = sys.argv[1:] if argv is None else argv
+    XML = Path(argv[0]) if len(argv) > 0 else DEFAULT_XML
+    OUT = Path(argv[1]) if len(argv) > 1 else DEFAULT_OUT
+
     if not XML.exists():
         print(f"ERROR: {XML} not found (run latexml first)", file=sys.stderr)
         return 1
@@ -169,12 +173,27 @@ def main() -> int:
         seen[b["content_hash"]] = seen.get(b["content_hash"], 0) + 1
     dupes = sum(1 for c in seen.values() if c > 1)
 
+    # Anchorability (review finding #11): tiny stubs ("TODO", ...) and
+    # byte-identical duplicate blocks make poor anchors for AI-generated
+    # content -- editing one copy shouldn't silently affect its twin, and a
+    # sub-20-char stub carries no distinguishing text to anchor against.
+    # This is additive metadata only; no block is dropped (counts stay the
+    # same), the frontend/cache is expected to consult this flag.
+    MIN_ANCHORABLE_LEN = 20
+    for b in blocks:
+        b["anchorable"] = (
+            b["text_length"] >= MIN_ANCHORABLE_LEN
+            and seen[b["content_hash"]] == 1
+        )
+    anchorable_count = sum(1 for b in blocks if b["anchorable"])
+
     manifest = {
         "build": {
             "source_xml": str(XML),
             "block_count": len(blocks),
             "section_count": len(sections),
             "duplicate_hashes": dupes,
+            "anchorable_count": anchorable_count,
         },
         "sections": sections,
         "blocks": blocks,
@@ -189,7 +208,8 @@ def main() -> int:
     no_anchor = sum(1 for b in blocks if not b["xml_id"])
     print(f"wrote {OUT}")
     print(f"  sections: {len(sections)}   blocks: {len(blocks)}"
-          f"   duplicate-hash groups: {dupes}   blocks w/o xml_id: {no_anchor}")
+          f"   duplicate-hash groups: {dupes}   blocks w/o xml_id: {no_anchor}"
+          f"   anchorable: {anchorable_count}/{len(blocks)}")
     print("  blocks by type: " + ", ".join(
         f"{k}={v}" for k, v in sorted(by_type.items(), key=lambda kv: -kv[1])))
     return 0
