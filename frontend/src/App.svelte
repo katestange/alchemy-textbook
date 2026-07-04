@@ -9,6 +9,7 @@
   import BudgetBanner from './lib/components/BudgetBanner.svelte';
 
   let currentChapter = null;
+  let pendingScrollTo = null; // fragment id to jump to after a cross-reference nav
 
   // If the HttpOnly session cookie is still valid (e.g. after a reload),
   // skip code entry and restore the live budget.
@@ -28,6 +29,15 @@
 
   function backToChapters() {
     currentChapter = null;
+  }
+
+  // An internal cross-reference in the reading pane (e.g. a next/prev/TOC link
+  // in the chapter's own header/footer). chapter === null means "book.html" ->
+  // the table of contents.
+  function handleNavigate(e) {
+    pendingScrollTo = e.detail.frag || null;
+    currentChapter = e.detail.chapter;
+    window.scrollTo(0, 0);
   }
 </script>
 
@@ -49,6 +59,6 @@
   {#if currentChapter == null}
     <ChapterPicker on:select={selectChapter} />
   {:else}
-    <ReadingPane chapter={currentChapter} />
+    <ReadingPane chapter={currentChapter} scrollTo={pendingScrollTo} on:navigate={handleNavigate} />
   {/if}
 {/if}

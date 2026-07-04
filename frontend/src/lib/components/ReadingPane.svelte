@@ -1,5 +1,5 @@
 <script>
-  import { onMount, onDestroy, tick } from 'svelte';
+  import { onMount, onDestroy, tick, createEventDispatcher } from 'svelte';
   import { manifestStore } from '../stores/manifestStore.js';
   import { session } from '../stores/session.js';
   import { refreshRequired, budgetNotice } from '../stores/banners.js';
@@ -19,8 +19,14 @@
   import { chatStore } from '../stores/chatStore.js';
 
   export let chapter;
+  // A fragment id to scroll to once the (possibly just-navigated) chapter is
+  // rendered -- set when the reader follows an internal cross-reference.
+  export let scrollTo = null;
+
+  const dispatch = createEventDispatcher();
 
   let containerEl;
+  let mainEl; // the reading column wrapper -- positioning context for the toolbar
   let html = '';
   let loading = true;
   let loadError = null;
@@ -60,6 +66,38 @@
     // for this chapter (one request, not one per block).
     await tick();
     hydrateChapterContent(n);
+    if (scrollTo) {
+      const el = document.getElementById(scrollTo);
+      if (el) el.scrollIntoView({ block: 'start' });
+      scrollTo = null;
+    }
+  }
+
+  // Internal cross-references in the LaTeXML HTML are relative links to other
+  // chapter files (e.g. `S3.html`, `book.html`, `S2.html#S2.F12`). Left alone
+  // they navigate the browser away from the SPA to a URL the backend answers
+  // with a 404 JSON body ("detail: Not Found"). Intercept them and route
+  // within the app instead. Pure in-page `#frag` links keep the browser
+  // default (they scroll to an element already on the page).
+  function handleContentClick(e) {
+    const a = e.target.closest && e.target.closest('a[href]');
+    if (!a || !containerEl.contains(a)) return;
+    const href = a.getAttribute('href') || '';
+    if (href.startsWith('#') || /^[a-z]+:/i.test(href)) return; // in-page or external
+    const m = href.match(/^(?:\.\/)?(?:S(\d+)|book)\.html(?:#(.+))?$/i);
+    if (!m) return;
+    e.preventDefault();
+    const targetChapter = m[1] ? Number(m[1]) : null; // book.html -> table of contents
+    const frag = m[2] || null;
+    if (targetChapter === chapter) {
+      // Same chapter: just scroll to the fragment.
+      if (frag) {
+        const el = document.getElementById(frag);
+        if (el) el.scrollIntoView({ block: 'start' });
+      }
+      return;
+    }
+    dispatch('navigate', { chapter: targetChapter, frag });
   }
 
   async function hydrateChapterContent(n) {
@@ -96,7 +134,12 @@
   }
 
   function containerOffset() {
-    const rect = containerEl.getBoundingClientRect();
+    // The floating toolbar is positioned inside `mainEl` (its offset parent),
+    // so its coordinates must be measured relative to `mainEl` -- not the
+    // inner, now-centered page-shell (which is inset by its auto margins).
+    // Measuring against page-shell is what put the toolbar in the wrong place
+    // once the reading column stopped spanning the full width.
+    const rect = mainEl.getBoundingClientRect();
     return { top: rect.top + window.scrollY, left: rect.left + window.scrollX };
   }
 
@@ -311,7 +354,7 @@
 </script>
 
 <div class="reading-pane" class:panel-open={$chatStore.open}>
- <div class="reading-main">
+ <div class="reading-main" bind:this={mainEl}>
   {#if loading}
     <div class="page-shell"><p>Loading chapter {chapter}…</p></div>
   {:else if loadError}
@@ -323,14 +366,19 @@
          underlying LaTeXML HTML's own semantics/keyboard nav (Q13: "the
          reading pane is plain semantic LaTeXML HTML, it stays fully
          navigable even with the interactive layer disabled"). -->
-    <div class="page-shell ltx_page_content" bind:this={containerEl} on:mouseup={handleMouseUp}>
+    <div
+      class="page-shell ltx_page_content"
+      bind:this={containerEl}
+      on:mouseup={handleMouseUp}
+      on:click={handleContentClick}
+    >
       {@html html}
     </div>
     {#if toolbar}
       <SelectionToolbar
         top={toolbar.top}
         left={toolbar.left}
-        mode={$chatStore.open ? 'quote' : 'creatures'}
+        panelOpen={$chatStore.open}
         onSelect={openPrompt}
         onQuote={quoteSelection}
       />
@@ -377,38 +425,56 @@
     border-color: var(--color-ink-soft);
   }
 
-  /* Decision 65: the panel PUSHES the reading column, never overlays. */
+  /* Decision 65: the panel PUSHES the reading column, never overlays -- but
+     the push should be gentle (author feedback: the old flex layout recentred
+     the text into a narrow strip with a big gap before a too-narrow panel).
+     The reading column stays centred on the page; the panel is docked to the
+     right gutter; and when the two would collide, the column slides left by
+     *only* the overlap, so on a wide screen the text barely moves.
+
+     PANEL_W = 34rem (was 26rem -- wider). The slide distance below is
+     max(0, PANEL_W + gap + halfColumn - halfViewport):
+       34rem + 1.5rem + (var(--content-max-width)/2) - 50vw
+     kept in one place as a custom property. */
   .reading-pane {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
+    position: relative;
+    --panel-w: 34rem;
+    --panel-gap: 1.5rem;
+    --reading-slide: max(
+      0px,
+      calc(var(--panel-w) + var(--panel-gap) + var(--content-max-width) / 2 - 50vw)
+    );
   }
   .reading-main {
-    flex: 1 1 auto;
-    min-width: 0;
     position: relative;
+    transition: transform 0.2s ease;
+  }
+  .reading-pane.panel-open .reading-main {
+    transform: translateX(calc(-1 * var(--reading-slide)));
   }
   .panel-slot {
-    flex: 0 0 26rem;
-    max-width: 26rem;
-    position: sticky;
+    position: fixed;
     top: 0;
-    max-height: 100vh;
+    right: 0;
+    height: 100vh;
+    width: var(--panel-w);
     display: flex;
+    padding: 0.5rem;
+    z-index: 40;
   }
-  /* Mobile / narrow: the panel becomes a full-width drawer (Q11). */
+  /* Mobile / narrow: no room to dock a side panel, so it becomes a bottom
+     drawer and the text stays put (Q11). */
   @media (max-width: 60rem) {
-    .reading-pane.panel-open {
-      flex-direction: column;
+    .reading-pane.panel-open .reading-main {
+      transform: none;
     }
     .panel-slot {
-      position: fixed;
-      inset: auto 0 0 0;
-      max-width: none;
-      flex: none;
+      top: auto;
+      bottom: 0;
+      left: 0;
       width: 100%;
+      height: auto;
       max-height: 70vh;
-      z-index: 40;
       box-shadow: 0 -4px 16px rgba(38, 32, 25, 0.25);
     }
   }
