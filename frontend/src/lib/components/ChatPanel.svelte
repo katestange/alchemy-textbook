@@ -152,9 +152,6 @@
   <div class="chat-panel-header">
     <span class="chat-panel-title">{title}</span>
     <div class="chat-panel-header-actions">
-      <button type="button" class="new-conversation" on:click={() => chatStore.newConversation()}>
-        + New conversation
-      </button>
       <button
         type="button"
         class="chat-panel-close"

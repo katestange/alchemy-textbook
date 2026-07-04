@@ -52,19 +52,6 @@ function createChatStore() {
       set(initialState());
     },
 
-    // "+ New conversation" (spec item 6): confirm-free reset that keeps the
-    // panel open on the same creature/anchor but throws away the transcript.
-    newConversation() {
-      update((s) => ({
-        ...initialState(),
-        open: true,
-        creatureType: s.creatureType,
-        openingQuote: s.openingQuote,
-        anchor: s.anchor,
-        chapterNum: s.chapterNum
-      }));
-    },
-
     // Context selector toggle (spec item 4, chat only): switching scope
     // inserts a quiet centered transcript note, in either direction.
     setScope(newScope) {

@@ -27,7 +27,10 @@
   --wash-grey: #e7e5e0;
 
   --font-serif: 'EB Garamond', 'Iowan Old Style', Palatino, Georgia, 'Times New Roman', serif;
-  --content-max-width: 34rem;
+  /* Reading measure (author feedback: was running the full window width, which
+     is awkward to read). arXiv-ish column at the slightly larger body size
+     below lands near a 65-character line. */
+  --content-max-width: 40rem;
 }
 
 [data-theme='dark'] {
@@ -64,7 +67,8 @@ body {
   background: var(--color-bg);
   color: var(--color-ink);
   font-family: var(--font-serif);
-  font-size: 1.05rem;
+  /* Author feedback: base text + math both read a touch small. */
+  font-size: 1.15rem;
   line-height: 1.6;
 }
 
@@ -204,8 +208,21 @@ button {
   position: relative;
 }
 
-.reading-pane .ltx_page_content {
+/* Keep the reading column at the parchment measure. The page-shell class on
+   this same element already sets max-width: var(--content-max-width); this
+   rule used to say `max-width: 100%` on the container and, being more
+   specific (.reading-pane .ltx_page_content beats .page-shell), silently
+   overrode it -- which is what made the text run the full window width.
+   Scope the overflow guard to the *inner* wide elements instead. */
+.reading-pane .ltx_page_content :is(img, table, .ltx_picture, .ltx_tabular) {
   max-width: 100%;
+}
+/* Wide displayed math (e.g. big matrices) scrolls within its own strip so it
+   never widens the page (author feedback: a displayed matrix selection). */
+.reading-pane .ltx_page_content :is(.ltx_equation, .ltx_equationgroup),
+.reading-pane .ltx_page_content math[display='block'] {
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 /* LaTeXML emits its own classes (ltx_*); keep the injected content readable
@@ -427,12 +444,16 @@ button {
 .ai-result .ai-result-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 0.4rem;
   font-size: 0.75rem;
   color: var(--color-ink-soft);
   margin-bottom: 0.4rem;
   font-variant-caps: small-caps;
   letter-spacing: 0.03em;
+}
+/* tag stays left; the hide/collapse controls cluster on the right */
+.ai-result .ai-result-head .hide {
+  margin-left: auto;
 }
 
 /* The phrase this artifact was generated about (its original selection):
@@ -461,6 +482,20 @@ button {
   border: none;
   color: var(--color-ink-soft);
   font-size: 0.95rem;
+}
+
+.ai-result .hide {
+  background: none;
+  border: none;
+  color: var(--color-ink-soft);
+  font: inherit;
+  font-size: 0.72rem;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.ai-result .hide:hover {
+  color: var(--color-ink);
 }
 
 .ai-result .body math {

@@ -19,6 +19,45 @@
 // theme.css).
 import { renderStreamedMath, escapeHtml } from './mathRender.js';
 
+// --- Per-reader "hide" list (author feedback: too many chips can be confusing
+// to navigate; let a student banish ones they don't want). Non-destructive and
+// client-only: the artifact stays on the server for everyone else, this reader
+// just doesn't see it. Persisted in localStorage keyed by item-key
+// (`creatureType:content_hash`) so it survives reloads. A change dispatches a
+// document event so the reading pane can update its "N hidden — show" control.
+const HIDDEN_KEY = 'alchemy:hidden-ai-items';
+
+function loadHidden() {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(HIDDEN_KEY) || '[]'));
+  } catch {
+    return new Set();
+  }
+}
+let hiddenSet = loadHidden();
+
+function persistHidden() {
+  try {
+    localStorage.setItem(HIDDEN_KEY, JSON.stringify([...hiddenSet]));
+  } catch {
+    /* private-mode / quota: hiding still works for this session */
+  }
+  try {
+    document.dispatchEvent(new CustomEvent('alchemy:hidden-changed', { detail: hiddenSet.size }));
+  } catch {
+    /* no DOM (tests) */
+  }
+}
+
+export function hiddenCount() {
+  return hiddenSet.size;
+}
+
+export function unhideAll() {
+  hiddenSet = new Set();
+  persistHidden();
+}
+
 const CREATURE_LABEL = {
   example: 'Example',
   intuition: 'Intuition'
@@ -61,8 +100,17 @@ function setExpanded(item, expanded) {
 // (hydrated/existing content, Decision 61's "book-first" rule) rather than
 // expanded (fresh generation, streams in open).
 export function ensureResultBox(anchorEl, creatureType, key, status = 'unreviewed', opts = {}) {
-  const cluster = getOrCreateCluster(anchorEl);
   const itemKey = `${creatureType}:${cssEscape(key)}`;
+
+  // Hidden by this reader: skip silently during hydration (opts.skipIfHidden),
+  // but a fresh, explicitly-requested generation un-hides and shows it again.
+  if (hiddenSet.has(itemKey)) {
+    if (opts.skipIfHidden) return null;
+    hiddenSet.delete(itemKey);
+    persistHidden();
+  }
+
+  const cluster = getOrCreateCluster(anchorEl);
   let item = cluster.querySelector(`[data-item-key="${itemKey}"]`);
   if (item) {
     const existing = item.querySelector('.ai-result');
@@ -103,6 +151,19 @@ export function ensureResultBox(anchorEl, creatureType, key, status = 'unreviewe
   tag.className = 'tag';
   tag.textContent = `AI-generated · ${status}`;
   head.appendChild(tag);
+
+  const hide = document.createElement('button');
+  hide.className = 'hide';
+  hide.type = 'button';
+  hide.textContent = 'hide';
+  hide.title = 'Hide this — remove it from the page (generating it again brings it back)';
+  hide.setAttribute('aria-label', 'Hide this AI item');
+  hide.addEventListener('click', () => {
+    hiddenSet.add(itemKey);
+    persistHidden();
+    item.remove();
+  });
+  head.appendChild(hide);
 
   const dismiss = document.createElement('button');
   dismiss.className = 'dismiss';

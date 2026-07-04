@@ -5,7 +5,14 @@
   import { refreshRequired, budgetNotice } from '../stores/banners.js';
   import { fetchChapterHtml, fetchCachedContent, fetchChapterContent, streamGenerate } from '../api.js';
   import { resolveSelectionAnchor } from '../selectionWalker.js';
-  import { ensureResultBox, updateResultBox, showResultError, removeResultItem } from '../inSituResult.js';
+  import {
+    ensureResultBox,
+    updateResultBox,
+    showResultError,
+    removeResultItem,
+    hiddenCount,
+    unhideAll
+  } from '../inSituResult.js';
   import SelectionToolbar from './SelectionToolbar.svelte';
   import PromptBox from './PromptBox.svelte';
   import ChatPanel from './ChatPanel.svelte';
@@ -81,9 +88,10 @@
       // chip (book-first) -- only a just-streamed generation opens expanded.
       const box = ensureResultBox(anchorEl, e.creature_type, e.content_hash, e.status, {
         collapsed: true,
-        selectionText: e.selection_text
+        selectionText: e.selection_text,
+        skipIfHidden: true
       });
-      updateResultBox(box, e.response);
+      if (box) updateResultBox(box, e.response);
     }
   }
 
@@ -152,9 +160,10 @@
       // collapsed -- only a fresh generation this session opens expanded.
       const box = ensureResultBox(anchorEl, e.creature_type, anchor.block.content_hash, e.status, {
         collapsed: true,
-        selectionText: e.selection_text
+        selectionText: e.selection_text,
+        skipIfHidden: true
       });
-      updateResultBox(box, e.response);
+      if (box) updateResultBox(box, e.response);
     }
   }
 
@@ -210,6 +219,10 @@
       selectionText
     });
     updateResultBox(box, '');
+    // The anchor block can sit well above a long selected/displayed element
+    // (e.g. a displayed matrix), which put the streaming box off-screen
+    // ("no response"). Bring it into view so the student sees it fill in.
+    box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     let accumulated = '';
 
     await streamGenerate(
@@ -274,11 +287,26 @@
     }
   }
 
+  // "N hidden — show" restore control (author feedback). hiddenCount() is
+  // module state in inSituResult; the custom event fires whenever a hide or
+  // unhide happens so this stays live.
+  let hiddenN = hiddenCount();
+  function onHiddenChanged() {
+    hiddenN = hiddenCount();
+  }
+  function showHidden() {
+    unhideAll();
+    hiddenN = 0;
+    hydrateChapterContent(chapter); // re-inject this chapter's now-visible items
+  }
+
   onMount(() => {
     document.addEventListener('mousedown', handleDocumentMouseDown);
+    document.addEventListener('alchemy:hidden-changed', onHiddenChanged);
   });
   onDestroy(() => {
     document.removeEventListener('mousedown', handleDocumentMouseDown);
+    document.removeEventListener('alchemy:hidden-changed', onHiddenChanged);
   });
 </script>
 
@@ -316,6 +344,11 @@
         onCancel={cancelPrompt}
       />
     {/if}
+    {#if hiddenN > 0}
+      <button class="show-hidden" type="button" on:click={showHidden}>
+        Show {hiddenN} hidden AI item{hiddenN === 1 ? '' : 's'}
+      </button>
+    {/if}
   {/if}
  </div>
  {#if $chatStore.open}
@@ -326,6 +359,24 @@
 </div>
 
 <style>
+  /* "N hidden — show" restore control (author feedback: let students banish
+     AI items, but always give them a quiet way back). */
+  .show-hidden {
+    display: block;
+    margin: 1.5rem auto 0;
+    background: none;
+    border: 1px dashed var(--color-rule);
+    border-radius: 999px;
+    padding: 0.25rem 0.9rem;
+    font: inherit;
+    font-size: 0.85rem;
+    color: var(--color-ink-soft);
+  }
+  .show-hidden:hover {
+    color: var(--color-ink);
+    border-color: var(--color-ink-soft);
+  }
+
   /* Decision 65: the panel PUSHES the reading column, never overlays. */
   .reading-pane {
     display: flex;

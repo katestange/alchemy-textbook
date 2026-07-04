@@ -113,19 +113,17 @@ describe('chatStore (Decision 65 chat/quiz panel conversation state)', () => {
     expect(get(chatStore).messages).toEqual([]);
   });
 
-  it('newConversation resets the transcript but keeps the panel open on the same creature/anchor', () => {
+  it('close() destroys the conversation entirely (the panel × control)', () => {
+    // Decision 68: the explicit "new conversation" button was removed as not
+    // useful enough -- close-and-reselect covers the same need.
     const anchor = { xml_id: 'S1.p1', block: { content_hash: 'h1' } };
     chatStore.open({ creatureType: 'quiz', selectionText: 'a section', anchor, chapterNum: 2 });
     chatStore.appendUserTurn({ text: 'Quiz me on this section.' });
     chatStore.appendAssistantDelta('What kind of quiz would you like?');
-    chatStore.newConversation();
+    chatStore.close();
     const s = get(chatStore);
-    expect(s.open).toBe(true);
-    expect(s.creatureType).toBe('quiz');
-    expect(s.anchor).toBe(anchor);
-    expect(s.chapterNum).toBe(2);
-    expect(s.openingQuote).toBe('a section');
+    expect(s.open).toBe(false);
+    expect(s.creatureType).toBeNull();
     expect(s.messages).toEqual([]);
-    expect(s.draftQuote).toBeNull();
   });
 });
