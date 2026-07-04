@@ -535,7 +535,7 @@ def api_chapter_content(n: str, request: Request):
     code = caller_code(request)
     rows = db_query(
         "SELECT id, content_hash, creature_type, response, status, created_at, "
-        "       created_by_code FROM cached_content "
+        "       created_by_code, selection_text FROM cached_content "
         "WHERE (section_id = ? OR section_id LIKE ?) AND status != 'removed' "
         "  AND (status = 'approved' OR (? IS NOT NULL AND created_by_code = ?))",
         (n, n + ".%", code, code),
@@ -549,6 +549,9 @@ def api_chapter_content(n: str, request: Request):
             "status": r["status"],
             "created_at": r["created_at"],
             "own": bool(code) and r["created_by_code"] == code,
+            # The phrase the generator selected -- later readers never made
+            # the selection, so the box must show what "this phrase" was.
+            "selection_text": r["selection_text"],
         }
         for r in rows
     ]
@@ -572,7 +575,8 @@ def api_whoami(request: Request):
 def api_content(block_hash: str, request: Request):
     code = caller_code(request)
     rows = db_query(
-        "SELECT id, creature_type, response, status, created_at, created_by_code "
+        "SELECT id, creature_type, response, status, created_at, created_by_code, "
+        "       selection_text "
         "FROM cached_content WHERE content_hash = ? AND "
         "(status = 'approved' OR (status = 'unreviewed' AND created_by_code = ?)) "
         "ORDER BY created_at",
@@ -586,6 +590,7 @@ def api_content(block_hash: str, request: Request):
             "status": r["status"],
             "created_at": r["created_at"],
             "own": r["created_by_code"] is not None and r["created_by_code"] == code,
+            "selection_text": r["selection_text"],
         }
         for r in rows
     ]

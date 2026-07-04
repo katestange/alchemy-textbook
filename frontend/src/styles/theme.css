@@ -435,6 +435,21 @@ button {
   letter-spacing: 0.03em;
 }
 
+/* The phrase this artifact was generated about (its original selection):
+   readers who didn't make the selection need it to resolve "this phrase". */
+.ai-result .ai-result-on {
+  font-size: 0.82rem;
+  font-style: italic;
+  color: var(--color-ink-soft);
+  border-left: 2px solid currentColor;
+  padding-left: 0.55rem;
+  margin: 0 0 0.6rem;
+  opacity: 0.85;
+}
+.ai-result .ai-result-on q {
+  quotes: '\201C' '\201D';
+}
+
 .ai-result .tag {
   border: 1px solid currentColor;
   border-radius: 999px;

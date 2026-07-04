@@ -80,7 +80,8 @@
       // Decision 61: content hydrated on chapter load rests as a collapsed
       // chip (book-first) -- only a just-streamed generation opens expanded.
       const box = ensureResultBox(anchorEl, e.creature_type, e.content_hash, e.status, {
-        collapsed: true
+        collapsed: true,
+        selectionText: e.selection_text
       });
       updateResultBox(box, e.response);
     }
@@ -150,7 +151,8 @@
       // Decision 61: surfaced-on-selection existing content also rests
       // collapsed -- only a fresh generation this session opens expanded.
       const box = ensureResultBox(anchorEl, e.creature_type, anchor.block.content_hash, e.status, {
-        collapsed: true
+        collapsed: true,
+        selectionText: e.selection_text
       });
       updateResultBox(box, e.response);
     }
@@ -204,7 +206,9 @@
     const anchorEl = document.getElementById(anchor.xml_id);
     if (!anchorEl) return;
 
-    const box = ensureResultBox(anchorEl, creatureType, anchor.block.content_hash, 'unreviewed');
+    const box = ensureResultBox(anchorEl, creatureType, anchor.block.content_hash, 'unreviewed', {
+      selectionText
+    });
     updateResultBox(box, '');
     let accumulated = '';
 

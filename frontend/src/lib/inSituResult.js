@@ -65,7 +65,11 @@ export function ensureResultBox(anchorEl, creatureType, key, status = 'unreviewe
   const itemKey = `${creatureType}:${cssEscape(key)}`;
   let item = cluster.querySelector(`[data-item-key="${itemKey}"]`);
   if (item) {
-    return item.querySelector('.ai-result');
+    const existing = item.querySelector('.ai-result');
+    // A regeneration on the same block may discuss a different phrase --
+    // keep the "On: ..." line current.
+    if (opts.selectionText !== undefined) setOnLine(existing, item, opts.selectionText);
+    return existing;
   }
 
   const collapsed = !!opts.collapsed;
@@ -119,7 +123,35 @@ export function ensureResultBox(anchorEl, creatureType, key, status = 'unreviewe
   item.appendChild(box);
   cluster.appendChild(item);
 
+  if (opts.selectionText) setOnLine(box, item, opts.selectionText);
+
   return box;
+}
+
+// The phrase this artifact was generated about (the user's original
+// selection). Later readers never made the selection, so the AI's "this
+// phrase..." is meaningless without it: show it as a muted quoted line
+// between the box head and body, and in the chip's hover tooltip.
+function setOnLine(box, item, selectionText) {
+  const text = (selectionText || '').trim();
+  let line = box.querySelector('.ai-result-on');
+  if (!text) {
+    if (line) line.remove();
+    return;
+  }
+  if (!line) {
+    line = document.createElement('div');
+    line.className = 'ai-result-on';
+    const head = box.querySelector('.ai-result-head');
+    head.insertAdjacentElement('afterend', line);
+  }
+  const short = text.length > 140 ? text.slice(0, 140) + '…' : text;
+  line.innerHTML = `On: <q>${escapeHtml(short)}</q>`;
+  const chip = item.querySelector('.ai-chip');
+  if (chip) {
+    const tip = text.length > 80 ? text.slice(0, 80) + '…' : text;
+    chip.title = `${chip.title.split(' — on "')[0]} — on "${tip}"`;
+  }
 }
 
 // Re-renders the accumulated text into the box's body on every SSE delta (or
