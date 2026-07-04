@@ -39,7 +39,7 @@
   </div>
 
   {% if item.selection_text %}
-  <blockquote class="selection">{{ item.selection_text }}</blockquote>
+  <blockquote class="selection js-latex" data-src="{{ item.selection_text }}">{{ item.selection_text }}</blockquote>
   {% endif %}
 
   {% for f in flags.get(item.id, []) %}
@@ -47,7 +47,7 @@
     &mdash; {{ f.created_at[:16].replace("T", " ") }}</div>
   {% endfor %}
 
-  <div class="response">{{ item.response }}</div>
+  <div class="response js-latex" data-src="{{ item.response }}">{{ item.response }}</div>
 
   <div class="actions">
     <form method="post" action="/admin/review/{{ item.id }}/approve">
@@ -73,6 +73,10 @@
 {% endblock %}
 
 {% block script %}
+<!-- Reuse the reader's exact render pipeline (Temml math + markdown subset +
+     solution toggles) so reviewers see answers as students will, not raw
+     LaTeX. Same-origin static bundle, no CDN. -->
+<script src="/admin-render.js"></script>
 <script>
 (function () {
   "use strict";

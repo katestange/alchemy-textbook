@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && npm run build:admin",
+    "build:admin": "esbuild src/admin-render.js --bundle --format=iife --minify --outfile=dist/admin-render.js",
     "preview": "vite preview",
     "test": "vitest run",
     "mock-server": "node mock-server/server.js"
