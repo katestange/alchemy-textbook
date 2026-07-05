@@ -459,16 +459,16 @@
      to its right rather than sitting at a fixed narrow width leaving the
      right margin half-empty.
 
-     `--reading-left` biases the column left of centre (centre would be
-     50vw - halfColumn); pulling ~15rem further left leaves generous room for
-     the panel. Below the drawer breakpoint the layout collapses to a single
-     centred column with the panel as a bottom drawer. */
+     The column is biased left of centre (centre would be 50vw - halfColumn);
+     pulling ~10rem further left leaves room for the panel. Below the drawer
+     breakpoint the layout collapses to a single centred column with the panel
+     as a bottom drawer. */
   .reading-pane {
     position: relative;
     display: flex;
     align-items: flex-start;
     gap: 2rem;
-    padding-left: max(1.5rem, calc(50vw - var(--content-max-width) / 2 - 15rem));
+    padding-left: max(1.5rem, calc(50vw - var(--content-max-width) / 2 - 10rem));
     padding-right: 1rem;
   }
   .reading-main {

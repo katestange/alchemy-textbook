@@ -27,10 +27,10 @@
   --wash-grey: #e7e5e0;
 
   --font-serif: 'EB Garamond', 'Iowan Old Style', Palatino, Georgia, 'Times New Roman', serif;
-  /* Reading measure (author feedback: was running the full window width, which
-     is awkward to read; then 40rem read a touch narrow, 44rem still). arXiv-ish
-     column at the slightly larger body size below. */
-  --content-max-width: 48rem;
+  /* Reading measure. Iterated with the author: full-window (bug) → 40 → 44 →
+     48rem all read too narrow, especially next to the wider in-place Sage
+     applets, whose width the author liked "for everything". Matched to that. */
+  --content-max-width: 60rem;
 }
 
 [data-theme='dark'] {
