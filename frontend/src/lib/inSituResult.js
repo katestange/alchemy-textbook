@@ -18,6 +18,7 @@
 // pushing any other chips onto their own line -- see .ai-cluster/.ai-item in
 // theme.css).
 import { renderStreamedMath, escapeHtml } from './mathRender.js';
+import { mountEditableCell } from './sageCell.js';
 
 // --- Per-reader "hide" list (author feedback: too many chips can be confusing
 // to navigate; let a student banish ones they don't want). Non-destructive and
@@ -60,12 +61,14 @@ export function unhideAll() {
 
 const CREATURE_LABEL = {
   example: 'Example',
-  intuition: 'Intuition'
+  intuition: 'Intuition',
+  applet: 'Applet'
 };
 
 const CREATURE_CHIP_LABEL = {
   example: 'Ex.',
-  intuition: 'Int.'
+  intuition: 'Int.',
+  applet: 'App.'
 };
 
 // Finds (or creates) the shared cluster sibling that holds every chip+box
@@ -87,6 +90,40 @@ function setExpanded(item, expanded) {
   item.classList.toggle('collapsed', !expanded);
   const chip = item.querySelector('.ai-chip');
   if (chip) chip.setAttribute('aria-expanded', String(expanded));
+  // An applet's SageCell is heavy (loads the SageCell library + an editor), so
+  // a collapsed/hydrated applet defers mounting until it's actually expanded.
+  if (expanded) mountAppletIfPending(item);
+}
+
+// If this item is an applet whose code is stashed but not yet turned into a
+// live editable SageCell, mount it now. Safe to call repeatedly.
+function mountAppletIfPending(item) {
+  const box = item.querySelector('.ai-result');
+  if (!box || box.dataset.creature !== 'applet') return;
+  const body = box.querySelector('.body');
+  if (body && body.dataset.sage != null && body.dataset.appletMounted !== 'true') {
+    mountApplet(body, body.dataset.sage);
+  }
+}
+
+// Turns the applet body into a live, editable SageCell seeded with `code`.
+function mountApplet(body, code) {
+  if (body.dataset.appletMounted === 'true') return;
+  body.dataset.appletMounted = 'true';
+  body.textContent = '';
+  const host = document.createElement('div');
+  host.className = 'applet-host';
+  body.appendChild(host);
+  mountEditableCell(host, code); // async; renders its own fallback on failure
+}
+
+// Models are told to emit raw Sage only, but strip stray ```-fences defensively
+// (and a lone opener that hasn't closed yet mid-stream).
+function stripCodeFences(text) {
+  const t = (text || '').trim();
+  const fenced = t.match(/^```[a-zA-Z]*\n([\s\S]*?)\n?```$/);
+  if (fenced) return fenced[1].trim();
+  return t.replace(/^```[a-zA-Z]*\n?/, '').replace(/\n?```$/, '').trim();
 }
 
 // Ensures a result box (and its collapsed-chip counterpart) exists for
@@ -221,8 +258,41 @@ function setOnLine(box, item, selectionText) {
 // stream-end rule).
 export function updateResultBox(box, accumulatedText, opts = {}) {
   const body = box.querySelector('.body');
+  if (box.dataset.creature === 'applet') {
+    renderApplet(box, body, stripCodeFences(accumulatedText), !!opts.streaming);
+    return;
+  }
   body.innerHTML = renderStreamedMath(accumulatedText, opts);
   wireSolutionToggles(body);
+}
+
+// Applet rendering: while streaming, show the code accumulating as read-only
+// source (a live SageCell can't be seeded until the code is complete). When
+// the stream ends (or for already-complete hydrated content), stash the final
+// code on the body and either mount the editable cell now (if the box is
+// open) or leave a placeholder that mounts on first expand.
+function renderApplet(box, body, code, streaming) {
+  const item = box.closest('.ai-item');
+  if (streaming) {
+    body.dataset.appletMounted = '';
+    body.innerHTML = '';
+    const pre = document.createElement('pre');
+    pre.className = 'sage-src';
+    pre.textContent = code || '';
+    body.appendChild(pre);
+    return;
+  }
+  body.dataset.sage = code;
+  body.dataset.appletMounted = body.dataset.appletMounted === 'true' ? 'true' : '';
+  if (item && item.classList.contains('expanded')) {
+    mountApplet(body, code);
+  } else if (body.dataset.appletMounted !== 'true') {
+    body.innerHTML = '';
+    const note = document.createElement('div');
+    note.className = 'applet-placeholder';
+    note.textContent = 'Interactive Sage demo — expand to load and run.';
+    body.appendChild(note);
+  }
 }
 
 // innerHTML wipes out any listeners attached on a previous render, so every

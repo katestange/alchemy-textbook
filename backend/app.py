@@ -61,7 +61,8 @@ MAX_CONVERSATION_MESSAGES = 40
 
 MODEL_BY_CREATURE = {
     "example": "claude-haiku-4-5",
-    # justify / counterexample / intuition / applet / chat / quiz / fun /
+    "applet": "claude-sonnet-5",  # explicit, though it's the default
+    # justify / counterexample / intuition / chat / quiz / fun /
     # summarize / eureka all default to Sonnet for now (Q3 table refines this).
 }
 DEFAULT_MODEL = "claude-sonnet-5"
@@ -165,6 +166,28 @@ CREATURE_INSTRUCTIONS = {
         "re-deriving it; small concrete numbers are welcome, full formal "
         "proofs are not. Write flowing prose only: no headings, no lists of "
         "steps, and no [[solution]] markers."
+    ),
+    # V1 PROMPT -- applet creature: output is dropped verbatim into an
+    # editable SageCell code cell, so the ENTIRE response must be runnable
+    # Sage code (iterate after quality testing like the prompts above).
+    "applet": (
+        "You are the Applet creature. Produce a small, self-contained, "
+        "editable SageMath demo that a student can tweak and re-run, "
+        "directly relevant to the selection below. Output ONLY valid "
+        "SageMath code: no prose, no explanation, no markdown, no code "
+        "fences (never write ```), no headings, and no title -- the entire "
+        "response is the code and nothing else, because it is dropped "
+        "verbatim into an editable code cell. Keep it small, roughly 5 to 25 "
+        "lines. The code must run on the public SageCell server (Sage 10.x) "
+        "with no external files and no network access, and it MUST produce "
+        "visible output when run -- use print(), or plot()/show()/G.plot() "
+        "for a graphic; a cell that computes but displays nothing is a "
+        "failure. Begin with a one-line Sage comment (starting with #) "
+        "naming what the demo shows, and use comments to mark the one or two "
+        "values a student should try changing. Prefer Sage built-ins "
+        "relevant to coding theory or cryptography when apt (for example "
+        "IntegerModRing, GF, codes.HammingCode, factor, power_mod, "
+        "EllipticCurve), but always driven by the selection."
     ),
     # V1 PROMPT -- chat creature (the Cat): open-ended conversation panel.
     "chat": (

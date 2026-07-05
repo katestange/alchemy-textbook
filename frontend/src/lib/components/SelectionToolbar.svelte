@@ -17,7 +17,8 @@
 
   const IN_SITU = [
     { type: 'example', label: 'Ex.', title: 'Example' },
-    { type: 'intuition', label: 'Int.', title: 'Intuition' }
+    { type: 'intuition', label: 'Int.', title: 'Intuition' },
+    { type: 'applet', label: 'App.', title: 'Applet — an editable interactive Sage demo' }
   ];
   const CONVERSATION = [
     { type: 'chat', label: 'Chat', title: 'Chat' },

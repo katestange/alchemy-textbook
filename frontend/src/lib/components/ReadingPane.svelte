@@ -17,6 +17,8 @@
   import PromptBox from './PromptBox.svelte';
   import ChatPanel from './ChatPanel.svelte';
   import { chatStore } from '../stores/chatStore.js';
+  import { builtinApplets } from '../builtinApplets.js';
+  import { mountEditableCell } from '../sageCell.js';
 
   export let chapter;
   // A fragment id to scroll to once the (possibly just-navigated) chapter is
@@ -36,7 +38,8 @@
 
   const DEFAULT_PROMPTS = {
     example: 'Create a worked example for this.',
-    intuition: 'Explain the intuition behind this.'
+    intuition: 'Explain the intuition behind this.',
+    applet: 'Make a small, editable interactive Sage demo for this.'
   };
 
   $: loadChapter(chapter);
@@ -66,6 +69,7 @@
     // for this chapter (one request, not one per block).
     await tick();
     hydrateChapterContent(n);
+    injectBuiltinApplets();
     if (scrollTo) {
       const el = document.getElementById(scrollTo);
       if (el) el.scrollIntoView({ block: 'start' });
@@ -130,6 +134,30 @@
         skipIfHidden: true
       });
       if (box) updateResultBox(box, e.response);
+    }
+  }
+
+  // Inject the pre-authored SageMath demos (builtinApplets.js) for whichever
+  // of their anchor blocks exist in this chapter -- an editable, always-on
+  // SageCell right after the block. Idempotent (guarded by a per-anchor id).
+  function injectBuiltinApplets() {
+    for (const app of builtinApplets) {
+      const anchorEl = document.getElementById(app.xmlId);
+      if (!anchorEl) continue;
+      const wrapId = `builtin-applet-${app.xmlId}`;
+      if (document.getElementById(wrapId)) continue;
+      const wrap = document.createElement('div');
+      wrap.id = wrapId;
+      wrap.className = 'builtin-applet';
+      const title = document.createElement('div');
+      title.className = 'builtin-applet-title';
+      title.textContent = app.title;
+      const host = document.createElement('div');
+      host.className = 'applet-host';
+      wrap.appendChild(title);
+      wrap.appendChild(host);
+      anchorEl.insertAdjacentElement('afterend', wrap);
+      mountEditableCell(host, app.code); // async; renders its own fallback
     }
   }
 

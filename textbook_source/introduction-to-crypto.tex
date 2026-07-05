@@ -149,7 +149,18 @@ The simplest and most famous example is the Caesar cipher, attributed to Julis C
 In general, one may use any permutation of the alphabet, not just a cipherwheel rotation.  Or one may use unusual symbols to replace letters, such as the `dancing men' in the eponymous Sherlock Holmes story (\emph{The Adventure of the Dancing Men}, Sir Arthur Conan Doyle).  An interesting example is that of a \textbf{Polybius square} (used for signalling long distances in ancient Greece).  The letters of the alphabet are arranged into a grid (the `Polybius square'), and each letter of the plaintext is then replaced by the coordinates it occupies in the grid (See Figure~\ref{fig:polybius-example}).
 
 \begin{figure}
-\caption{Example of a Polybius square}
+$$
+\begin{array}{c|ccccc}
+  & 1 & 2 & 3 & 4 & 5 \\
+\hline
+1 & A & B & C & D & E \\
+2 & F & G & H & I/J & K \\
+3 & L & M & N & O & P \\
+4 & Q & R & S & T & U \\
+5 & V & W & X & Y & Z \\
+\end{array}
+$$
+\caption{Example of a Polybius square.  For example, the letter $B$ is encrypted as $(1,2)$.}
 \label{fig:polybius-example}
 \end{figure}
 

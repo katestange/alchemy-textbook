@@ -1,0 +1,62 @@
+// Pre-authored, always-on interactive Sage demos that ship with the book
+// ("in-built applets"), sourced from the SageCell usage on
+// crypto.katestange.net. Each is injected as an editable SageCell immediately
+// after the block with id `xmlId` when its chapter loads (see
+// ReadingPane.injectBuiltinApplets). If an `xmlId` isn't in the current build,
+// that applet is silently skipped, so this list is safe to edit freely.
+//
+// The `code` runs on the public SageCell server (Sage 10.x). Keep each demo
+// small, self-contained, visibly output-producing, and pleasant to tweak --
+// the comments point a student at the one or two values worth changing.
+
+export const builtinApplets = [
+  {
+    // §1.5 Key Exchange — modular exponentiation as a mixing map.
+    xmlId: 'S1.SS5.SSS1.p2',
+    title: 'Try it — modular exponentiation as a mixing map',
+    code: `# Each residue x mod n is wired to x^a mod n. This "mixing" is what
+# makes modular exponentiation useful for key exchange.
+# Try changing n (the modulus) and a (the exponent), then press Run.
+n = 7
+a = 2
+R = IntegerModRing(n)
+left  = [' ' + str(r) + ' '  for r in R]
+right = ['  ' + str(r) + '  ' for r in R]
+pre_pos = graphs.CompleteBipartiteGraph(len(left), len(right)).get_pos()
+G = DiGraph()
+pos = {}
+for (i, v) in enumerate(left + right):
+    G.add_vertex(v)
+    pos[v] = pre_pos[i]
+for x in range(n):
+    G.add_edge(left[x], right[lift(R(x ^ a))])
+G.plot(pos=pos)`
+  },
+  {
+    // §8.5 Linear codes — the [7,4] binary Hamming code, and 1-error decoding.
+    xmlId: 'S8.SS5.p1',
+    title: 'Try it — the [7,4] Hamming code corrects one error',
+    code: `# A linear code: the [7, 4] binary Hamming code.
+# Try flipping a different bit below, or GF(2) -> GF(3), then press Run.
+C = codes.HammingCode(GF(2), 3)
+print("Code:", C)
+print("length =", C.length(),
+      " dimension =", C.dimension(),
+      " minimum distance =", C.minimum_distance())
+print()
+print("Generator matrix:")
+print(C.generator_matrix())
+print()
+
+# Encode a 4-bit message, corrupt one bit, and watch the code recover it.
+message  = vector(GF(2), [1, 0, 1, 1])
+codeword = message * C.generator_matrix()
+received = copy(codeword)
+received[2] += 1          # <-- flip any single bit (index 0..6)
+
+print("message  =", message)
+print("codeword =", codeword)
+print("received =", received, "  (1 bit flipped)")
+print("decoded  =", C.decode_to_message(received))`
+  }
+];
