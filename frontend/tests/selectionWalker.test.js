@@ -1,5 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { findEnclosingBlock, resolveSelectionAnchor } from '../src/lib/selectionWalker.js';
+import {
+  findEnclosingBlock,
+  resolveSelectionAnchor,
+  resolveSelectionAnchorFromRange
+} from '../src/lib/selectionWalker.js';
 import { buildBlockMap } from '../src/lib/manifestMap.js';
 
 // jsdom is configured as the vitest environment (vite.config.js `test.environment`),
@@ -98,5 +102,56 @@ describe('findEnclosingBlock / resolveSelectionAnchor', () => {
     document.body.appendChild(div);
 
     expect(resolveSelectionAnchor(div, blockMap)).toBeNull();
+  });
+
+  // A selection that spans an image: LaTeXML puts the figure/image in its own
+  // non-block element, so commonAncestorContainer bubbles above any paragraph.
+  it('resolveSelectionAnchorFromRange anchors a text-through-image selection via its start node', () => {
+    const section = document.createElement('section');
+    const p = document.createElement('p');
+    p.id = 'S1.SS1.p1';
+    const startText = document.createTextNode('as shown in ');
+    p.appendChild(startText);
+    const figure = document.createElement('figure'); // id S1.F1 -- NOT a manifest block
+    figure.id = 'S1.F1';
+    const img = document.createElement('img');
+    img.id = 'S1.F1.g1';
+    figure.appendChild(img);
+    section.appendChild(p);
+    section.appendChild(figure);
+    document.body.appendChild(section);
+
+    // Range from the paragraph text through the image -> commonAncestor = section.
+    const range = document.createRange();
+    range.setStart(startText, 0);
+    range.setEnd(img, 0);
+    expect(range.commonAncestorContainer).toBe(section);
+    expect(resolveSelectionAnchor(range.commonAncestorContainer, blockMap)).toBeNull();
+
+    const anchor = resolveSelectionAnchorFromRange(range, blockMap);
+    expect(anchor.xml_id).toBe('S1.SS1.p1');
+  });
+
+  // A figure-only selection: no anchorable ancestor, so fall back to the
+  // nearest preceding anchorable block (the paragraph above the figure).
+  it('resolveSelectionAnchorFromRange falls back to the preceding block for a figure-only selection', () => {
+    const section = document.createElement('section');
+    const p = document.createElement('p');
+    p.id = 'S1.SS1.p1';
+    p.appendChild(document.createTextNode('intro'));
+    const figure = document.createElement('figure');
+    figure.id = 'S1.F1';
+    const cap = document.createElement('figcaption');
+    const capText = document.createTextNode('Figure 1: a picture');
+    cap.appendChild(capText);
+    figure.appendChild(cap);
+    section.appendChild(p);
+    section.appendChild(figure);
+    document.body.appendChild(section);
+
+    const range = document.createRange();
+    range.selectNodeContents(cap);
+    const anchor = resolveSelectionAnchorFromRange(range, blockMap);
+    expect(anchor.xml_id).toBe('S1.SS1.p1');
   });
 });

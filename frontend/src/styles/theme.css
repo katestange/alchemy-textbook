@@ -28,9 +28,9 @@
 
   --font-serif: 'EB Garamond', 'Iowan Old Style', Palatino, Georgia, 'Times New Roman', serif;
   /* Reading measure (author feedback: was running the full window width, which
-     is awkward to read; then 40rem read a touch narrow). arXiv-ish column at
-     the slightly larger body size below. */
-  --content-max-width: 44rem;
+     is awkward to read; then 40rem read a touch narrow, 44rem still). arXiv-ish
+     column at the slightly larger body size below. */
+  --content-max-width: 48rem;
 }
 
 [data-theme='dark'] {

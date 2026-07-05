@@ -38,3 +38,49 @@ export function resolveSelectionAnchor(startNode, blockMap) {
   if (match.block && match.block.anchorable === false) return null;
   return match;
 }
+
+// Resolves an anchor for a whole selection Range, robust to selections that
+// include non-block content. LaTeXML wraps figures/images in their own
+// elements (e.g. `<figure id="S2.F12">`, `<img id="S2.F12.g1">`) that are NOT
+// manifest blocks, so when a selection spans an image the browser's
+// `commonAncestorContainer` bubbles up past every anchorable paragraph to a
+// container with no mapped id -- and the plain walk returns null, leaving the
+// reader with no toolbar. Try the selection's start and end nodes too (which
+// usually sit inside a real text block), and finally fall back to the nearest
+// preceding anchorable block in document order (so even a figure-only
+// selection attaches to the paragraph just above it).
+export function resolveSelectionAnchorFromRange(range, blockMap) {
+  if (!range) return null;
+  for (const node of [range.startContainer, range.commonAncestorContainer, range.endContainer]) {
+    const a = resolveSelectionAnchor(node, blockMap);
+    if (a) return a;
+  }
+  let el = range.startContainer;
+  if (el && el.nodeType !== 1) el = el.parentElement;
+  return precedingAnchorable(el, blockMap);
+}
+
+// Nearest anchorable block that appears before `el` in document order: scan
+// previous element siblings (and any anchorable descendants within them) at
+// each ancestor level, climbing until one is found.
+function precedingAnchorable(el, blockMap) {
+  const ok = (id) => {
+    if (!id || !blockMap.has(id)) return null;
+    const block = blockMap.get(id);
+    return !block || block.anchorable !== false ? { xml_id: id, block } : null;
+  };
+  let node = el;
+  while (node && node.nodeType === 1) {
+    for (let prev = node.previousElementSibling; prev; prev = prev.previousElementSibling) {
+      const self = ok(prev.id);
+      if (self) return self;
+      const inner = prev.querySelectorAll ? prev.querySelectorAll('[id]') : [];
+      for (let i = inner.length - 1; i >= 0; i--) {
+        const hit = ok(inner[i].id);
+        if (hit) return hit;
+      }
+    }
+    node = node.parentElement;
+  }
+  return null;
+}

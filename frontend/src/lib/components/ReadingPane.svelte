@@ -4,7 +4,7 @@
   import { session } from '../stores/session.js';
   import { refreshRequired, budgetNotice } from '../stores/banners.js';
   import { fetchChapterHtml, fetchCachedContent, fetchChapterContent, streamGenerate } from '../api.js';
-  import { resolveSelectionAnchor } from '../selectionWalker.js';
+  import { resolveSelectionAnchorFromRange } from '../selectionWalker.js';
   import {
     ensureResultBox,
     updateResultBox,
@@ -152,7 +152,7 @@
     if (!containerEl.contains(range.commonAncestorContainer)) {
       return;
     }
-    const anchor = resolveSelectionAnchor(range.commonAncestorContainer, $manifestStore.blockMap);
+    const anchor = resolveSelectionAnchorFromRange(range, $manifestStore.blockMap);
     if (!anchor) {
       toolbar = null;
       return;
@@ -425,32 +425,25 @@
     border-color: var(--color-ink-soft);
   }
 
-  /* Decision 65: the panel PUSHES the reading column, never overlays -- but
-     the push should be gentle (author feedback: the old flex layout recentred
-     the text into a narrow strip with a big gap before a too-narrow panel).
-     The reading column stays centred on the page; the panel is docked to the
-     right gutter; and when the two would collide, the column slides left by
-     *only* the overlap, so on a wide screen the text barely moves.
-
-     PANEL_W = 34rem (was 26rem -- wider). The slide distance below is
-     max(0, PANEL_W + gap + halfColumn - halfViewport):
-       34rem + 1.5rem + (var(--content-max-width)/2) - 50vw
-     kept in one place as a custom property. */
+  /* Decision 65: the chat/quiz panel docks to the right gutter. Author
+     feedback: since that right space is "used to chat/quiz sometimes", bias
+     the reading column LEFT permanently by reserving the gutter -- so the
+     column sits left-of-centre and does NOT move when the panel opens/closes.
+     The page-shell inside still uses margin:0 auto, so it centres within the
+     *remaining* left area. The reservation shrinks gracefully on smaller
+     screens; below the drawer breakpoint the panel becomes a bottom drawer
+     and the gutter is released so the column reclaims the full width. */
   .reading-pane {
     position: relative;
     --panel-w: 34rem;
     --panel-gap: 1.5rem;
-    --reading-slide: max(
-      0px,
-      calc(var(--panel-w) + var(--panel-gap) + var(--content-max-width) / 2 - 50vw)
-    );
   }
   .reading-main {
     position: relative;
-    transition: transform 0.2s ease;
-  }
-  .reading-pane.panel-open .reading-main {
-    transform: translateX(calc(-1 * var(--reading-slide)));
+    padding-right: min(
+      calc(var(--panel-w) + var(--panel-gap)),
+      max(0px, calc(100vw - var(--content-max-width) - 3rem))
+    );
   }
   .panel-slot {
     position: fixed;
@@ -462,11 +455,11 @@
     padding: 0.5rem;
     z-index: 40;
   }
-  /* Mobile / narrow: no room to dock a side panel, so it becomes a bottom
-     drawer and the text stays put (Q11). */
-  @media (max-width: 60rem) {
-    .reading-pane.panel-open .reading-main {
-      transform: none;
+  /* Narrow: not enough room to dock a 34rem panel beside the column, so it
+     becomes a bottom drawer and the reading column reclaims the full width. */
+  @media (max-width: 84rem) {
+    .reading-main {
+      padding-right: 0;
     }
     .panel-slot {
       top: auto;
