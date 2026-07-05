@@ -9,12 +9,23 @@
 // source, carried in a data-src attribute so Jinja escaping never mangles it)
 // replaced with rendered HTML.
 import { renderStreamedMath } from './lib/mathRender.js';
+import { mountEditableCell } from './lib/sageCell.js';
 
 function renderAll() {
   document.querySelectorAll('.js-latex').forEach((el) => {
     const src = el.getAttribute('data-src');
     if (src == null) return;
     el.innerHTML = renderStreamedMath(src, { streaming: false });
+  });
+  // Applet responses are Sage code, not prose -- mount an editable, runnable
+  // SageCell so the instructor can actually try it before approving, instead
+  // of markdown-rendering the code (which mangled the leading `#` comment into
+  // a heading, etc.).
+  document.querySelectorAll('.js-sage-applet').forEach((el) => {
+    const src = el.getAttribute('data-src');
+    if (src == null) return;
+    el.textContent = '';
+    mountEditableCell(el, src);
   });
   wireSolutionToggles(document);
 }

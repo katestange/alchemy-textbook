@@ -273,20 +273,26 @@ export function updateResultBox(box, accumulatedText, opts = {}) {
 // open) or leave a placeholder that mounts on first expand.
 function renderApplet(box, body, code, streaming) {
   const item = box.closest('.ai-item');
-  if (streaming) {
-    body.dataset.appletMounted = '';
+  const hasCode = !!(code && code.trim());
+  // Once a live cell is mounted, never clobber it on a later re-render.
+  if (body.dataset.appletMounted === 'true') return;
+
+  // Still streaming, or nothing to mount yet (the initial empty call): show the
+  // code accumulating as read-only source; never mount a partial/empty cell.
+  if (streaming || !hasCode) {
     body.innerHTML = '';
-    const pre = document.createElement('pre');
-    pre.className = 'sage-src';
-    pre.textContent = code || '';
-    body.appendChild(pre);
+    const el = document.createElement(hasCode ? 'pre' : 'div');
+    el.className = hasCode ? 'sage-src' : 'applet-placeholder';
+    el.textContent = hasCode ? code : 'Writing the Sage demo…';
+    body.appendChild(el);
     return;
   }
+
+  // Final, with code. Mount now if open; otherwise stash and mount on expand.
   body.dataset.sage = code;
-  body.dataset.appletMounted = body.dataset.appletMounted === 'true' ? 'true' : '';
   if (item && item.classList.contains('expanded')) {
     mountApplet(body, code);
-  } else if (body.dataset.appletMounted !== 'true') {
+  } else {
     body.innerHTML = '';
     const note = document.createElement('div');
     note.className = 'applet-placeholder';

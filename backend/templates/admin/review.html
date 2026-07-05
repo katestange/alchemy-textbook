@@ -47,7 +47,11 @@
     &mdash; {{ f.created_at[:16].replace("T", " ") }}</div>
   {% endfor %}
 
+  {% if item.creature_type == 'applet' %}
+  <div class="response js-sage-applet" data-src="{{ item.response }}"><pre>{{ item.response }}</pre></div>
+  {% else %}
   <div class="response js-latex" data-src="{{ item.response }}">{{ item.response }}</div>
+  {% endif %}
 
   <div class="actions">
     <form method="post" action="/admin/review/{{ item.id }}/approve">
