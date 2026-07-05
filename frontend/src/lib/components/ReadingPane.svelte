@@ -425,49 +425,59 @@
     border-color: var(--color-ink-soft);
   }
 
-  /* Decision 65: the chat/quiz panel docks to the right gutter. Author
-     feedback: since that right space is "used to chat/quiz sometimes", bias
-     the reading column LEFT permanently by reserving the gutter -- so the
-     column sits left-of-centre and does NOT move when the panel opens/closes.
-     The page-shell inside still uses margin:0 auto, so it centres within the
-     *remaining* left area. The reservation shrinks gracefully on smaller
-     screens; below the drawer breakpoint the panel becomes a bottom drawer
-     and the gutter is released so the column reclaims the full width. */
+  /* Decision 65 + author feedback: the reading column is left-anchored (a
+     left-of-centre gutter that's the SAME whether or not the panel is open,
+     so the text never moves), and the chat/quiz panel FILLS the whole space
+     to its right rather than sitting at a fixed narrow width leaving the
+     right margin half-empty.
+
+     `--reading-left` biases the column left of centre (centre would be
+     50vw - halfColumn); pulling ~15rem further left leaves generous room for
+     the panel. Below the drawer breakpoint the layout collapses to a single
+     centred column with the panel as a bottom drawer. */
   .reading-pane {
     position: relative;
-    --panel-w: 34rem;
-    --panel-gap: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    padding-left: max(1.5rem, calc(50vw - var(--content-max-width) / 2 - 15rem));
+    padding-right: 1rem;
   }
   .reading-main {
+    flex: 0 1 var(--content-max-width);
+    min-width: 0;
     position: relative;
-    padding-right: min(
-      calc(var(--panel-w) + var(--panel-gap)),
-      max(0px, calc(100vw - var(--content-max-width) - 3rem))
-    );
   }
   .panel-slot {
-    position: fixed;
+    flex: 1 1 20rem; /* fills the remaining width... */
+    max-width: 48rem; /* ...up to a sane cap on very wide screens */
+    align-self: stretch;
+    position: sticky;
     top: 0;
-    right: 0;
     height: 100vh;
-    width: var(--panel-w);
     display: flex;
-    padding: 0.5rem;
+    padding: 0.5rem 0;
     z-index: 40;
   }
-  /* Narrow: not enough room to dock a 34rem panel beside the column, so it
-     becomes a bottom drawer and the reading column reclaims the full width. */
+  /* Narrow: no room for a side panel, so the layout is a single centred
+     column and the panel becomes a bottom drawer. */
   @media (max-width: 84rem) {
-    .reading-main {
+    .reading-pane {
+      display: block;
+      padding-left: 0;
       padding-right: 0;
     }
     .panel-slot {
+      position: fixed;
       top: auto;
       bottom: 0;
       left: 0;
-      width: 100%;
+      right: 0;
+      width: auto;
+      max-width: none;
       height: auto;
       max-height: 70vh;
+      padding: 0;
       box-shadow: 0 -4px 16px rgba(38, 32, 25, 0.25);
     }
   }
