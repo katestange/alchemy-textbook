@@ -21,6 +21,7 @@
   import { builtinApplets } from '../builtinApplets.js';
   import { mountEditableCell } from '../sageCell.js';
   import { mountDesmosCalculator } from '../desmos.js';
+  import { mountGeoGebra } from '../geogebra.js';
 
   export let chapter;
   // A fragment id to scroll to once the (possibly just-navigated) chapter is
@@ -177,6 +178,8 @@
       // async; each mounts its own fallback on failure
       if (app.tool === 'desmos') {
         mountDesmosCalculator(host, app.code);
+      } else if (app.tool === 'geogebra') {
+        mountGeoGebra(host, app.code);
       } else {
         mountEditableCell(host, app.code);
       }
@@ -403,13 +406,31 @@
     hydrateChapterContent(chapter); // re-inject this chapter's now-visible items
   }
 
+  // A eureka captured in the chat panel (Decision 41) is the one thing a
+  // conversation persists: drop its chip into the margin at the anchor block.
+  function onEurekaCreated(e) {
+    const d = e.detail || {};
+    const anchorEl = d.xmlId && document.getElementById(d.xmlId);
+    if (!anchorEl) return;
+    const box = ensureResultBox(anchorEl, 'eureka', d.contentHash || d.xmlId, 'unreviewed', {
+      collapsed: false,
+      selectionText: d.selectionText
+    });
+    if (box) {
+      updateResultBox(box, d.text || '');
+      box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }
+
   onMount(() => {
     document.addEventListener('mousedown', handleDocumentMouseDown);
     document.addEventListener('alchemy:hidden-changed', onHiddenChanged);
+    document.addEventListener('alchemy:eureka', onEurekaCreated);
   });
   onDestroy(() => {
     document.removeEventListener('mousedown', handleDocumentMouseDown);
     document.removeEventListener('alchemy:hidden-changed', onHiddenChanged);
+    document.removeEventListener('alchemy:eureka', onEurekaCreated);
   });
 </script>
 

@@ -20,10 +20,12 @@
 import { renderStreamedMath, escapeHtml } from './mathRender.js';
 import { mountEditableCell } from './sageCell.js';
 import { mountDesmosCalculator } from './desmos.js';
+import { mountGeoGebra } from './geogebra.js';
 
-// An applet whose code begins with this marker is a Desmos graph rather than a
-// Sage cell (the model chooses per selection -- see the applet prompt).
+// An applet's code may begin with a tool marker; the model chooses per
+// selection (see the applet prompt). No marker => a SageMath cell.
 const DESMOS_MARKER = '[[DESMOS]]';
+const GEOGEBRA_MARKER = '[[GEOGEBRA]]';
 
 // --- Per-reader "hide" list (author feedback: too many chips can be confusing
 // to navigate; let a student banish ones they don't want). Non-destructive and
@@ -67,13 +69,15 @@ export function unhideAll() {
 const CREATURE_LABEL = {
   example: 'Example',
   intuition: 'Intuition',
-  applet: 'Applet'
+  applet: 'Applet',
+  eureka: 'Eureka'
 };
 
 const CREATURE_CHIP_LABEL = {
   example: 'Ex.',
   intuition: 'Int.',
-  applet: 'App.'
+  applet: 'App.',
+  eureka: '💡'
 };
 
 // Finds (or creates) the shared cluster sibling that holds every chip+box
@@ -123,6 +127,8 @@ function mountApplet(body, code) {
   const trimmed = code.trimStart();
   if (trimmed.startsWith(DESMOS_MARKER)) {
     mountDesmosCalculator(host, trimmed.slice(DESMOS_MARKER.length));
+  } else if (trimmed.startsWith(GEOGEBRA_MARKER)) {
+    mountGeoGebra(host, trimmed.slice(GEOGEBRA_MARKER.length));
   } else {
     mountEditableCell(host, code); // async; renders its own fallback on failure
   }
@@ -350,7 +356,7 @@ function renderApplet(box, body, code, streaming) {
     body.innerHTML = '';
     const el = document.createElement(hasCode ? 'pre' : 'div');
     el.className = hasCode ? 'sage-src' : 'applet-placeholder';
-    el.textContent = hasCode ? code.replace(/^\s*\[\[DESMOS\]\]\s*/, '') : 'Writing the demo…';
+    el.textContent = hasCode ? code.replace(/^\s*\[\[(DESMOS|GEOGEBRA)\]\]\s*/, '') : 'Writing the demo…';
     body.appendChild(el);
     return;
   }

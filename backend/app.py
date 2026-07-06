@@ -191,16 +191,25 @@ CREATURE_INSTRUCTIONS = {
         "that MUST produce visible output when run (print(), or "
         "plot()/show()/G.plot()). Begin with a one-line Sage comment (#) "
         "naming the demo and mark the value(s) worth changing.\n"
-        "(B) Desmos -- for VISUAL graphing: plotting functions and curves, "
-        "geometry, points and vectors, lattices, regions, transformations. "
-        "To choose Desmos, make the ENTIRE response begin with the exact "
-        "token [[DESMOS]] on its own first line, then list the Desmos "
-        "expressions to graph, ONE PER LINE, as plain Desmos/LaTeX (e.g. "
-        "y=x^2, or (3,4), or a point list like [(a,2a) for a=[-5...5]]). "
-        "Lines starting with # are treated as comments/labels.\n"
-        "Pick whichever tool makes the better demo for THIS selection. In "
-        "either case output ONLY the code/expressions -- no prose, no "
-        "markdown, no code fences (never write ```), no headings, no title."
+        "(B) Desmos -- for VISUAL graphing of functions and curves in the "
+        "plane, plotting points/vectors, lattices, regions. To choose Desmos, "
+        "make the ENTIRE response begin with the exact token [[DESMOS]] on "
+        "its own first line, then list the Desmos expressions to graph, ONE "
+        "PER LINE, as plain Desmos/LaTeX (e.g. y=x^2, or (3,4), or a point "
+        "list like [(a,2a) for a=[-5...5]]). Lines starting with # are "
+        "comments/labels.\n"
+        "(C) GeoGebra -- for INTERACTIVE geometry and construction: dragging "
+        "points on a curve, secant/tangent lines, angles, loci, elliptic-"
+        "curve point addition, ruler-and-compass style constructions. To "
+        "choose GeoGebra, make the ENTIRE response begin with the exact token "
+        "[[GEOGEBRA]] on its own first line, then list GeoGebra commands, ONE "
+        "PER LINE (e.g. `c: y^2 = x^3 - 3x + 3`, `A = Point(c)`, "
+        "`s = Line(A, B)`). Lines starting with # are comments.\n"
+        "Pick whichever tool makes the best demo for THIS selection: Desmos "
+        "for straightforward graphing, GeoGebra when dragging/constructing is "
+        "the point, Sage for computation. Output ONLY the code/expressions/"
+        "commands -- no prose, no markdown, no code fences (never write ```), "
+        "no headings, no title."
     ),
     # V1 PROMPT -- chat creature (the Cat): open-ended conversation panel.
     "chat": (
@@ -218,7 +227,14 @@ CREATURE_INSTRUCTIONS = {
         "something the current chapter doesn't cover. The student may paste "
         "new quoted passages from the book into the conversation; treat "
         "those as fresh context. Never use headings, never title your "
-        "responses, and never use [[solution]] markers."
+        "responses, and never use [[solution]] markers.\n"
+        "Eureka capture: if the student asks you to capture, save, pin, or "
+        "remember an insight as a 'eureka' (an aha! they want to keep), "
+        "distill the single key insight into ONE or two crisp sentences and "
+        "put it on its own line beginning with the exact token [[EUREKA]] -- "
+        "this pins a permanent note in the margin of their passage. Then "
+        "warmly confirm you've pinned it. Use [[EUREKA]] ONLY when they "
+        "clearly want to keep something; never otherwise."
     ),
     # V1 PROMPT -- quiz creature (the Raven): interactive quiz dialogue.
     "quiz": (
@@ -237,7 +253,14 @@ CREATURE_INSTRUCTIONS = {
         "contents). Keep every turn short -- this is a conversation. Never "
         "use headings, never title your responses, and never use "
         "[[solution]] markers or reveal an answer before the student has "
-        "attempted it."
+        "attempted it.\n"
+        "Add-to-textbook: if the student says a question is good and asks to "
+        "add it to the textbook (or you both craft a strong question worth "
+        "keeping), output the polished question followed by its brief answer "
+        "on their own line beginning with the exact token "
+        "[[TEXTBOOK_QUESTION]] -- this forwards it to the instructor for "
+        "review. Then confirm warmly. Use the token ONLY on an explicit "
+        "request to add a question to the book."
     ),
 }
 DEFAULT_CREATURE_INSTRUCTION = (
@@ -833,6 +856,37 @@ async def api_generate(request: Request):
                 ),
             )
 
+        # The one thing a conversation may leave behind (Decision 41): a
+        # [[EUREKA]] insight the student asked the Cat to keep, or a
+        # [[TEXTBOOK_QUESTION]] the Raven forwarded for the instructor. Both
+        # are anchored to the conversation's block and enter the review flow.
+        captured = []
+        if conversational:
+            for marker, ctype in (
+                ("[[EUREKA]]", "eureka"),
+                ("[[TEXTBOOK_QUESTION]]", "suggested_question"),
+            ):
+                idx = response_text.find(marker)
+                if idx == -1:
+                    continue
+                snippet = response_text[idx + len(marker):].strip().split("\n\n")[0].strip()
+                if not snippet:
+                    continue
+                cid = db_execute(
+                    "INSERT INTO cached_content "
+                    "(content_hash, selection_text, creature_type, response, model_used, "
+                    " cost_microdollars, status, created_at, section_id, created_by_code) "
+                    "VALUES (?, ?, ?, ?, ?, 0, 'unreviewed', ?, ?, ?)",
+                    (block["content_hash"], selection_text, ctype, snippet, model, ts,
+                     block["section_id"], code),
+                )
+                captured.append({
+                    "creature_type": ctype,
+                    "content_id": cid,
+                    "content_hash": block["content_hash"],
+                    "text": snippet,
+                })
+
         # h. Terminal event (includes the authoritative remaining budget so
         # the client never has to approximate it).
         remaining_row = db_query(
@@ -843,6 +897,7 @@ async def api_generate(request: Request):
             {
                 "content_id": content_id,
                 "ephemeral": ephemeral,
+                "captured": captured,
                 "cost_microdollars": student_cost,
                 "budget_remaining_microdollars": (
                     remaining_row[0]["remaining"] if remaining_row else None),

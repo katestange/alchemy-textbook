@@ -52,6 +52,11 @@ function createChatStore() {
       set(initialState());
     },
 
+    // A quiet centered transcript note (e.g. "pinned as a eureka").
+    appendNote(text) {
+      update((s) => ({ ...s, messages: [...s.messages, { role: 'note', text }] }));
+    },
+
     // Context selector toggle (spec item 4, chat only): switching scope
     // inserts a quiet centered transcript note, in either direction.
     setScope(newScope) {

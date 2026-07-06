@@ -74,6 +74,7 @@
           chatStore.appendAssistantDelta(data.text || '');
         } else if (event === 'done') {
           chatStore.finalizeAssistantTurn();
+          handleCaptured(data.captured, snapshot);
           if (typeof data.budget_remaining_microdollars === 'number') {
             session.updateBudget(data.budget_remaining_microdollars);
           } else if (
@@ -90,6 +91,38 @@
         }
       }
     );
+  }
+
+  // Hide the capture-control tokens from the transcript; their effect (a
+  // pinned eureka / a forwarded question) is surfaced as a note instead.
+  function chatText(t) {
+    return (t || '').replace(/\[\[EUREKA\]\]/g, '').replace(/\[\[TEXTBOOK_QUESTION\]\]/g, '');
+  }
+
+  // A conversation can leave two things behind (server-side, Decision 41): a
+  // eureka pinned to the margin, or a question forwarded to the instructor.
+  function handleCaptured(captured, snapshot) {
+    if (!Array.isArray(captured)) return;
+    for (const c of captured) {
+      if (c.creature_type === 'eureka') {
+        chatStore.appendNote('💡 Pinned to your margin as a eureka.');
+        const xmlId = snapshot.anchor && snapshot.anchor.xml_id;
+        if (xmlId) {
+          document.dispatchEvent(
+            new CustomEvent('alchemy:eureka', {
+              detail: {
+                xmlId,
+                contentHash: c.content_hash,
+                text: c.text,
+                selectionText: snapshot.openingQuote
+              }
+            })
+          );
+        }
+      } else if (c.creature_type === 'suggested_question') {
+        chatStore.appendNote('📩 Sent to your instructor as a suggested textbook question.');
+      }
+    }
   }
 
   function handleError(data) {
@@ -198,7 +231,7 @@
         </div>
       {:else}
         <div class="turn turn-assistant">
-          <div class="turn-body">{@html renderStreamedMath(m.text, { streaming: !!m.streaming })}</div>
+          <div class="turn-body">{@html renderStreamedMath(chatText(m.text), { streaming: !!m.streaming })}</div>
         </div>
       {/if}
     {/each}
@@ -235,5 +268,10 @@
 
   <div class="ephemerality-notice">
     Conversations aren't saved anywhere. When you close this panel, it's gone.
+    {#if $chatStore.creatureType === 'quiz'}
+      <br />📩 Like a question? Say “add that to the textbook” to forward it to your instructor.
+    {:else}
+      <br />💡 Want to keep an insight? Say “capture this as a eureka” — it pins a note to your margin (the one thing that's kept).
+    {/if}
   </div>
 </div>
