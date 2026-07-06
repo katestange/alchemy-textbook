@@ -185,7 +185,7 @@ Any cipher in which the letters of the message are simply rearranged is called a
 
 \subsubsection{Multialphabetic substitution ciphers}
 
-The Vigen\`ere cipher deserves special attention, as it represents a conceptual advance from most other classical cryptograph of the past several millenia.  It was gradually developed in the 1400s and 1500s by a number of people, none of which was Vigen\`ere (as is the case for many named mathematical ideas).  The key insight is that a Caesar cipher would be much more secure if a \emph{different} key were used for each letter of the plaintext.  
+The Vigen\`ere cipher deserves special attention, as it represents a conceptual advance from most other classical cryptograph of the past several millennia.  It was gradually developed in the 1400s and 1500s by a number of people, none of which was Vigen\`ere (as is the case for many named mathematical ideas).  The key insight is that a Caesar cipher would be much more secure if a \emph{different} key were used for each letter of the plaintext.  
 
 It is useful to have on hand a Vigen\`ere square, seen in Figure~\ref{fig:vig-square}.  This shows the alphabet in each of its 26 possible shifted forms.  To begin, we choose a key word.  We could choose, for example, the word `POLLEN.'  Each letter of the key is interpreted as a shift.  The letter `P,' being the 16th letter of the alphabet, represents a shift of 16 positions.  Writing the keyword, repeatedly, above the plaintext, we encrypt each letter of the plaintext with the corresponding shift.  See Figure~\ref{fig:vig-example}
 
@@ -286,7 +286,7 @@ Most ciphers up until world war two were at most combinations of substitution an
 \label{fig:adfgvx-example}
 \end{figure}
 
-Another famous polygraphic cipher is matrix encryption, which is often called a Hill cipher, but sometimes credited to bothe Levine and Hill during the first half of the twentieth century.  In this system, letters are replaced with their positions in the alphabet (so `A' becomes `1' etc.), and then groups of letters are considered vectors.  Matrices then act on the vectors.  We will see this in Section~\ref{sec:hill}.
+Another famous polygraphic cipher is matrix encryption, which is often called a Hill cipher, but sometimes credited to both Levine and Hill during the first half of the twentieth century.  In this system, letters are replaced with their positions in the alphabet (so `A' becomes `1' etc.), and then groups of letters are considered vectors.  Matrices then act on the vectors.  We will see this in Section~\ref{sec:hill}.
 
 
 
@@ -360,9 +360,9 @@ For example, in the Caesar cipher, the keyspace consists of the $26$ possible al
 \label{fig:caesar-exhaustive}
 \end{figure}
 
-Therefore, the security of a symmetric key cryptosystem is bounded in terms of its keyspace:  a small keyspace necessarily means a weak system.  But a big keyspace does not guarantee a strong system.  Even with a very large keyspace, a clever \textbf{cryptanalyst} (one who attempts to break a cryptosystem) may have a more efficient algorithm than an exhaustive search.  An example of this is the alphabetic cipher mentioned in Section \KS{GIVE SEC}.  For english, the keyspace consists of all possible permutations of 26 roman letters.  That's a space of size $26!$ ($26$ factorial).  That means there are more than $400,000,000,000,000,000,000,000,000$ possible keys.  Trying one per nanosecond (a nanosecond may by time for a couple of instructions on a modern laptop) that will take over $12,000,000$ millenia.
+Therefore, the security of a symmetric key cryptosystem is bounded in terms of its keyspace:  a small keyspace necessarily means a weak system.  But a big keyspace does not guarantee a strong system.  Even with a very large keyspace, a clever \textbf{cryptanalyst} (one who attempts to break a cryptosystem) may have a more efficient algorithm than an exhaustive search.  An example of this is the alphabetic cipher mentioned in Section \KS{GIVE SEC}.  For english, the keyspace consists of all possible permutations of 26 roman letters.  That's a space of size $26!$ ($26$ factorial).  That means there are more than $400,000,000,000,000,000,000,000,000$ possible keys.  Trying one per nanosecond (a nanosecond may by time for a couple of instructions on a modern laptop) that will take over $12,000,000$ millennia.
 
-Despite this large keyspace, however, solving alphabetic ciphers is a popular pasttime, as evidenced by the Cryptogram found in many weekend newspapers, which is essentially an alphabetic ciphertext without a key provided; the goal is to obtain the plaintext.  This amusement dates to the middle ages (Wikipedia).  Methods vary, but are typically based on patterns inherent in the target language.  For example, in english, the letter `E' is the most frequently used letter, so one may guess that the most frequently occurring letter in the ciphertext should correspond to `E.'  Proceeding by guessing and familiarity with english allows many people to solve these in a pleasantly passed half hour over breakfast.
+Despite this large keyspace, however, solving alphabetic ciphers is a popular pastime, as evidenced by the Cryptogram found in many weekend newspapers, which is essentially an alphabetic ciphertext without a key provided; the goal is to obtain the plaintext.  This amusement dates to the middle ages (Wikipedia).  Methods vary, but are typically based on patterns inherent in the target language.  For example, in english, the letter `E' is the most frequently used letter, so one may guess that the most frequently occurring letter in the ciphertext should correspond to `E.'  Proceeding by guessing and familiarity with english allows many people to solve these in a pleasantly passed half hour over breakfast.
 
 Therefore the security of a symmetric key cryptosystem is affected by the size of the keyspace and the availability of efficient \textbf{cryptographic attacks}, or methods that may reveal the plaintext, without use of the secret key.  Exhaustive search is a cryptographic attack that is always available, but one hopes for something faster.
 
@@ -381,7 +381,7 @@ Let's say we wish to find a factor of the integer $N$ by trial division.  The \t
 
 The \textbf{asymptotic runtime} or \textbf{asymptotic complexity} is the time taken as a function of that input size, as the input size grows.  For our example algorithm, the time taken is $\sqrt{N}$ trial divisions.  Assume for simplicity for the moment that a trial division takes a constant amount of time\footnote{this is not true, but we will ignore that for now}.  Then the time taken as a function of input size is $\sqrt{N}$ steps as a function of $\log_2(N)$.  If we let $X := \log_2(N)$ represent the input size, then\footnote{the notation $:=$ means that I am defining the symbol on the left to be the quantity on the right} we have $N = 2^X$ and we obtain a runtime of $\sqrt{N} = N^{1/2} = 2^{X/2} = \sqrt{2}^X$.  This is an \emph{exponential} function in $X$, so we say that trial division is an \textbf{exponential algorithm}.
 
-Exponential algorithms are horrendous things.  In our exmaple, if it takes time $T$ to factor something of $b$ bits, then it takes time $T^2$ to factor something of $2b$ bits.  Double the bits means the square of the amount of time!  Triple the bits and you must cube the time taken.  This means that we can write down, on a single piece of paper, integers that are so large we expect humankind will never be able to factor them\footnote{Well, with our current tools, anyway!  Quantum computers are on the horizon.}.
+Exponential algorithms are horrendous things.  In our example, if it takes time $T$ to factor something of $b$ bits, then it takes time $T^2$ to factor something of $2b$ bits.  Double the bits means the square of the amount of time!  Triple the bits and you must cube the time taken.  This means that we can write down, on a single piece of paper, integers that are so large we expect humankind will never be able to factor them\footnote{Well, with our current tools, anyway!  Quantum computers are on the horizon.}.
 
 \subsection{The advent of public-key cryptography}
 
@@ -432,7 +432,7 @@ This is what motivates the \textbf{Diffie-Hellman Key Exchange}. This is a sligh
 Now Eve must turn the information of $\alpha^a$ and $\alpha^b$ into the information of $\alpha^{ab}$ to break the system.  It turns out this problem, called the \textbf{Computational Diffie-Hellman Problem}, appears to have high complexity.  That is, no one knows a fast algorithm for it.  So Eve can't break this system (as far as we know).
 However, computing $\alpha^a$ and the other exponents in the algorithm \emph{does} have fast algorithms (low complexity), so all these computations can be done very quickly.  Otherwise this wouldn't be a practical scheme, i.e. one we can use in reality on the hardware we have.  In fact, this scheme is very practical and is in use around the world ADD STATISTICS. 
 
-It is exactly this disparity between the complexity of performing the key exchange and the complexity of breaking the key exchange that provides the security of this key exchange scheme.  Unfortunately, we don't actually \emph{know} that the Compuational Diffie-Hellman Problem is difficult!  We are fairly confident only because many researchers (mathematicians and computer scientists) have tried to come up with an efficient algorithm, but have failed.  In other words, the security of the modern internet is based only on a \emph{conjecture}.
+It is exactly this disparity between the complexity of performing the key exchange and the complexity of breaking the key exchange that provides the security of this key exchange scheme.  Unfortunately, we don't actually \emph{know} that the Computational Diffie-Hellman Problem is difficult!  We are fairly confident only because many researchers (mathematicians and computer scientists) have tried to come up with an efficient algorithm, but have failed.  In other words, the security of the modern internet is based only on a \emph{conjecture}.
 
 This is not an unusual state of affairs.  In fact, all of the modern cryptography in use today is based on such assurances.  We trust it only because many people have tried to break it and failed.
 
@@ -888,7 +888,7 @@ Examples:
 
 For the second example, we can give a more direct reason that $2$ is not invertible.  If $2x \equiv 1 \pmod 6$, then $2x + 6k = 1$ for some integer $k$.  But the left side of this equation is always an even number, and the right side is odd.  So $2$ is not invertible in this situation because it shares a factor of $2$ with the modulus.
 
-This notion of invertibility explains the $x \mapsto 2x \pmod 6$ affine cipher example just discussed:  $2$ and $3$ are inversees of each other.  So multiplying by one undoes multiplication by the other.
+This notion of invertibility explains the $x \mapsto 2x \pmod 6$ affine cipher example just discussed:  $2$ and $3$ are inverses of each other.  So multiplying by one undoes multiplication by the other.
 
 Let's pause for a bit of reflection on the philosophy of mathematical definition.  Two is the inverse of $3$ modulo $5$.  Said another way, $3$ is \emph{that element, which, when multiplied by $2$, gives $1$}.  This is an example of a fundamental mathematical paradigm:  we should define an element by what it does.  So it is very reasonable to interpret the symbol $1/2$ as the phrase \emph{that which, when multiplied by $2$ gives $1$}, and then say that $1/2 \equiv 3 \pmod 5$.  This answers the question `Can we \emph{divide} by $2$ in modulo $5$?'  The answer is yes, but not by trying to map the rational number $1/2$ somewhere on the clock, but instead by asking for an element which multiplies by $2$ to give $1$.  That element turns out to be $3$.
 
@@ -1544,7 +1544,7 @@ With Diffie-Hellman key exchange, we now have a working example of a key exchang
 
 \begin{enumerate}
     \item We need it to be \textbf{efficient} (fast) to \textbf{implement} the key exchange (in practice, a user is waiting for a browser to connect to a server).
-    \item We need it to be \textbf{inefficient} (slow) to \textbf{break} the cryptographic scheme as an evesdropper or attacker (in practice, an internet router listening to the conversation can't practically break the system).
+    \item We need it to be \textbf{inefficient} (slow) to \textbf{break} the cryptographic scheme as an eavesdropper or attacker (in practice, an internet router listening to the conversation can't practically break the system).
 \end{enumerate}
 
 For the first, the computation of $g^a$ and $g^b$ modulo $p$ needs to be fast.  For the second, finding $g^{ab}$ from $g^a$ and $g^b$ has to be slow.  
@@ -1555,7 +1555,7 @@ At that size, the exponent $a$ and $b$, chosen randomly in the range $0, \ldots,
 
 \subsubsection{Successive squaring}
 
-So how do we do modular exponentation quickly?
+So how do we do modular exponentiation quickly?
 
 Here's a puzzle to get you started:  try to compute $3^{32}$ modulo $n$, using as few multiplications as possible.  I've intentionally not given you the modulus, so you can't do this explicitly, but you can imagine yourself as a robot or computer program, which has two functions:  (1) multiplying two numbers to get a reduced result, and (2) storing results in memory.  For example, you might begin by computing $3$ times $3$ and storing the output $3^2$.  Then you might compute $3^2$ times $3^2$ and store $3^4$.
 
@@ -1661,7 +1661,7 @@ For each of the following functions, determine if $f = O(g)$ and if $g = O(f)$ (
 
 We want to measure an algorithm's \textbf{time complexity} (or \textbf{runtime}) in terms of the number of operations it takes to complete the algorithm, as a function of input size.  Similarly, we want to measure an algorithm's \textbf{space complexity} in terms of the number of bits of memory used, as a function of input size.
 
-For example, consider the algorithm which takes as input an integer $n$, written in decimal notation, and prints ``Hello!'' exactly $n$ times.  The runtime is $n$ steps, each of which is a constant\footnote{I'm ignoring the intricacies of the counter itself} number of operations (printing the text and incrementing a counter that will determine when to stop).  So the runtime is $O(n)$ operations.  However, the input is of size $M := \log_{10}(n)$.  So, the runtime as a function of the input size $M$ is atually $O(n) = O(10^M)$ steps.  Thus, this algorithm is an \emph{exponential function} of the input size $M$.
+For example, consider the algorithm which takes as input an integer $n$, written in decimal notation, and prints ``Hello!'' exactly $n$ times.  The runtime is $n$ steps, each of which is a constant\footnote{I'm ignoring the intricacies of the counter itself} number of operations (printing the text and incrementing a counter that will determine when to stop).  So the runtime is $O(n)$ operations.  However, the input is of size $M := \log_{10}(n)$.  So, the runtime as a function of the input size $M$ is actually $O(n) = O(10^M)$ steps.  Thus, this algorithm is an \emph{exponential function} of the input size $M$.
 
 As another example, trial division for factoring an integer $n$ tests at most $\sqrt{n}$ integers, so its runtime is $O(\sqrt{n}) = O(10^{M/2})$, again exponential.
 
@@ -1997,7 +1997,7 @@ then this algorithm has runtime $L_p(1/2,1)$ and variants have runtimes $L_p(\al
 \subsubsection{Logjam attack}
 
 Observe that most of the work in this algorithm lies in the precomputation phase.  This phase depends only on the prime and primitive root, not on the value of $h$.  This is also true of the \emph{number field sieve} and \emph{function field sieve}.  
-This led to the famous \textbf{Logjam attack} \KS{give citation to webpage weakdh.org}, revealted publicly on May 20, 2015.  This attack consisted of two components.  The first was a weakness in the $TLS$ handshake protocol between client and server that allowed a \textbf{man-in-the-middle} (someone altering messages passing between client and server) to force the server to use a relatively weak (but still built-in) $512$-bit prime, even when server settings dictated the use of a stronger prime.  The second component was a large precomputation for the number field sieve for the most commonly used prime(s) $p$.  It turns out that some $8.4\%$ of the top 1 million websites were using this most popular prime number.  By running the precomputation offline before the attack, the online, active phase of the attack could be made very quick (a matter of around a minute).  The researchers who created and revealed the Logjam attack speculated that a nation state agency such as the National Security Agency may have the server power and money (in the hundreds of millions\KS{cite wikipedia or the original paper}) to run pre-computations for the most common $1024$-bit prime, obviating the need for the first component, and allowing them to decrypt a significant portion of internet traffic (around a quarter of websites and two thirds of VPNs).  The researchers released instructions to server administrators on how to avoid this attack.
+This led to the famous \textbf{Logjam attack} \KS{give citation to webpage weakdh.org}, revealed publicly on May 20, 2015.  This attack consisted of two components.  The first was a weakness in the $TLS$ handshake protocol between client and server that allowed a \textbf{man-in-the-middle} (someone altering messages passing between client and server) to force the server to use a relatively weak (but still built-in) $512$-bit prime, even when server settings dictated the use of a stronger prime.  The second component was a large precomputation for the number field sieve for the most commonly used prime(s) $p$.  It turns out that some $8.4\%$ of the top 1 million websites were using this most popular prime number.  By running the precomputation offline before the attack, the online, active phase of the attack could be made very quick (a matter of around a minute).  The researchers who created and revealed the Logjam attack speculated that a nation state agency such as the National Security Agency may have the server power and money (in the hundreds of millions\KS{cite wikipedia or the original paper}) to run pre-computations for the most common $1024$-bit prime, obviating the need for the first component, and allowing them to decrypt a significant portion of internet traffic (around a quarter of websites and two thirds of VPNs).  The researchers released instructions to server administrators on how to avoid this attack.
 
 
 \subsection{A lower bound on solving discrete log}
@@ -2012,7 +2012,7 @@ Notice that in such a situation, you could still run the birthday attack.  You c
 
 So in this sense, the birthday attack is a totally general attack on a cyclic group.  It doesn't need to know anything about the elements except that they have a group law and a consistent naming convention.
 
-Compare this to the index calculus.  If I tried to run the index calculus algorithm against Mr. Spock, I would ask for a power of `Bob', get back `Ahmed' and then attempt to do trival division on Ahmed, at which point Ahmed would probably get fed up and tell me to stop poking him with my slide rule.  I can't do trial division on an abstractly named group element.  I need to have a number.  So the index calculus is not a general algorithm.
+Compare this to the index calculus.  If I tried to run the index calculus algorithm against Mr. Spock, I would ask for a power of `Bob', get back `Ahmed' and then attempt to do trial division on Ahmed, at which point Ahmed would probably get fed up and tell me to stop poking him with my slide rule.  I can't do trial division on an abstractly named group element.  I need to have a number.  So the index calculus is not a general algorithm.
 
 This thought experiment can be turned into a formal proof that the best totally generic algorithm against the discrete logarithm problem runs in time $O(\sqrt{p})$ group operations.  The method of proof is a little wacky -- it basically involves setting up a thought experiment like this, with a \emph{simulator} like Mr. Spock -- except Mr. Spock doesn't actually know the answer to the discrete log problem either!  Amazingly, a little careful analysis of this game of  `the blind leading the blind' can give a lower bound.
 
@@ -2093,7 +2093,7 @@ Summarizing the discussion, we have the following algorithm:
 
 
       An eavesdropper Eve can see $B = g^b, K = g^k, c = g^{kb} m$ and must compute $m$.
-      Given $c$, the computation of $m$ is equivalent to the compuation of $g^{kb}$, hence the security of ElGamal encryption is exactly the same as that for Diffie-Hellman Key Exchange.
+      Given $c$, the computation of $m$ is equivalent to the computation of $g^{kb}$, hence the security of ElGamal encryption is exactly the same as that for Diffie-Hellman Key Exchange.
 
       \KS{consider putting a formal proof of this fact}
 
@@ -2136,7 +2136,7 @@ Summarizing the discussion, we have the following algorithm:
       \vspace{3em}
 
 
-      The reason the verificationworks is that for a properly formed signature, $A^K K^s = g^{aK + ks} = g^m$.
+      The reason the verification works is that for a properly formed signature, $A^K K^s = g^{aK + ks} = g^m$.
 
       It may help to discuss how one might come to this scheme, as the defining equation $aK + sk = m$ seems very complicated.  Insofar as correctness, it would be ok to use $s$ so that $a + s \equiv m$ and then verify that $A g^s = g^m$.  But, then knowledge of $s$ is equivalent to knowledge of $a$:  if you know one, you know the other.  So once Alice signs anything, she would be giving away her private key, which she clearly doesn't want to do (her private key is her identification in the cryptographic world, as the knowledge of her private key is the only thing differentiating her from anyone else).  
       This explains why the scheme mixes $k$ (a private element of randomness) into the definition of $s$.  This makes $s$ unable to reveal $a$.  
@@ -2209,7 +2209,7 @@ The Euclidean algorithm is merely a formalization of this very intuitive process
 	35 &= 2 \cdot 15 + 5 \\
 	15 &= 3 \cdot 5 + 0
 \end{align*}
-Each row has the fom:
+Each row has the form:
 \[
 	(\text{larger pile}) = (\text{number of copies}) \cdot (\text{smaller pile (to become new bigger pile)}) + (\text{remainder (to become new smaller pile)})
 \]
@@ -2578,7 +2578,7 @@ The last example is particularly interesting for us for what will come next.  No
 
 \subsection{Proof of the Euler Phi function formula}
 
-In a previous section, we left the proof of the Euler phi function's formula without proof.  Now, with the use of Chinese Remainder Theorem, we can prove it.  It comes down to the so-called \textbf{multiplicativity} of the Euler phi function. \KS{this was atctually proven above when stating full CRT, reorganize}
+In a previous section, we left the proof of the Euler phi function's formula without proof.  Now, with the use of Chinese Remainder Theorem, we can prove it.  It comes down to the so-called \textbf{multiplicativity} of the Euler phi function. \KS{this was actually proven above when stating full CRT, reorganize}
 
 \begin{theorem}
 Suppose that $\gcd(m,n)=1$.  Then $\varphi(nm) = \varphi(n)\varphi(m)$.
@@ -2589,7 +2589,7 @@ Suppose that $a \in \ZZ/nm\ZZ$.  Then $a$ is invertible modulo $nm$ if and only 
 \[
 ax \equiv 1 \pmod{m}, \quad ax \equiv 1 \pmod{n}
 \]
-has  solution.  This system will have a solution \emph{only if} $a$ is invertible modulo $n$ and modulo $m$.  But by the chinese remainder theorem, if the two equations individually have a solution, then the system does too.  So this sytem will have a solution if $a$ is invertible modulo $n$ and modulo $m$.
+has  solution.  This system will have a solution \emph{only if} $a$ is invertible modulo $n$ and modulo $m$.  But by the chinese remainder theorem, if the two equations individually have a solution, then the system does too.  So this system will have a solution if $a$ is invertible modulo $n$ and modulo $m$.
 
 Thus, we have shown that $a \pmod{nm}$ is invertible if and only if $a \pmod n$ and $a \pmod m$ are both invertible.  This shows that the chinese remainder theorem map $(a \pmod{nm}) \mapsto (a \pmod{n} , a \pmod{m})$ is a bijection 
 \[
@@ -2653,7 +2653,7 @@ In this case, Bob chooses
 \[
 e = 24157092077072373.
 \]
-Then, using the extended Euclidean algorith, Bob computes the inverse of $e$ modulo $\varphi(n)$.  One obtains
+Then, using the extended Euclidean algorithm, Bob computes the inverse of $e$ modulo $\varphi(n)$.  One obtains
 \[
 d = 20132023423892469.
 \]
@@ -2918,7 +2918,7 @@ The Fermat method is not very useful as a general method of factoring, but it \e
 
 The \textbf{quadratic sieve} is a method to find square roots modulo $n$, and hence factor $n$ (by the section above this one).
 
-The goal is to choose a \textbf{factor base} (a list of small primes, much like in the index claculus), and then somehow obtain a great many factorizations of the form
+The goal is to choose a \textbf{factor base} (a list of small primes, much like in the index calculus), and then somehow obtain a great many factorizations of the form
 \[
  k^2 - n = \prod_{i} p_i^{e_{i,k}}
 \]
@@ -3591,7 +3591,7 @@ There is a particularly simple algorithm for finding square roots modulo $p$ whe
     \item If not, then return \textbf{failed}. (In this case there is no square root of $a$ and $k^2 \equiv -a \pmod{p}$.)
 \end{enumerate}
 
-That's it!  Notice that it is only when $p \equiv 3 \pmod{4}$ that that $\frac{p+1}{4}$ is an integer.  If it is not an integer, we wouldn't be able to compute $a^{\frac{p+1}{4}}$ as a modular exponentiation.
+That's it!  Notice that it is only when $p \equiv 3 \pmod{4}$ that $\frac{p+1}{4}$ is an integer.  If it is not an integer, we wouldn't be able to compute $a^{\frac{p+1}{4}}$ as a modular exponentiation.
 
 \begin{example}
     To compute the square root of $3$ modulo $11$, we compute
@@ -3832,7 +3832,7 @@ Physics tells us that multiplying a state by a complex vector of length $1$, lik
 
 
 \subsection{Diving Deeper:  Projective space and the Bloch Sphere (Fall 2024: can skip)}
- This way of introducing quantum states is typical.  But if we step back and look at what we've done, it becomes clear that the mathematically familiar language for these qubit states is is \emph{projective space}.  In fact, the \textbf{state space} for one qubit -- the set of possible states -- is really $\mathbb{P}^1_\CC$, where we write the state
+ This way of introducing quantum states is typical.  But if we step back and look at what we've done, it becomes clear that the mathematically familiar language for these qubit states is \emph{projective space}.  In fact, the \textbf{state space} for one qubit -- the set of possible states -- is really $\mathbb{P}^1_\CC$, where we write the state
 \[
 a |0\rangle + b |1 \rangle
 \]
@@ -3849,7 +3849,7 @@ Is $[0,1] = [1,0]$?
 Name some equivalent vectors to $[1,i]$.
 \end{quiz}
 
-We can identify a vector $[a,b] \in \PP^1_\CC$ with the state $a |0 \rangle + b |1 \rangle$.  However, we set two convenions:
+We can identify a vector $[a,b] \in \PP^1_\CC$ with the state $a |0 \rangle + b |1 \rangle$.  However, we set two conventions:
 
 \begin{enumerate}
 	\item $|a|^2 + |b|^2 = 1$
@@ -3947,7 +3947,7 @@ Now, from the perspective of quantum computing, it is important to write every s
 &| + \rangle, |-\rangle \\
 &| i \rangle, |-i\rangle 
 \end{align*}
-These are each orthogonormal bases (the lines in $\CC^2$ that they represent are orthogonormal).  Every other element in the space can be written as a linear combination in terms of this basis.  
+These are each orthonormal bases (the lines in $\CC^2$ that they represent are orthonormal).  Every other element in the space can be written as a linear combination in terms of this basis.  
 
 \begin{example}
 For example, suppose we wish to express $|0\rangle$ in the basis $|+\rangle$ and $|-\rangle$.
@@ -4940,7 +4940,7 @@ Its conjugate transpose is itself again, so it is unitary.  We can interpret thi
 |0\rangle &\mapsto |1 \rangle, \\
 |1\rangle &\mapsto |0 \rangle.
 \end{align*}
-This explains why it is considered a NOT gate; it is alo called the Pauli X gate.
+This explains why it is considered a NOT gate; it is also called the Pauli X gate.
 
 Some more examples are given in the table below:
 
@@ -5748,7 +5748,7 @@ If we simplify some of these, we get
 
 \subsection{Shor's Algorithm}
 
-We wish to factor $N = pq$, where $p$ and $q$ are prime.  In this case, finding a proper factor of $N$ is equivlent to factoring $N$.  (That is, if you find one factor, then you get the other factor by dividing.)
+We wish to factor $N = pq$, where $p$ and $q$ are prime.  In this case, finding a proper factor of $N$ is equivalent to factoring $N$.  (That is, if you find one factor, then you get the other factor by dividing.)
 
 \subsubsection{From factoring to period finding}
 
@@ -6473,7 +6473,7 @@ Next, we compute $\mathbf{v}_2^*$ (notice that the length computations above are
 =
 \begin{pmatrix} 2 \\ 5 \end{pmatrix}.
 \]
-Thus our new basis issss
+Thus our new basis is
 \[
 \mathbf{v}_1 = \begin{pmatrix} 17 \\ 5 \end{pmatrix}, 
 \mathbf{v}_2^* = \begin{pmatrix} 2 \\ 5 \end{pmatrix}.
@@ -6601,7 +6601,7 @@ Bob's public/private key pair is the following:
 
 The public key is $A, b:= As + e \in \FF_p^k$.
 
-\KS{todo draw little diagramslike in notes}
+\KS{todo draw little diagrams like in notes}
 
 \subsubsection{Regev Encryption Algorithm}
 
@@ -6940,7 +6940,7 @@ Notice (from above) that subspaces include the origin -- the zero vector.  So th
 
 Again, an example helps.  Here are all the lines in $\FF_3^2$:
 
-\KS{inclue a drawing}
+\KS{include a drawing}
 
 A particularly nice property of cosets is that the full vector space can be broken up into disjoint cosets, once we've chosen a subspace.  Here's an example:
 
@@ -6951,7 +6951,7 @@ A particularly nice property of cosets is that the full vector space can be brok
     \item Consider the set $\{ 000, 010, 001, 100 \}$ as a subset of $\FF_2^3$.  Is this a subspace?  The answer is no.
         If it were a subspace, then any linear combination of the elements would have to be contained in the subspace also.  But $010 + 001 = 011$ which is not in the subspace.
         \item Consider the set $\{ 01, 10 \}$ as a subset of $\FF_2^2$.  Is this a subspace?  The answer is no.  If it were a subspace, it would include the zero vector.  \item Consider the set $\{ 00, 01, 10 \}$ as a subset of $\FF_2^2$.  Is this a subspace?  The answer is no.  If it were a subspace, it would have a power of two cardinality.
-        \item Consider the set $\{ 000, 010, 001, 011 \}$ as a susbset of $\FF_2^3$.  Is this a subspace?  The answer is yes.  To see this, you could check that all linear combinations stay inside the space.  Or you could give linear equations that describe the space, e.g., the set consists of all vectors $(x,y,z)$ such that $x=0$.
+        \item Consider the set $\{ 000, 010, 001, 011 \}$ as a subset of $\FF_2^3$.  Is this a subspace?  The answer is yes.  To see this, you could check that all linear combinations stay inside the space.  Or you could give linear equations that describe the space, e.g., the set consists of all vectors $(x,y,z)$ such that $x=0$.
 \end{enumerate}
 \end{example}
 

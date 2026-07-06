@@ -13,6 +13,7 @@ import datetime
 import hashlib
 import json
 import os
+import re
 import secrets
 import sqlite3
 import threading
@@ -135,7 +136,16 @@ runs in a SageCell widget.
 Pedagogy: prefer hints, reasoning, and Socratic questions over finished \
 answers; encourage the student to attempt the next step themselves. You are \
 a tutor teaching good habits and self-discipline for learning, not an \
-answer machine.\
+answer machine.
+
+Unusable selections: if the selection is too short, nonsensical, or simply \
+not something you can build the requested artifact from (for example, the \
+student selected the single word "the" and asked for a worked example), do \
+not force it. Reply briefly and warmly, suggest a more fruitful selection \
+(name a concrete better one if you can), and make the ENTIRE response begin \
+with the exact token [[EPHEMERAL]] on its own first line. That token marks a \
+throwaway redirect that is shown once and never saved. Use it ONLY for this \
+case -- never at the start of a genuine answer.\
 """
 
 # V1 PROMPT -- per-creature instructions (only "example" is tuned so far).
@@ -508,6 +518,27 @@ def book():
     return FileResponse(BOOK_HTML_PATH, media_type="text/html")
 
 
+# LaTeXML renames every figure to a bare file like `x3.jpg` / `x12.png` and the
+# chapter HTML references it relatively; since the reader is a SPA served at
+# "/", the browser requests `/x3.jpg`. Serve those figures from the pipeline
+# build dir (they are NOT copied into frontend/dist). The "/x..." path prefix
+# can't collide with the SPA's own files (index.html, /assets, /admin-render.js)
+# and is registered before the catch-all static mount below.
+_GRAPHIC_RE = re.compile(r"^x[\w.-]+\.(?:png|jpe?g|gif|svg)$")
+
+
+@app.get("/x{name}")
+def chapter_graphic(name: str):
+    fname = "x" + name
+    if not _GRAPHIC_RE.match(fname):
+        raise HTTPException(status_code=404)
+    for base in (BUILD_DIR, BUILD_DIR / "html"):
+        path = base / fname
+        if path.is_file():
+            return FileResponse(path)
+    raise HTTPException(status_code=404)
+
+
 # --- auth ------------------------------------------------------------------
 
 
@@ -769,11 +800,18 @@ async def api_generate(request: Request):
             "WHERE code = ?",
             (student_cost, code),
         )
+        # Ephemeral redirects: when the model judges the selection unusable it
+        # prefixes [[EPHEMERAL]] (see CORE_SYSTEM_PROMPT). Such throwaway
+        # responses are shown once and never stored, so the instructor's review
+        # queue isn't cluttered with "you selected 'the', try a longer passage"
+        # notes. Budget is still charged (tokens were spent).
+        ephemeral = response_text.lstrip().startswith("[[EPHEMERAL]]")
+
         # Chat/quiz turns are ephemeral (Decisions 41/66): never written to
         # cached_content, no content_id -- the client alone holds the
         # conversation. One-shot creature output is cached as before.
         content_id = None
-        if not conversational:
+        if not conversational and not ephemeral:
             content_id = db_execute(
                 "INSERT INTO cached_content "
                 "(content_hash, selection_text, creature_type, response, model_used, "
@@ -801,6 +839,7 @@ async def api_generate(request: Request):
             "done",
             {
                 "content_id": content_id,
+                "ephemeral": ephemeral,
                 "cost_microdollars": student_cost,
                 "budget_remaining_microdollars": (
                     remaining_row[0]["remaining"] if remaining_row else None),

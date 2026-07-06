@@ -63,6 +63,13 @@ body {
   padding: 0;
 }
 
+/* Author calibrated at browser zoom 120% and liked it; make that the default
+   by scaling the root, so every rem-based size (text, columns, UI) grows in
+   proportion -- imitating zoom. Reset the browser back to 100% to see it. */
+html {
+  font-size: 120%;
+}
+
 body {
   background: var(--color-bg);
   color: var(--color-ink);
@@ -798,20 +805,87 @@ button {
   overflow-x: auto;
 }
 
-/* Pre-authored built-in demos embedded in the reading column. */
+/* Pre-authored built-in demos embedded in the reading column. Collapsible via
+   the title bar (author feedback: collapse to a titled bar, not a tiny chip). */
 .builtin-applet {
   margin: 1.2rem 0;
-  padding: 0.75rem 0.9rem;
+  padding: 0.5rem 0.9rem 0.75rem;
   background: var(--wash-green);
   border: 1px solid var(--color-rule);
   border-left: 3px solid var(--accent-green);
   border-radius: 0 8px 8px 0;
 }
+.builtin-applet-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.25rem 0;
+  background: none;
+  border: none;
+  text-align: left;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+}
 .builtin-applet-title {
   font-variant-caps: small-caps;
   letter-spacing: 0.03em;
   font-size: 0.9rem;
-  color: var(--color-ink-soft);
-  margin-bottom: 0.35rem;
+}
+.builtin-applet-caret::before {
+  content: '▾';
+  display: inline-block;
+  font-size: 0.8em;
+  transition: transform 0.15s ease;
+}
+.builtin-applet.collapsed .builtin-applet-caret::before {
+  transform: rotate(-90deg);
+}
+.builtin-applet.collapsed .applet-host {
+  display: none;
 }
 [data-theme='dark'] .builtin-applet { background: var(--wash-green); }
+
+/* SageCell's own controls (Run / Share / full-screen), styled to sit in the
+   parchment theme (author feedback). SageCell ships its own CSS, so a few
+   overrides need to win on specificity. */
+.sagecell_evalButton {
+  background: var(--accent-green) !important;
+  color: #fff !important;
+  border: 1px solid var(--accent-green) !important;
+  border-radius: 6px !important;
+  padding: 0.25rem 0.9rem !important;
+  font-family: var(--font-serif) !important;
+  font-size: 0.95rem !important;
+  cursor: pointer;
+}
+.sagecell_evalButton:hover { filter: brightness(0.94); }
+.sagecell_permalink {
+  font-family: var(--font-serif) !important;
+  font-size: 0.85rem !important;
+  color: var(--accent-teal) !important;
+  border: 1px solid var(--color-rule) !important;
+  border-radius: 6px !important;
+  padding: 0.15rem 0.6rem !important;
+  background: var(--color-bg) !important;
+}
+/* Full-screen toggle: smaller, and nudged a little further right. */
+.sagecell_fullScreen {
+  font-size: 0.8em !important;
+  transform: scale(0.85);
+  transform-origin: right center;
+  margin-left: 0.6rem !important;
+  opacity: 0.7;
+}
+.sagecell_fullScreen:hover { opacity: 1; }
+
+/* Ephemeral one-time note (author idea): unusable-selection redirects marked
+   [[EPHEMERAL]] by the model -- shown once, never stored, self-dismissing. */
+.ai-item.ephemeral .ai-result {
+  border-style: dashed;
+  opacity: 0.92;
+}
+.ai-item.ephemeral .ai-result-head .tag {
+  border-style: dashed;
+  font-style: italic;
+}

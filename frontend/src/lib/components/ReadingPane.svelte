@@ -11,7 +11,8 @@
     showResultError,
     removeResultItem,
     hiddenCount,
-    unhideAll
+    unhideAll,
+    markEphemeral
   } from '../inSituResult.js';
   import SelectionToolbar from './SelectionToolbar.svelte';
   import PromptBox from './PromptBox.svelte';
@@ -149,12 +150,27 @@
       const wrap = document.createElement('div');
       wrap.id = wrapId;
       wrap.className = 'builtin-applet';
-      const title = document.createElement('div');
+      // The title is a toggle bar: collapsing hides the cell but leaves the
+      // titled bar in place (author feedback: not a tiny chip like creatures).
+      const bar = document.createElement('button');
+      bar.type = 'button';
+      bar.className = 'builtin-applet-bar';
+      bar.setAttribute('aria-expanded', 'true');
+      const caret = document.createElement('span');
+      caret.className = 'builtin-applet-caret';
+      caret.setAttribute('aria-hidden', 'true');
+      const title = document.createElement('span');
       title.className = 'builtin-applet-title';
       title.textContent = app.title;
+      bar.appendChild(caret);
+      bar.appendChild(title);
       const host = document.createElement('div');
       host.className = 'applet-host';
-      wrap.appendChild(title);
+      bar.addEventListener('click', () => {
+        const collapsed = wrap.classList.toggle('collapsed');
+        bar.setAttribute('aria-expanded', String(!collapsed));
+      });
+      wrap.appendChild(bar);
       wrap.appendChild(host);
       anchorEl.insertAdjacentElement('afterend', wrap);
       mountEditableCell(host, app.code); // async; renders its own fallback
@@ -314,6 +330,9 @@
           // normal toggle instead of staying a "being written" placeholder
           // forever (Decision 62: "treat stream-end-without-close as close").
           updateResultBox(box, accumulated, { streaming: false });
+          // Unusable-selection redirect: shown once, not stored (server sent
+          // no content_id). Turn it into a self-dismissing one-time note.
+          if (data.ephemeral) markEphemeral(box);
           if (typeof data.budget_remaining_microdollars === 'number') {
             // authoritative figure from the server
             session.updateBudget(data.budget_remaining_microdollars);

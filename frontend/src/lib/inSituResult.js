@@ -258,12 +258,39 @@ function setOnLine(box, item, selectionText) {
 // stream-end rule).
 export function updateResultBox(box, accumulatedText, opts = {}) {
   const body = box.querySelector('.body');
+  // Strip a leading [[EPHEMERAL]] marker (unusable-selection redirect) so the
+  // reader never sees the raw token; the marker's effect is applied on `done`.
+  const text = (accumulatedText || '').replace(/^\s*\[\[EPHEMERAL\]\]\s*/, '');
   if (box.dataset.creature === 'applet') {
-    renderApplet(box, body, stripCodeFences(accumulatedText), !!opts.streaming);
+    renderApplet(box, body, stripCodeFences(text), !!opts.streaming);
     return;
   }
-  body.innerHTML = renderStreamedMath(accumulatedText, opts);
+  body.innerHTML = renderStreamedMath(text, opts);
   wireSolutionToggles(body);
+}
+
+// Turns a result into an ephemeral, one-time note (author idea): the model
+// marked the selection unusable ([[EPHEMERAL]]), so it was never stored. It
+// can't rest as a persistent chip -- it self-removes on the next click
+// outside it, and its controls are dropped since there's nothing to keep.
+export function markEphemeral(box) {
+  const item = box.closest('.ai-item');
+  if (!item) return;
+  item.classList.add('ephemeral');
+  const tag = box.querySelector('.ai-result-head .tag');
+  if (tag) tag.textContent = 'One-time note · not saved';
+  box
+    .querySelectorAll('.ai-result-head .hide, .ai-result-head .dismiss')
+    .forEach((b) => b.remove());
+  setTimeout(() => {
+    const onDown = (e) => {
+      if (!item.contains(e.target)) {
+        item.remove();
+        document.removeEventListener('mousedown', onDown, true);
+      }
+    };
+    document.addEventListener('mousedown', onDown, true);
+  }, 0);
 }
 
 // Applet rendering: while streaming, show the code accumulating as read-only
