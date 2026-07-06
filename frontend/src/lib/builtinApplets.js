@@ -60,7 +60,7 @@ seg1 = Segment(R, Sum)`
     tool: 'desmos',
     code: `# L = a·v1 + b·v2 for integers a, b. Drag/zoom the graph, or edit the
 # vectors: change 17, 5, 19, 10 to any numbers and watch the lattice change.
-[(17a + 19b,\\ 5a + 10b) for a=[-6...6], b=[-6...6]]
+[(17a + 19b, 5a + 10b) for a=[-6,...,6], b=[-6,...,6]]
 (17, 5)
 (19, 10)`
   },
