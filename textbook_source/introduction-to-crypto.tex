@@ -408,8 +408,12 @@ Here's a sort of failed first attempt at a key exchange:
 \begin{enumerate}
 	\item Alice chooses a private key $a$ (an integer)
 	\item Bob chooses a private key $b$ (an integer)
-	\item Alice makes a public key $2a$ and sends it to Bob.
-	\item Bob makes a public key $2b$ and sends it to Alice.
+% AI-FLAGGED ORIGINAL:
+%	\item Alice makes a public key $2a$ and sends it to Bob.
+%	\item Bob makes a public key $2b$ and sends it to Alice.
+	\item Alice makes a public key $5a$ and sends it to Bob.
+	\item Bob makes a public key $5b$ and sends it to Alice.
+\KS{Fixed by AI: the rest of this example (steps below and the Eve/division-by-$5$ discussion) uses public keys $5a$ and $5b$; the multiplier here should be $5$, not $2$, for internal consistency.}
 	\item Alice can compute (Alice's private key)x(Bob's public key) $= a(5b) = 5ab$.
 	\item Bob can compute (Bob's private key)x(Alice's public key) $= b(5a) = 5ab$.
 \end{enumerate}
@@ -698,8 +702,11 @@ The Caesar cipher is best viewed as a cryptosystem based on modular arithmetic m
 \]
 and then the corresponding decryption is
 \[
-\text{decryption}: c \mapsto c - x \pmod{26}.
+% AI-FLAGGED ORIGINAL:
+%\text{decryption}: c \mapsto c - x \pmod{26}.
+\text{decryption}: c \mapsto c - s \pmod{26}.
 \]
+\KS{Fixed by AI: the secret shift is $s$ (encryption is $m \mapsto m+s$), so decryption must subtract $s$, not the undefined $x$.}
 Then the \textbf{plaintext space}, \textbf{ciphertext space} and keyspace are all equal to $\ZZ/26\ZZ$ (although we think of this as the roman alphabet).  Figure~\ref{fig:vig-square} shows the addition table of $\ZZ/26\ZZ$ written in this way.
 
 \begin{figure}
@@ -1077,8 +1084,11 @@ We just have to keep in mind the Principles of Modular Arithmetic (Section~\ref{
 \[
 	\begin{pmatrix} a & b \\ c & d \end{pmatrix}^{-1}
 	=
-	\frac{1}{ad-bc} \begin{pmatrix} d & -b \\ -c & a \end{pmatrix}^{-1}
+% AI-FLAGGED ORIGINAL:
+%	\frac{1}{ad-bc} \begin{pmatrix} d & -b \\ -c & a \end{pmatrix}^{-1}
+	\frac{1}{ad-bc} \begin{pmatrix} d & -b \\ -c & a \end{pmatrix}
 \]
+\KS{Fixed by AI: the adjugate matrix on the right should not itself be inverted; the $2\times2$ inverse formula is $\frac{1}{ad-bc}\left(\begin{smallmatrix} d & -b \\ -c & a\end{smallmatrix}\right)$ with no exponent $-1$.}
 (This is the usual formula for the inverse, but we can only use it if division by $ad-bc$ is allowed.)
 For example, the following matrix is \emph{not invertible} modulo $6$, because its determinant, $2$, is not invertible modulo $6$:
 \[
@@ -1438,7 +1448,10 @@ a^{\varphi(n)} \equiv 1 \pmod n.
 \end{proof}
 
 \begin{checkin}
-    Observe that $\varphi(17)=6$ and $7^6 \equiv 7 \pmod{14}$.  This seems to contradict Euler's Theorem.  Why doesn't it?\footnote{Answer:  Euler's Theorem requires that the base, $a$, be in the multiplicative group.  But $a=7$ is not coprime to $14$, so Euler's Theorem doesn't apply to this base.}
+% AI-FLAGGED ORIGINAL:
+%    Observe that $\varphi(17)=6$ and $7^6 \equiv 7 \pmod{14}$.
+    Observe that $\varphi(14)=6$ and $7^6 \equiv 7 \pmod{14}$.
+\KS{Fixed by AI: the modulus here is $14$, and $\varphi(14)=6$ (whereas $\varphi(17)=16$). The footnote answer also refers to modulus $14$, so this should read $\varphi(14)=6$.}  This seems to contradict Euler's Theorem.  Why doesn't it?\footnote{Answer:  Euler's Theorem requires that the base, $a$, be in the multiplicative group.  But $a=7$ is not coprime to $14$, so Euler's Theorem doesn't apply to this base.}
 \end{checkin}
 
 The version of Euler's Theorem when $n$ is a prime is so important it is given a special name.
@@ -1760,9 +1773,9 @@ Check whether you are correct by finding $x$ (by any method).
 
 The first algorithm we will study which is faster than exhaustive search for the Discrete Logarithm Problem is known as the \emph{Baby-Step-Giant-Step} algorithm, and is due to Shanks \KS{add citation}.  It is an example of a \emph{meet-in-the-middle} algorithm, because we compute two lists and look for a collision.  To motivate the algorithm, suppose we compute two lists of randomly generated elements of $\ZZ/p\ZZ$.  The first list consists of elements of the form $g^j$, i.e., random powers of the generator $g$.  The second list consists of elements of the form $hg^k$, i.e. random powers of $g$, all multiplied by $h$.  If we notice a collision, i.e. $g^j = h g^k$, then rearranging, we obtain $g^{j-k} = h$ and $j-k$ is the solution to the problem.  
 
-Such an attack is sometimes called a \emph{birthday attack}.  It is an improvement over the more na\"ive method of computing a single list of random powers of $g$ and hoping to collide with $h$.  Indeed, the number of comparisons that may result in a collision in this na\"ive method is equal to the length $\ell$ of the list.  But with two lists of length $\ell$, there are ${\ell\choose 2} = \frac{\ell(\ell+1)}{2}$ comparisons that may `get lucky.'  This results in an improved runtime, since we obtain more new comparisons per computation of an element.  (It does require more memory, however).
+Such an attack is sometimes called a \emph{birthday attack}.  It is an improvement over the more na\"ive method of computing a single list of random powers of $g$ and hoping to collide with $h$.  Indeed, the number of comparisons that may result in a collision in this na\"ive method is equal to the length $\ell$ of the list.  But with two lists of length $\ell$, there are ${\ell\choose 2} = \frac{\ell(\ell-1)}{2}$\KS{Fixed by AI: the original wrote $\frac{\ell(\ell+1)}{2}$, but $\binom{\ell}{2}=\frac{\ell(\ell-1)}{2}$.} comparisons that may `get lucky.'  This results in an improved runtime, since we obtain more new comparisons per computation of an element.  (It does require more memory, however).
 
-Shanks' Baby-Step-Giant-Step algorithm takes the randomness out of this two-list approach, by generating two lists which are expected to `cover' the space of possibilities fairly evenly.  To make this precise, start with the observation that every integer $0 \le n < 100$ can be written with two base-ten digits in a unique way.  Similarly, any integer $0 \le n < p-1$ can be written uniquely with two digits in base $\sqrt{p-1}$, or at least, approximately so, since if $\sqrt{p-1}$ is not an integer, we will use the closest integer greater than it.  That is, we let $N = \rceil p-1 \lceil$.
+Shanks' Baby-Step-Giant-Step algorithm takes the randomness out of this two-list approach, by generating two lists which are expected to `cover' the space of possibilities fairly evenly.  To make this precise, start with the observation that every integer $0 \le n < 100$ can be written with two base-ten digits in a unique way.  Similarly, any integer $0 \le n < p-1$ can be written uniquely with two digits in base $\sqrt{p-1}$, or at least, approximately so, since if $\sqrt{p-1}$ is not an integer, we will use the closest integer greater than it.  That is, we let $N = \lceil \sqrt{p-1} \rceil$.\KS{Fixed by AI: the original ``$\rceil p-1 \lceil$'' had reversed ceiling brackets and, more importantly, omitted the square root; the base used is $\sqrt{p-1}$, so $N=\lceil\sqrt{p-1}\rceil$.}
 
 The first list is the `baby steps':
 \[
@@ -2112,7 +2125,7 @@ Suppose $m$ is a message to be signed.  We think of it as an exponent, so it liv
 
 Alice, who wishes to sign the document $m$, will create \emph{two} private-public key pairs.  The first, $a$ and $A = g^a$ is her private public key pair for long term.  The second, is an ephemeral key for signing, which we will call $k$ and $K = g^k$ ($k$ is for `key').  The signed message will be made up of $(m, K, s)$ where $s$ is chosen such that $aK + sk\equiv m$ modulo $p-1$.  In other words, $s$ should be thought of as an exponent.  But strangely, we are also thinking of $K$ as an exponent as well, in this context.
 
-To verify the signature, Bob will combine Alice's public key $A$ with the signed message $(m,K,s)$.  He will compute $A^K K^s$ and $g^m$.  Since $A^K K^s = g^{aK + sk}$, these are equal if and only if $aB + bs = m$, i.e. if $(m,K,s)$ is a correctly signed document. 
+To verify the signature, Bob will combine Alice's public key $A$ with the signed message $(m,K,s)$.  He will compute $A^K K^s$ and $g^m$.  Since $A^K K^s = g^{aK + sk}$, these are equal if and only if $aK + sk = m$, i.e. if $(m,K,s)$ is a correctly signed document. \KS{Fixed by AI: the condition should be $aK+sk=m$ (matching the exponent $g^{aK+sk}$ and the signing equation); the original ``$aB+bs=m$'' used symbols $B,b$ that do not appear in this signature scheme.}
 
 
 Summarizing the discussion, we have the following algorithm:
@@ -2307,7 +2320,7 @@ At the end of this computation, we have a recipe card for $4$, i.e., we have lea
 \[
 	196 \cdot (-11) + 180 \cdot 12 = 4.
 \]
-In other words, we have solved the original problem, and found $(x,y) = (-11,10)$.  
+In other words, we have solved the original problem, and found $(x,y) = (-11,12)$.  \KS{Fixed by AI: the solution found is $(x,y)=(-11,12)$ (consistent with the recipe card and the equation $196\cdot(-11)+180\cdot12=4$ just above); the original ``$(-11,10)$'' has the wrong $y$-value ($196\cdot(-11)+180\cdot10=-356\neq4$).}
 
 If we wish to solve more general linear Diophantine equations, of the form $ax + by = c$ where $c \neq \gcd(a,b)$, then we observe two things:
 \begin{enumerate}
@@ -2341,8 +2354,11 @@ Let $g = \gcd(a,b)$.  To solve the Diophantine equation $ax + by = c$, we have:\
 \item When $c$ is not a multiple of $\gcd(a,b)$, there are no solutions.
 \item When $c = d g$, the full set of solutions is given by
 \[
-\{ d(x_0, y_0) + k(-b/g, a/b) : k \in \ZZ \}.
+% AI-FLAGGED ORIGINAL:
+%\{ d(x_0, y_0) + k(-b/g, a/b) : k \in \ZZ \}.
+\{ d(x_0, y_0) + k(-b/g, a/g) : k \in \ZZ \}.
 \]
+\KS{Fixed by AI: the homogeneous solution direction is $(-b/g,a/g)$ (as in the $c=0$ case just above); the original ``$a/b$'' should be ``$a/g$''.}
 where $(x_0, y_0)$ is any one solution to $ax+by=g$ (for example, found by the extended Euclidean algorithm).
 \end{enumerate}
 
@@ -3045,13 +3061,22 @@ For example, the ring $\FF_3[x]/(x^2+1)$ has exactly 9 elements:
 0,1,2,x,x+1,x+2,2x,2x+1,2x+2.
 \]
 Any other element can be reduced to one of these.  The two rules in this case are
+% AI-FLAGGED ORIGINAL:
+%\[
+%3 \equiv 0, \quad x \equiv 2
+%\]
+%This second rule came from rearranging $x +1 \equiv 0$ to become $x \equiv -1 \equiv 2$.  It's a nicer rule to handle.  Then, for example, applying these rules we can reduce:
+%\[
+%x^2 + 7x = 2^2 + 7 \cdot 2 = 2^2 + 1 \cdot 2 = 4 + 2 = 6 = 0.
+%\]
 \[
-3 \equiv 0, \quad x \equiv 2
+3 \equiv 0, \quad x^2 \equiv 2
 \]
-This second rule came from rearranging $x +1 \equiv 0$ to become $x \equiv -1 \equiv 2$.  It's a nicer rule to handle.  Then, for example, applying these rules we can reduce:
+This second rule came from rearranging $x^2 +1 \equiv 0$ to become $x^2 \equiv -1 \equiv 2$.  It's a nicer rule to handle.  Then, for example, applying these rules we can reduce:
 \[
-x^2 + 7x = 2^2 + 7 \cdot 2 = 2^2 + 1 \cdot 2 = 4 + 2 = 6 = 0.
+x^2 + 7x \equiv 2 + 7x \equiv 2 + x \equiv x+2.
 \]
+\KS{Fixed by AI: the modulus is $m(x)=x^2+1$, so the reduction rule is $x^2\equiv-1\equiv2$ (one cannot set $x\equiv2$; the element $x$ has degree $1$ and is already reduced). Correctly reducing $x^2+7x$: replace $x^2$ by $2$ and reduce $7\equiv1\pmod3$, giving $2+x=x+2$ (an element of the listed residue set), not $0$.}
 
 
 
@@ -3188,15 +3213,24 @@ We will work in $\ZZ/5\ZZ$.
     \[
     \text{slope} \equiv  \frac{4-2}{2-0} \equiv \frac{2}{2} \equiv 1 \pmod{5}.
     \]
-    Since $P$ is on the line $y \equiv 2x + n$, we have $2 \equiv 2 \cdot 0 + n$ so the $y$-intercept $n$ is $2$ and $L$ is the line
+    Since $P$ is on the line $y \equiv x + n$, we have $2 \equiv 1 \cdot 0 + n$ so the $y$-intercept $n$ is $2$ and $L$ is the line
+% AI-FLAGGED ORIGINAL:
+%    Since $P$ is on the line $y \equiv 2x + n$, we have $2 \equiv 2 \cdot 0 + n$ so the $y$-intercept $n$ is $2$ and $L$ is the line
+%    \[
+%    L : y \equiv 2x + 2 \pmod{5}.
+%    \]
     \[
-    L : y \equiv 2x + 2 \pmod{5}.
+    L : y \equiv x + 2 \pmod{5}.
     \]
+\KS{Fixed by AI: the slope was just computed as $1$ (not $2$), so the line through $P,Q$ is $y\equiv x+2$. Check: $Q=(2,4)$ satisfies $2+2=4$, whereas $2\cdot2+2=6\equiv1\neq4$. (The substitution below already uses $(x+2)^2$, i.e.\ slope $1$.)}
 
     Next, we find the third intersection point of $L$ and $E$.  To do this, we substitute $L$ into $E$:
     \[
-    (x+2)^2 \equiv x^3  + 3 x + 4 \pmod{5}.
+% AI-FLAGGED ORIGINAL:
+%    (x+2)^2 \equiv x^3  + 3 x + 4 \pmod{5}.
+    (x+2)^2 \equiv x^3  + 2 x + 4 \pmod{5}.
     \]
+\KS{Fixed by AI: the right-hand side is the curve $x^3+2x+4$, not $x^3+3x+4$. Indeed $(x+2)^2=x^2+4x+4$ and $x^3+2x+4-(x^2+4x+4)=x^3-x^2-2x$, matching the simplified cubic below.}
     Simplifying,
     \[
     x^3 - x^2 -2x \equiv 0 \pmod{5}.
@@ -3205,7 +3239,7 @@ We will work in $\ZZ/5\ZZ$.
     \[
     0 + 2 + x_R \equiv -(-1) \equiv 1 \pmod{5}.
     \]
-    So $x_R = 4$ and we can plug into $L$ to obtain $y_R \equiv 2x_R + 2 \equiv 2 \cdot 4 + 2 \equiv 1 \pmod{5}$.  So the third intersection point is $R = (4,1)$.
+    So $x_R = 4$ and we can plug into $L$ to obtain $y_R \equiv x_R + 2 \equiv 4 + 2 \equiv 1 \pmod{5}$.\KS{Fixed by AI: the line is $y\equiv x+2$ (slope $1$), so $y_R\equiv x_R+2\equiv4+2\equiv1$. The original ``$2x_R+2\equiv2\cdot4+2$'' used the wrong slope, and moreover $2\cdot4+2=10\equiv0\neq1$.}  So the third intersection point is $R = (4,1)$.
 
     Finally, the last step is to reflect $R$ across the $x$-axis, which means changing the sign on the $y$ coordinate (keep in mind $-1 \equiv 4 \pmod{5}$):
     \[
@@ -3304,7 +3338,7 @@ On the curve $y^2 \equiv x^3 +2x + 1$ modulo 7, try to compute the addition of t
 
 \textbf{Question 3.}  On the curve $y^2 \equiv x^3 +2x + 1$ modulo 35, try to compute the addition of the two points $P = (28,13)$ and $Q = (21,22)$ by hand.\\
 
-\textbf{Soln.} We begin by considering the slope, rise over run:  $-9/-7 \equiv 9/7$.  Since we are working modulo $35$, we must compute the inverse of $7$ modulo $35$.  But if we begin that process (which involves an extended Euclidean algorithm), we will come up against the fact that $7$ is not invertible modulo $35$, since they share a non-trivial factor of $7$.  Boom!  The universe explodes as we attempt to divide by something which is not invertible!  In calmer parlance, we cannot proceed.\\
+\textbf{Soln.} We begin by considering the slope, rise over run:  $-9/7$.\KS{Fixed by AI: the run is $x_P-x_Q=28-21=7$ (positive), so the slope is $-9/7$, not $-9/-7\equiv9/7$. This matters for the ``shadow'' reasoning: $-9/7\equiv1/2\equiv3\pmod5$ matches the slope in Question~1, whereas $9/7\equiv2\pmod5$ would not.}  Since we are working modulo $35$, we must compute the inverse of $7$ modulo $35$.  But if we begin that process (which involves an extended Euclidean algorithm), we will come up against the fact that $7$ is not invertible modulo $35$, since they share a non-trivial factor of $7$.  Boom!  The universe explodes as we attempt to divide by something which is not invertible!  In calmer parlance, we cannot proceed.\\
 
 Now let's step back and analyse the situation.  Observe the following things:
 \begin{enumerate}
@@ -3335,11 +3369,12 @@ This is based on a common paradigm:  work modulo $n$, and you are working modulo
 a \rightarrow a^2 
 \rightarrow a^{3!}
 \rightarrow a^{4!}
-\rightarrow a^{5!!}
+\rightarrow a^{5!}
 \rightarrow a^{6!}
 \rightarrow a^{7!}
 \rightarrow \cdots
 \end{equation}
+\KS{Fixed by AI: the fifth term was written $a^{5!!}$ (double factorial); it should be $a^{5!}$ to match the factorial sequence (cf.\ the CRT version below, which has $a_1^{5!}$).}
 To compute this, we can first square, then cube, then raise to the fourth power, etc.
 
 Behind the scenes, so to speak, the Chinese remainder theorem tells us that our arithmetic efforts are simultaneously reproduced modulo $p$ and modulo $q$.  Under the isomorphism of CRT,
@@ -3773,12 +3808,16 @@ form a field, under the operations
 \[
 (a+bi)+(c+di) = (a+c) + (b+d)i, 
 \quad
-(a+bi)(c+di) = (ab - bd) + (ac+bd)i
+% AI-FLAGGED ORIGINAL:
+%(a+bi)(c+di) = (ab - bd) + (ac+bd)i
+(a+bi)(c+di) = (ac - bd) + (ad+bc)i
 \]
+\KS{Fixed by AI: the complex product is $(ac-bd)+(ad+bc)i$. The original real part ``$ab-bd$'' should be ``$ac-bd$'', and the imaginary part ``$ac+bd$'' should be ``$ad+bc$''.}
 The multiplication rule just written may seem arbitrary, but it is a simple consequence of the `rule' that $i^2 = -1$, i.e.
 \[
-(a+bi)(c+di) = ac + bdi^2 + (ac+bd)i = (ac - bd) + (ac+bd)i.
+(a+bi)(c+di) = ac + bdi^2 + (ad+bc)i = (ac - bd) + (ad+bc)i.
 \]
+\KS{Fixed by AI: the cross terms give $(ad+bc)i$, not $(ac+bd)i$ (both occurrences corrected on this line).}
 
 In fact, this construction is precisely what we did in constructing finite fields:  we could begin with the polynomial ring $\RR[x]$ and take a quotient by the polynomial $x^2+1$, i.e. apply the rule $x^2 = -1$.  We would obtain a field whose elements can all be expressed as linear polynomials $bx + a$ for $a,b \in \RR$.  But writing $i$ instead of $x$, we obtain the definition above.
 
@@ -3904,9 +3943,9 @@ In Figure~\ref{fig:bloch} we see how these two parameters $0 \le \theta \le 2\pi
 \end{figure}
 
 \KS{move this?}
-Then \textbf{relative phase} is the angle the complex number $a/b$ makes with the real axis, i.e. $\varphi$.  The \textbf{relative magnitude} is the length of the complex number $a/b$, i.e. $\sin \frac{\theta}{2} / \cos \frac{\theta}{2}$. 
+Then \textbf{relative phase} is the angle the complex number $b/a$ makes with the real axis, i.e. $\varphi$.  The \textbf{relative magnitude} is the length of the complex number $b/a$, i.e. $\sin \frac{\theta}{2} / \cos \frac{\theta}{2}$. \KS{Fixed by AI: with the state $\cos(\theta/2)\,|0\rangle+e^{i\varphi}\sin(\theta/2)\,|1\rangle$ (so $a=\cos(\theta/2),\,b=e^{i\varphi}\sin(\theta/2)$), the ratio with phase $\varphi$ and magnitude $\tan(\theta/2)=\sin(\theta/2)/\cos(\theta/2)$ is $b/a$, not $a/b$. Corrected both occurrences.}
 
-(As a quick concept check, if $\varphi=0$ and $\theta=0$, we get $|1 \rangle$ which has relative phase undefined and relative magnitude $0$.\KS{more concept checks here})
+(As a quick concept check, if $\varphi=0$ and $\theta=0$, we get $|0 \rangle$ which has relative phase undefined and relative magnitude $0$.\KS{Fixed by AI: at $\theta=0$ the state is $\cos(0)|0\rangle+\sin(0)|1\rangle=|0\rangle$ (north pole), not $|1\rangle$; and indeed its relative magnitude $|b/a|=0$, consistent with $|0\rangle$.}\KS{more concept checks here})
 
 
 \begin{quiz}
@@ -4108,7 +4147,7 @@ Consider the qubit state superposition $i|0\rangle + \sqrt{3}|1 \rangle$.
         \cos(\theta/2) = \frac{1}{2}, \quad
         e^{i\varphi} \sin(\theta/2) = -i \frac{\sqrt{3}}{2}.
         \]
-        Taking $\theta = \pi/3$ solves the first equation, and plugging that into the second, we need
+        Taking $\theta = 2\pi/3$ solves the first equation, and plugging that into the second, we need\KS{Fixed by AI: $\cos(\theta/2)=1/2$ requires $\theta/2=\pi/3$, i.e.\ $\theta=2\pi/3$ (then $\sin(\theta/2)=\sqrt3/2$, giving $e^{i\varphi}=-i$). The value $\theta=\pi/3$ gives $\cos(\pi/6)=\sqrt3/2\neq1/2$. Cf.\ the identical computation in the Test Review section, which correctly uses $2\pi/3$.}
         \[
         e^{i\varphi} = -i
         \]
@@ -4487,7 +4526,7 @@ In the final phase, they may use a few of these bits to check whether there was 
 
 The security guarantee of QKD is very different from the other systems we have studied.  Here, we rely on the physical laws of quantum physics to guarantee (with overwhelming probability, anyway) that an eavesdropper can be \emph{detected}.  If an eavesdropper is detected, we simply give up and perhaps start over.
 
-To see that Phase III detects an eavesdropper with some probability, consider what happens in the following two cases.  In both cases, imagine that we are in the first row of the example table above.  That is, Alice sends 0 in the L basis, meaning $| \uparrow \rangle$, and Bob measures the photon in the L basis.  If no eavesdropper is on the channel, Bob will measure a 1.
+To see that Phase III detects an eavesdropper with some probability, consider what happens in the following two cases.  In both cases, imagine that we are in the first row of the example table above.  That is, Alice sends 0 in the L basis, meaning $| \uparrow \rangle$, and Bob measures the photon in the L basis.  If no eavesdropper is on the channel, Bob will measure a 0.\KS{Fixed by AI: Alice sent bit $0$ ($|\uparrow\rangle$); Bob measuring in the L basis recovers $|\uparrow\rangle$ with probability $1$, which decodes to $0$, not $1$.}
 
 However, if there is an eavesdropper on the channel, say Eve, then she cannot interact with the photon without measuring it.  Let's consider two possibilities:
 
@@ -4741,7 +4780,7 @@ This has no solution.
     |00 \rangle + i|01 \rangle
     \right).
     \]
-    These two states result in the \emph{same probabilities} for the second qubit.  However, this state is NOT entangled, because if it were, then we would have a solution to
+    These two states result in the \emph{same probabilities} for the second qubit.  However, this state IS entangled, because if it were not, then we would have a solution to\KS{Fixed by AI: the point of this remark is precisely that independent second-qubit probabilities do NOT imply unentangled; the derivation below yields a contradiction, so the state IS entangled (as the last sentence also concludes). Changed ``is NOT entangled, because if it were'' to ``IS entangled, because if it were not''.}
     \[
     ac = 1, ad = 1, bc = 1, bd = i.
     \]
@@ -5648,11 +5687,12 @@ If we simplify some of these, we get
 					- i |010\rangle
 					 +\omega |011\rangle
 					-|100\rangle
-					-\omega |101\rangle
+					- i \omega |101\rangle
 					+ i |110\rangle
-					- i \omega |111\rangle
+					- \omega |111\rangle
 				\right)
 				\]
+\KS{Fixed by AI: reading the fourth column ($\omega^{3i}$) of the $8\times8$ matrix, the $|101\rangle$ ($i=5$) coefficient is $\omega^{15}=\omega^{7}=-i\omega$ and the $|111\rangle$ ($i=7$) coefficient is $\omega^{21}=\omega^{5}=-\omega$; the original had these two swapped (and they match the matrix's own $6$th row col.\ $6$).}
 
  
 			\item The next several questions are a progression.
@@ -5762,11 +5802,12 @@ To motivate our method for discovering this square root, let's do an example wit
  & $\alpha^0 =1$ & $\alpha^1$ & $\alpha^2$ & $\alpha^3$ & $\alpha^4$ & $\alpha^5$ \\
  \hline
  $\alpha = 2$ & $1$ & $2$ & \Block[borders={top,bottom,left,right}]{}{\(4\)}  & $8$ & $1$ & $2$  \\
- $\alpha = 13$ & $1$ & $13$ & \Block[borders={top,bottom,left,right}]{}{\(11\)} & $8$ & $1$ & $13$ \\
+ $\alpha = 13$ & $1$ & $13$ & \Block[borders={top,bottom,left,right}]{}{\(4\)} & $7$ & $1$ & $13$ \\ % AI-FIXED: was 11 and 8
  $\alpha = 11$ & $1$ & \Block[borders={top,bottom,left,right}]{}{\(11\)} & $1$ & $11$ & $1$ & $11$ 
 \end{NiceTabular}
 \end{center}
 
+\KS{Fixed by AI: the $\alpha=13$ row had $\alpha^2=11,\ \alpha^3=8$; correctly, modulo $15$, $13\equiv-2$ so $13^2\equiv4$ and $13^3\equiv7$. The row is now $1,13,4,7,1,13$, and the boxed square root of $1$ is $13^2\equiv4$.}
 In the table, I've boxed the power that's \emph{halfway} to $1$, i.e. $\alpha^{r/2}$ where $\alpha^r \equiv 1$.  It is a square root of $1$.  Since it is not $1$ or $-1$, we can use this to factor.  For example, taking the top box, $4^2 \equiv 1 \pmod{15}$ so we take $\gcd(4-1,15) = 3$.
 
 The lesson we've learned is that if we can find the order of $\alpha$ modulo $N$, and that order is even, we \emph{might} be lucky enough to have found a surprise square root.  The resulting algorithm is like this:
@@ -5992,14 +6033,15 @@ So, the entire state changes to
      \begin{pmatrix} 1 \\ -1 \\ 1 \\ -1 \\ 1 \\ -1 \\ 1 \\ -1
      \end{pmatrix}
      +
-          \begin{pmatrix} 1 \\ -i\omega \\ -i \\- \omega \\ -1 \\ i\omega \\ -i \\ \omega
+          \begin{pmatrix} 1 \\ -i\omega \\ -i \\- \omega \\ -1 \\ i\omega \\ i \\ \omega
      \end{pmatrix}
      \right) \\
      &=
      \frac{1}{\sqrt{24}}
-               \begin{pmatrix} 3 \\ \sqrt{2} - 1 \\ 1 \\  -1 \\ -1 \\ -1 \\ 1 \\ \sqrt{2} - 1
-     \end{pmatrix}
+               \begin{pmatrix} 3 \\ \sqrt{2} - 1 \\ 1 \\  -\sqrt{2}-1 \\ -1 \\ -\sqrt{2}-1 \\ 1 \\ \sqrt{2} - 1
+     \end{pmatrix} % AI-FIXED: entries 4 and 6 were -1, should be -sqrt(2)-1; and 7th entry of preceding col-7 vector was -i, should be i
 					\end{align*}
+\KS{Fixed by AI (see comment above): in the third summand (QFT column $7$, $\omega^{7i}$) the $i=6$ entry is $\omega^{42}=\omega^2=i$, not $-i$; and in the result the $i=3,5$ entries equal $-\sqrt2-1$ (e.g.\ $i\omega-1-\omega=-\sqrt2-1$), not $-1$. Verified numerically.}
      For the computation above, we use the fact that
      \[
      \omega = \frac{1}{\sqrt{2}} + i \frac{1}{\sqrt{2}}, \quad \frac{2}{\sqrt{2}} = \sqrt{2}.
@@ -6830,16 +6872,18 @@ e_2 = x^2
 \]
 Ephemeral public key:
 \begin{align*}
-	K &= gk + e_1 = 27x^3 + 75x^2 + 6x + 5 
+	K &= gk + e_2 = 27x^3 + 75x^2 + 6x + 5 % AI-FIXED: was gk + e_1
 \end{align*}
+\KS{Fixed by AI: the ephemeral public key is $K=gk+e_2$ (per the scheme definition), not $gk+e_1$. Verified: $gk+e_2=27x^3+75x^2+6x+5$ over $\FF_{101}[x]/(x^4+1)$, matching the stated value.}
 \item Create error for us in ciphertext:
 \[
 e_3 = 100x^2 + x
 \]
 Ciphertext:
 \begin{align*}
-	  C &= Bk + e_2 + \ell m = 79x^3 + 23x + 51
+	  C &= Bk + e_3 + \ell m = 79x^3 + 23x + 51 % AI-FIXED: was Bk + e_2
 \end{align*}
+\KS{Fixed by AI: the ciphertext uses the error $e_3$ (per the scheme, $C=Bk+e_3+\ell m$), not $e_2$. Verified: $Bk+e_3+\ell m=79x^3+23x+51$ over $\FF_{101}[x]/(x^4+1)$, matching the stated value.}
 \end{enumerate}
 \item {Bob's Decryption}
 \begin{enumerate}
