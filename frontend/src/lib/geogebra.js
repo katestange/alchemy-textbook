@@ -117,13 +117,20 @@ export function mountGeoGebra(hostEl, commands, opts = {}) {
   return ensureGeoGebraLoaded()
     .then((GGBApplet) => {
       const params = {
-        appName: opts.appName || 'graphing',
+        // 'classic' supports the FULL command set (Segment, Line, Intersect,
+        // Point-on-curve, angles, loci) that construction demos need -- the
+        // 'graphing' app rejects geometry commands like Segment with an error
+        // modal. Toolbar/menu stay hidden for a clean embed.
+        appName: opts.appName || 'classic',
         showToolBar: false,
         showMenuBar: false,
         showAlgebraInput: true,
         width: 800,
         height: 440,
         appletOnLoad: (api) => {
+          // Suppress GeoGebra's own error dialog so an unrecognized command
+          // fails quietly instead of popping a modal over the applet.
+          if (api.setErrorDialogsActive) api.setErrorDialogsActive(false);
           for (const c of cmds) {
             try {
               api.evalCommand(c);
