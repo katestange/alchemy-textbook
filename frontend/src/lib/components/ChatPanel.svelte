@@ -113,6 +113,7 @@
               detail: {
                 xmlId,
                 contentHash: c.content_hash,
+                contentId: c.content_id,
                 text: c.text,
                 selectionText: snapshot.openingQuote
               }

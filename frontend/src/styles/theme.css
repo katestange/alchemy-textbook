@@ -525,6 +525,22 @@ button {
   color: var(--color-ink);
 }
 
+/* Delete-forever (creator only): distinct from "hide" -- red, destructive. */
+.ai-result .ai-result-head .delete-forever {
+  margin-left: auto; /* pushes this + hide + collapse to the right */
+  background: none;
+  border: none;
+  color: var(--accent-red);
+  font: inherit;
+  font-size: 0.72rem;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.ai-result .ai-result-head .delete-forever:hover {
+  filter: brightness(0.85);
+}
+
 .ai-result .body math {
   font-size: 1em;
 }

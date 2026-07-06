@@ -3,7 +3,13 @@
   import { manifestStore } from '../stores/manifestStore.js';
   import { session } from '../stores/session.js';
   import { refreshRequired, budgetNotice } from '../stores/banners.js';
-  import { fetchChapterHtml, fetchCachedContent, fetchChapterContent, streamGenerate } from '../api.js';
+  import {
+    fetchChapterHtml,
+    fetchCachedContent,
+    fetchChapterContent,
+    streamGenerate,
+    deleteContent
+  } from '../api.js';
   import { resolveSelectionAnchorFromRange, chooseInjectAfter } from '../selectionWalker.js';
   import {
     ensureResultBox,
@@ -135,7 +141,9 @@
       const box = ensureResultBox(anchorEl, e.creature_type, e.content_hash, e.status, {
         collapsed: true,
         selectionText: e.selection_text,
-        skipIfHidden: true
+        skipIfHidden: true,
+        own: e.own,
+        contentId: e.id
       });
       if (box) updateResultBox(box, e.response);
     }
@@ -293,7 +301,9 @@
       const box = ensureResultBox(anchorEl, e.creature_type, anchor.block.content_hash, e.status, {
         collapsed: true,
         selectionText: e.selection_text,
-        skipIfHidden: true
+        skipIfHidden: true,
+        own: e.own,
+        contentId: e.id
       });
       if (box) updateResultBox(box, e.response);
     }
@@ -350,7 +360,8 @@
 
     const box = ensureResultBox(anchorEl, creatureType, anchor.block.content_hash, 'unreviewed', {
       selectionText,
-      injectAfter
+      injectAfter,
+      own: true // a fresh generation is always the caller's own
     });
     updateResultBox(box, '');
     // The anchor block can sit well above a long selected/displayed element
@@ -377,6 +388,8 @@
           // normal toggle instead of staying a "being written" placeholder
           // forever (Decision 62: "treat stream-end-without-close as close").
           updateResultBox(box, accumulated, { streaming: false });
+          // Stamp the stored id so the "delete forever" control can purge it.
+          if (data.content_id != null) box.dataset.contentId = String(data.content_id);
           // Unusable-selection redirect: shown once, not stored (server sent
           // no content_id). Turn it into a self-dismissing one-time note.
           if (data.ephemeral) markEphemeral(box);
@@ -444,7 +457,9 @@
     if (!anchorEl) return;
     const box = ensureResultBox(anchorEl, 'eureka', d.contentHash || d.xmlId, 'unreviewed', {
       collapsed: false,
-      selectionText: d.selectionText
+      selectionText: d.selectionText,
+      own: true,
+      contentId: d.contentId
     });
     if (box) {
       updateResultBox(box, d.text || '');
@@ -452,15 +467,24 @@
     }
   }
 
+  // Delete-forever dispatched from an AI box (inSituResult); the box removes
+  // itself from the DOM, this purges it server-side.
+  function onDeleteContent(e) {
+    const id = e.detail && e.detail.contentId;
+    if (id != null) deleteContent(id);
+  }
+
   onMount(() => {
     document.addEventListener('mousedown', handleDocumentMouseDown);
     document.addEventListener('alchemy:hidden-changed', onHiddenChanged);
     document.addEventListener('alchemy:eureka', onEurekaCreated);
+    document.addEventListener('alchemy:delete-content', onDeleteContent);
   });
   onDestroy(() => {
     document.removeEventListener('mousedown', handleDocumentMouseDown);
     document.removeEventListener('alchemy:hidden-changed', onHiddenChanged);
     document.removeEventListener('alchemy:eureka', onEurekaCreated);
+    document.removeEventListener('alchemy:delete-content', onDeleteContent);
   });
 </script>
 

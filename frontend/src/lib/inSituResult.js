@@ -176,6 +176,7 @@ export function ensureResultBox(anchorEl, creatureType, key, status = 'unreviewe
     // A regeneration on the same block may discuss a different phrase --
     // keep the "On: ..." line current.
     if (opts.selectionText !== undefined) setOnLine(existing, item, opts.selectionText);
+    if (opts.contentId != null) existing.dataset.contentId = String(opts.contentId);
     return existing;
   }
 
@@ -201,6 +202,7 @@ export function ensureResultBox(anchorEl, creatureType, key, status = 'unreviewe
   const box = document.createElement('div');
   box.className = 'ai-result';
   box.dataset.creature = creatureType;
+  if (opts.contentId != null) box.dataset.contentId = String(opts.contentId);
   box.setAttribute('aria-label', `${creatureLabel}, ${status}, generated content`);
 
   const head = document.createElement('div');
@@ -216,6 +218,31 @@ export function ensureResultBox(anchorEl, creatureType, key, status = 'unreviewe
   tag.className = 'tag';
   tag.textContent = `AI-generated · ${status}`;
   head.appendChild(tag);
+
+  // Delete-forever, creator only (author feedback: purge a bad AI output).
+  // For a fresh generation the content id arrives with the `done` event and is
+  // stamped on the box then; clicking before that just removes it locally.
+  if (opts.own) {
+    const del = document.createElement('button');
+    del.className = 'delete-forever';
+    del.type = 'button';
+    del.textContent = 'delete';
+    del.title = 'Delete this forever — removes it for everyone (only you, its creator, can)';
+    del.setAttribute('aria-label', 'Delete this AI item forever');
+    del.addEventListener('click', () => {
+      if (!window.confirm('Delete this AI output forever? It will be removed for everyone and cannot be undone.')) {
+        return;
+      }
+      const id = box.dataset.contentId;
+      if (id) {
+        document.dispatchEvent(
+          new CustomEvent('alchemy:delete-content', { detail: { contentId: Number(id) } })
+        );
+      }
+      item.remove();
+    });
+    head.appendChild(del);
+  }
 
   const hide = document.createElement('button');
   hide.className = 'hide';

@@ -68,6 +68,16 @@ export function fetchCachedContent(blockHash) {
   return getJSON(`/api/content/${blockHash}`);
 }
 
+// Delete-forever, creator-only (server enforces created_by_code). Best-effort:
+// the caller removes the box from the DOM regardless; this purges it server-side.
+export async function deleteContent(contentId) {
+  const res = await fetch(`/api/content/${contentId}`, {
+    method: 'DELETE',
+    credentials: 'same-origin'
+  });
+  return res.ok;
+}
+
 // One request per chapter view (NOT per block): all artifacts visible to the
 // caller anchored anywhere in chapter n, so existing AI content appears as
 // soon as the chapter renders (Q13: "place any cached creatures that already

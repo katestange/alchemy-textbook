@@ -760,6 +760,25 @@ def api_content(block_hash: str, request: Request):
     ]
 
 
+@app.delete("/api/content/{content_id}")
+def api_delete_content(content_id: int, request: Request):
+    """Delete-forever, for the artifact's creator only (author feedback: a
+    student should be able to purge their own bad AI output). Removes it for
+    everyone, and from the instructor's review queue."""
+    code = caller_code(request)
+    if not code:
+        raise HTTPException(status_code=401, detail="Not signed in")
+    rows = db_query(
+        "SELECT created_by_code FROM cached_content WHERE id = ?", (content_id,))
+    if not rows:
+        return {"ok": True}  # already gone
+    if rows[0]["created_by_code"] != code:
+        raise HTTPException(status_code=403, detail="You can only delete your own AI content")
+    db_execute("DELETE FROM content_flags WHERE cached_content_id = ?", (content_id,))
+    db_execute("DELETE FROM cached_content WHERE id = ?", (content_id,))
+    return {"ok": True}
+
+
 # --- generation (SSE) ------------------------------------------------------
 
 
