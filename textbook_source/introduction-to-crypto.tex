@@ -66,6 +66,7 @@
 \newtheorem{problem}[theorem]{Problem}
 \newtheorem{question}[theorem]{Question}
 \newtheorem*{solution}{Solution}
+\newtheorem*{aisolution}{AI Generated Solution (needs review)}
 
 \numberwithin{theorem}{section}
 
@@ -585,6 +586,9 @@ It is sometimes helpful to imagine modular arithmetic as a wall clock (Figure~\r
 \begin{checkin}
     Use Figure~\ref{fig:7-clock} to show that $7 \equiv -3 \pmod{5}$.
 \end{checkin}
+\begin{aisolution}
+Both numbers land on the same ray of the clock: $7 = 5\cdot 1 + 2$ sits on the ray labelled $2$, and $-3 = 5\cdot(-1) + 2$ also sits on the ray labelled $2$.  Equivalently, $7 - (-3) = 10 = 2\cdot 5$ is a multiple of $5$, so $7 \equiv -3 \pmod 5$.
+\end{aisolution}
 
 
 We use the notation $\ZZ/n\ZZ$ for the set of residues modulo $n$, or the set of `notches' of the clock.  This is a finite set.  If $n$ is equal to a prime $p$, we also write $\FF_p$ (this is in anticipation of our work with finite fields in Section\KS{whatever later chapter}).  Let's record this as a formal definition.
@@ -606,16 +610,28 @@ Every integer is equivalent modulo $n$ to exactly one element of $\ZZ/n\ZZ$.
 \begin{checkin}
     Write out $\ZZ/10\ZZ$ and $\ZZ/3\ZZ$.\footnote{Answers: $\ZZ/10\ZZ = \{0,1,2,3,4,5,6,7,8,9\}$; $\ZZ/3\ZZ = \{ 0,1,2\}$.}
 \end{checkin}
+\begin{aisolution}
+We list the residues $0,1,\ldots,n-1$:
+\[
+\ZZ/10\ZZ = \{0,1,2,3,4,5,6,7,8,9\}, \qquad \ZZ/3\ZZ = \{0,1,2\}.
+\]
+\end{aisolution}
 
 It is typical to \textbf{reduce} integers modulo $n$ to one of the $n$ elements of $\ZZ/n\ZZ$.   So, for example, $15 \equiv 0 \pmod{5}$ since it is a multiple of $5$; and $1999999992 \equiv 2 \pmod{10}$ since reducing modulo $10$ is the same as taking the final digit.  
 
 \begin{checkin}
     Reduce $77772$ modulo $7$ (by pure thought).  Hint:  take out obvious multiples of $7$.\footnote{Answer: $2$ (since $77770$ is an obvious multiple of $7$).}
 \end{checkin}
+\begin{aisolution}
+Note $77770 = 7 \cdot 11110$ is a multiple of $7$, so $77772 = 77770 + 2 \equiv 2 \pmod 7$.
+\end{aisolution}
 
 \begin{checkin}
     Reduce  $1200004$ modulo $3$ (by pure thought).\footnote{Answer: Since $12$ is a recognizable multiple of $3$, $1200004 \equiv 4 \equiv 1 \pmod{3}$.}
 \end{checkin}
+\begin{aisolution}
+Since $1200000 = 3\cdot 400000$ is a multiple of $3$, we have $1200004 \equiv 4 \equiv 1 \pmod 3$.  (As a check, the digit sum is $1+2+4 = 7 \equiv 1 \pmod 3$.)
+\end{aisolution}
 
 Reducing into this `standard' set makes it easier to compare integers and see if they are equivalent modulo $n$.  Since $70 \equiv 0 \pmod{5}$ and $143 \equiv 3 \pmod{5}$, we know that they are not equivalent modulo $5$.
 
@@ -645,6 +661,9 @@ As an example of the theorem in action\footnote{Whenever you meet a Theorem, you
 \begin{checkin}
     Verify that the example just given, the second conclusion of the Theorem (about multiplication) also holds.\footnote{Answer:  $a_1a_2 = -48 \equiv -8 \equiv 2 \pmod{5}$ and $b_1b_2 = 2 \equiv 2 \pmod{5}$.}
 \end{checkin}
+\begin{aisolution}
+With $a_1 = 16$, $a_2 = -3$, $b_1 = 1$, $b_2 = 2$: the product $a_1a_2 = -48 = -50 + 2 \equiv 2 \pmod 5$, while $b_1 b_2 = 1\cdot 2 = 2 \equiv 2 \pmod 5$.  The two products agree modulo $5$, confirming $a_1a_2 \equiv b_1b_2 \pmod 5$.
+\end{aisolution}
 
 \begin{proof}[Proof of Theorem~\ref{thm:well-def-mod}]
 	Under the hypotheses given\footnote{That $a_1, a_2, b_1, b_2, n \in \ZZ$ and $a_1 \equiv b_1 \pmod n$ and $a_2 \equiv b_2 \pmod n$.}, $b_1 = a_1 + k_1n$ and $b_2 = a_2 + k_2n$, for some integers $k_1, k_2 \in \ZZ$.  Then $b_1 + b_2 = a_1 + a_2 + (k_1+k_2)n \equiv a_1+a_2 \pmod{n}$ and $b_1b_2 = (a_1+k_1n)(a_2+k_2n) = a_1a_2 + n(k_1a_2+k_2a_1 + nk_1k_2) \equiv a_1a_2 \pmod{n}$.  Therefore the conclusions are satisfied.
@@ -665,10 +684,23 @@ In general these require a bit of creativity.  In both examples above, observe\f
 \begin{checkin}
     Compute $1313131312^{50000} \pmod{13}$ (by pure thought).\footnote{Answer: $1313131312 \equiv 12 \equiv -1$, so $1313131312^{50000} \equiv (-1)^{50000} \equiv 1 \pmod{13}$.}
 \end{checkin}
+\begin{aisolution}
+First reduce the base: $1313131313 = 13\cdot 101010101$ is a multiple of $13$, so $1313131312 \equiv -1 \equiv 12 \pmod{13}$.  Then
+\[
+1313131312^{50000} \equiv (-1)^{50000} \equiv 1 \pmod{13},
+\]
+since the exponent $50000$ is even.
+\end{aisolution}
 
 \begin{checkin}
     Compute $3^{50000} \pmod{8}$ (by pure thought).\footnote{Answer: $3^2 \equiv 9 \equiv 1 \pmod{8}$, so $3^{50000} \equiv (3^2)^{25000} \equiv 1^{25000} \equiv 1 \pmod{8}$.}
 \end{checkin}
+\begin{aisolution}
+Since $3^2 = 9 \equiv 1 \pmod 8$ and $50000 = 2\cdot 25000$ is even,
+\[
+3^{50000} = (3^2)^{25000} \equiv 1^{25000} \equiv 1 \pmod 8.
+\]
+\end{aisolution}
 
 Later we will see other ticks for dealing with large exponents.  Informally, the complexity of modular addition and multiplication is a simple\footnote{actually a polynomial; we will discuss this later} function of the modulus itself, since things are quickly reduced into that range.
 
@@ -1122,12 +1154,23 @@ Thus, the first ciphertext block is 22,7, also known as WH.
 \begin{checkin}
     Verify the next two ciphertext blocks are 22, 14 and 8, 22, i.e. WO and IW.
 \end{checkin}
+\begin{aisolution}
+Applying $A = \left(\begin{smallmatrix} 1 & 2 \\ 3 & 3\end{smallmatrix}\right)$ to the remaining plaintext vectors modulo $26$:
+\[
+A\begin{pmatrix} 22 \\ 0 \end{pmatrix} \equiv \begin{pmatrix} 22 \\ 66 \end{pmatrix} \equiv \begin{pmatrix} 22 \\ 14 \end{pmatrix}, \qquad
+A\begin{pmatrix} 24 \\ 18 \end{pmatrix} \equiv \begin{pmatrix} 60 \\ 126 \end{pmatrix} \equiv \begin{pmatrix} 8 \\ 22 \end{pmatrix}.
+\]
+These are the blocks $22,14$ (WO) and $8,22$ (IW), as claimed.
+\end{aisolution}
 
 Thus, the ciphertext of ALWAYS is WHWOIW.  Notice that this cipher has the appealing property that individual letters do not consistently map to individual letters.  For example, the two A's in ALWAYS map to W and O respectively.
 
 \begin{checkin}
 Why is this an appealing property?\footnote{One possible answer:  it will foil any type of frequency analysis on alphabet letters.}
 \end{checkin}
+\begin{aisolution}
+Because a given plaintext letter is not encrypted to a fixed ciphertext letter---its image depends on its position within a block and on the other letters in that block.  This destroys the single-letter frequency structure of the plaintext, so a simple frequency analysis (which breaks substitution ciphers) no longer reveals the letters.
+\end{aisolution}
 
 How do we decrypt?  To `undo' multiplication by $A$, we multiply by $A^{-1}$.  In other words, the inverse function to $\mathbf{x} \mapsto A\mathbf{x}$ is $\mathbf{x} \mapsto A^{-1} \mathbf{x}$.  Thus the decryption key is $A^{-1}$.  Since $\det A = -3$, 
 \[
@@ -1150,10 +1193,21 @@ This is, as expected, the first block AL of the plaintext.
 \begin{checkin}
     Finish verifying the decryption of WHWOIW.
 \end{checkin}
+\begin{aisolution}
+Using $A^{-1} \equiv \left(\begin{smallmatrix} -1 & -8 \\ 1 & -9\end{smallmatrix}\right) \pmod{26}$ on the remaining ciphertext blocks:
+\[
+A^{-1}\begin{pmatrix} 22 \\ 14 \end{pmatrix} \equiv \begin{pmatrix} -22-112 \\ 22-126 \end{pmatrix} \equiv \begin{pmatrix} 22 \\ 0 \end{pmatrix}, \qquad
+A^{-1}\begin{pmatrix} 8 \\ 22 \end{pmatrix} \equiv \begin{pmatrix} -8-176 \\ 8-198 \end{pmatrix} \equiv \begin{pmatrix} 24 \\ 18 \end{pmatrix}.
+\]
+These are the blocks WA ($22,0$) and YS ($24,18$), so the full decryption reads AL WA YS, i.e. ALWAYS.
+\end{aisolution}
 
 \begin{checkin}
     What is the keyspace of the $n \times n$ Hill cipher on the standard alphabet of $26$ letters?\footnote{Answer:  The set of invertible $n \times n$ matrices modulo $26$.}
 \end{checkin}
+\begin{aisolution}
+The key is the encryption matrix, and decryption requires it to be invertible modulo $26$.  Hence the keyspace is the set of $n\times n$ matrices with entries in $\ZZ/26\ZZ$ whose determinant is a unit modulo $26$ (i.e. coprime to $26$, equivalently coprime to both $2$ and $13$)---the group $GL_n(\ZZ/26\ZZ)$.
+\end{aisolution}
 
 \subsubsection{Example Exercises}
 
@@ -1453,6 +1507,9 @@ a^{\varphi(n)} \equiv 1 \pmod n.
     Observe that $\varphi(14)=6$ and $7^6 \equiv 7 \pmod{14}$.
 \KS{Fixed by AI: the modulus here is $14$, and $\varphi(14)=6$ (whereas $\varphi(17)=16$). The footnote answer also refers to modulus $14$, so this should read $\varphi(14)=6$.}  This seems to contradict Euler's Theorem.  Why doesn't it?\footnote{Answer:  Euler's Theorem requires that the base, $a$, be in the multiplicative group.  But $a=7$ is not coprime to $14$, so Euler's Theorem doesn't apply to this base.}
 \end{checkin}
+\begin{aisolution}
+Euler's Theorem only applies to bases $a \in (\ZZ/n\ZZ)^*$, i.e. bases coprime to $n$.  Here $\gcd(7,14) = 7 \neq 1$, so $7 \notin (\ZZ/14\ZZ)^*$ and the theorem simply does not apply.  (Indeed $7^2 = 49 \equiv 7 \pmod{14}$, so $7^k \equiv 7 \pmod{14}$ for every $k\geq 1$; the powers of $7$ never reach $1$.)
+\end{aisolution}
 
 The version of Euler's Theorem when $n$ is a prime is so important it is given a special name.
 
@@ -1608,6 +1665,9 @@ and thereby compute, using values from our list of successive squares,
 \begin{checkin}
     How many multiplications did this last example take?\footnote{Answer:  5 to obtain a list of squares, then 3 more to put the appropriate squares together.}
 \end{checkin}
+\begin{aisolution}
+Eight in total: the five squarings to build the list $3^2, 3^4, 3^8, 3^{16}, 3^{32}$, followed by three more to combine the four needed powers $3^{32}\cdot 3^4 \cdot 3^2 \cdot 3$ (combining $k$ factors takes $k-1$ multiplications, here $4-1 = 3$).
+\end{aisolution}
 
 This is called the method of successive squares.  To summarize:
 \begin{enumerate}
@@ -1706,11 +1766,21 @@ Note that $L_g(h)$ lives naturally in the ring $\ZZ/\varphi(n)\ZZ$, because it i
 \begin{checkin}
     What is $L_2(3)$ working in $(\ZZ/13\ZZ)^*$?  \footnote{Answer: This is a small enough ring to try some small Sage for loops or other experimentation.  Noticing that $2^4 \equiv 3 \pmod{13}$, we discover that $L_2(3) = 4$.}
 \end{checkin}
+\begin{aisolution}
+List the powers of $2$ modulo $13$: $2^1 \equiv 2$, $2^2 \equiv 4$, $2^3 \equiv 8$, $2^4 \equiv 16 \equiv 3$.  Since $2^4 \equiv 3 \pmod{13}$, we have $L_2(3) = 4$.
+\end{aisolution}
 
 \KS{todo: pick other numbers in this checkin}
 \begin{checkin}
     It is a fact that $p=101$ is prime, and $2$ is a primitive root modulo $p$.  It is a fact that $L_2(3)=69$ and $L_2(5)=24$ working in $(\ZZ/p\ZZ)^*)$.   It is also a fact that the integer factorization of $24$ is $24 = 2^3 \cdot 3$.  Using these facts, evaluate $L_2(24)$ working in $(\ZZ/p\ZZ)^*$ with minimal work (just combine the facts above).\footnote{Answer: From the factorization of $24$, we have $L_2(24) = 3 \cdot L_2(2) + L_2(3) = 3 \cdot 1 + 69 = 72$.  The log of $5$ is not needed.}
 \end{checkin}
+\begin{aisolution}
+Discrete logs turn products into sums (of exponents, working modulo $p-1 = 100$).  Since $24 = 2^3\cdot 3$,
+\[
+L_2(24) = 3\,L_2(2) + L_2(3) = 3\cdot 1 + 69 = 72,
+\]
+using $L_2(2) = 1$ (as $2^1 = 2$) and the given $L_2(3) = 69$.  The value $L_2(5)$ is not needed.  (Check: $2^{72} \equiv 24 \pmod{101}$.)
+\end{aisolution}
 
 
 
@@ -1755,6 +1825,22 @@ Check whether you are correct by finding $x$ (by any method).
 \item Why is it ok for odd primes $p$?
 \end{enumerate}
 \end{question}
+\begin{aisolution}
+\begin{enumerate}
+\item Suppose $ab \equiv 0 \pmod p$, so $p \mid ab$.  Since $p$ is prime, if $p \nmid a$ then $\gcd(p,a) = 1$, and multiplying $ab \equiv 0$ by $a^{-1}$ modulo $p$ gives $b \equiv 0 \pmod p$.  Hence $a \equiv 0$ or $b \equiv 0 \pmod p$.  (This is Euclid's Lemma.)
+\item If $x^2 \equiv 1 \pmod p$ then $(x+1)(x-1) = x^2 - 1 \equiv 0 \pmod p$.  By part (1), either $x+1 \equiv 0$ or $x-1 \equiv 0$, i.e. $x \equiv -1$ or $x \equiv 1 \pmod p$.  So the only solutions are $\pm 1$.
+\item Let $y = g^{(p-1)/2}$.  Then $y^2 = g^{p-1} \equiv 1 \pmod p$ by Fermat's Little Theorem, so by part (2), $y \equiv \pm 1$.  If $y \equiv 1$, then $g^{(p-1)/2} \equiv 1$ would make the order of $g$ at most $(p-1)/2 < p-1$, contradicting that $g$ is a primitive root (order exactly $p-1$).  Hence $g^{(p-1)/2} \equiv -1 \pmod p$.
+\item Raise $h \equiv g^x$ to the power $(p-1)/2$:
+\[
+h^{(p-1)/2} \equiv \left( g^{(p-1)/2} \right)^x \equiv (-1)^x \pmod p,
+\]
+using part (3).  Thus $h^{(p-1)/2} \equiv 1 \pmod p$ if $x$ is even, and $\equiv -1 \pmod p$ if $x$ is odd.  Computing $h^{(p-1)/2} \bmod p$ therefore reveals the parity of $x$.
+\item Here $p = 11$, so $(p-1)/2 = 5$, and $h = 5$.  We compute $5^5 \pmod{11}$: $5^2 \equiv 3$, $5^4 \equiv 3^2 \equiv 9$, $5^5 \equiv 9\cdot 5 \equiv 45 \equiv 1 \pmod{11}$.  Since the result is $+1$, $x$ is \emph{even}.  Checking directly: the powers of $2$ modulo $11$ are $2,4,8,5,\ldots$, so $2^4 \equiv 5 \pmod{11}$, giving $x = 4$, which is indeed even.
+\item The test is a single modular exponentiation $h^{(p-1)/2} \bmod p$, computable by successive squaring in $O(\log p)$ multiplications---polynomial in the input size.  So parity is \emph{easy} to determine, even though computing $x$ itself (the full discrete log) is believed to be hard.
+\item The discrete log $x$ is only defined modulo the order of $g$ (here $p-1$): replacing $x$ by $x + (p-1)$ gives the same $h$.  So parity is well-defined only when this ambiguity preserves parity, i.e. when the order is even.  In general, working modulo $n$, the log lives modulo $\mathrm{ord}(g)$, and its parity is well-defined precisely when $\mathrm{ord}(g)$ is even.
+\item For an odd prime $p$, the modulus of the exponent is $p-1$, which is even.  Adding an even number never changes parity, so the parity of $x$ is well-defined; moreover parts (2)--(3) require $p$ to be an odd prime (so that $1 \neq -1$ modulo $p$ and Euclid's Lemma applies).
+\end{enumerate}
+\end{aisolution}
 
 \begin{solution}
     \begin{enumerate}
@@ -2832,6 +2918,13 @@ $3 \rightarrow 9 \rightarrow -1 \rightarrow 1 \rightarrow 1$ &  & & probably pri
 \begin{quiz}
     For each of the following chains, what is the conclusion\footnote{Solutions: composite (Dong-Dong); probably prime; composite (Ding-Ding)}?  $3 \rightarrow 4 \rightarrow 7 \rightarrow 1$, $2 \rightarrow -1 \rightarrow 1 \rightarrow 1$, $7 \rightarrow 4 \rightarrow 3$.
 \end{quiz}
+\begin{aisolution}
+\begin{itemize}
+\item $3 \rightarrow 4 \rightarrow 7 \rightarrow 1$: the chain ends in $1$, but the step $7 \rightarrow 1$ is a surprise square root ($7 \not\equiv \pm 1$ yet squares to $1$).  Thermal camera Dong-Dong: \emph{composite}.
+\item $2 \rightarrow -1 \rightarrow 1 \rightarrow 1$: ends in $1$, and the only step reaching $1$ comes from $-1$, which is allowed.  No alarm: \emph{probably prime}.
+\item $7 \rightarrow 4 \rightarrow 3$: the final value is $3 \neq 1$, so the Fermat test fails.  Geiger counter Ding-Ding: \emph{composite}.
+\end{itemize}
+\end{aisolution}
 
 
 To summarize the algorithm, we do the following:
@@ -3208,6 +3301,9 @@ We will work in $\ZZ/5\ZZ$.
     \begin{checkin}
         Verify that $Q$ is on the curve.
     \end{checkin}
+    \begin{aisolution}
+    For $Q = (2,4)$ we compute both sides modulo $5$: the left side is $y^2 \equiv 4^2 \equiv 16 \equiv 1 \pmod 5$, and the right side is $x^3 + 2x + 4 \equiv 2^3 + 2\cdot 2 + 4 \equiv 8 + 4 + 4 \equiv 16 \equiv 1 \pmod 5$.  They agree, so $Q$ lies on $E$.
+    \end{aisolution}
 
     To begin the group law calculation, we find the line $L$ through $P$ and $Q$.  This involves finding the slope, which is rise over run:
     \[
@@ -3257,6 +3353,13 @@ Let's record that nice \textbf{trace trick}:
 \begin{checkin}
     Can you prove the trace trick?\footnote{Hint: Try expanding $(x+r)(x+s)(x+t)$.}
 \end{checkin}
+\begin{aisolution}
+If the cubic $x^3 + ax^2 + bx + c$ has roots $r,s,t$, then it factors as $(x-r)(x-s)(x-t)$.  Expanding,
+\[
+(x-r)(x-s)(x-t) = x^3 - (r+s+t)x^2 + (rs+rt+st)x - rst.
+\]
+Matching the coefficient of $x^2$ gives $a = -(r+s+t)$, i.e. $r+s+t = -a$.
+\end{aisolution}
 
 Also, notice that we have to be careful to keep in mind we are working modulo $p$.  This means we can't divide by any multiple of $p$, when taking the slope, for example.
 
@@ -3301,6 +3404,9 @@ etc.
 \begin{quiz}
     Verify that every non-zero vector of $\FF_5^2$ occurs somewhere in the lists above.  What is the principle of organization that I used to list them all here?  Choose two random elements from the same line, and figure out what is the corresponding $\lambda$ in the explanation of $\sim$ given above.
 \end{quiz}
+\begin{aisolution}
+There are $5^2 - 1 = 24$ non-zero vectors in $\FF_5^2$, and the six lists contain $6 \times 4 = 24$ vectors---exactly accounting for all of them (each appears once).  The principle of organization is grouping by \emph{direction}: two vectors are in the same list exactly when one is a non-zero scalar multiple of the other.  Each class is named by a normalized representative---either $[0,1]$, or $[1,m]$ with the first coordinate scaled to $1$.  For instance, take $[1,2]$ and $[2,4]$ from the same line: here $[2,4] = 2\cdot[1,2]$, so $\lambda = 2$.
+\end{aisolution}
 
 To count the elements in the projective space $\PP^n_{\FF_q}$, we first count the number of elements in the underlying vector space:
 \[
@@ -3318,6 +3424,12 @@ vectors.  Next, we are identifying the vectors into groups.  For each non-zero v
 \begin{quiz}
     Verify the formula above for the example above.  Don't just verify the conclusion, but verify each step of the explanation in the case of the example above (number of non-zero vectors, size of each equivalence class).
 \end{quiz}
+\begin{aisolution}
+Here $q = 5$ and $n = 1$.  The underlying vector space $\FF_5^2$ has $q^{n+1} = 5^2 = 25$ vectors; removing the zero vector leaves $25 - 1 = 24$ non-zero vectors.  Each equivalence class has size $q - 1 = 4$ (the four non-zero scalar multiples), which matches the four vectors listed on each line above.  Hence the number of classes is $24/4 = 6$, agreeing with the formula
+\[
+\#\PP^1_{\FF_5} = \frac{q^{n+1}-1}{q-1} = \frac{25-1}{5-1} = \frac{24}{4} = 6.
+\]
+\end{aisolution}
 
 
 
@@ -3826,6 +3938,9 @@ The complex numbers have a visual interpretation, since they can be thought of a
 \begin{quiz}
     Show that the complex number $z = 1+2i$ satisfies $|z|^2 = 5$.
 \end{quiz}
+\begin{aisolution}
+For $z = a+bi$ we have $|z|^2 = a^2 + b^2$.  With $a = 1$, $b = 2$, this gives $|z|^2 = 1^2 + 2^2 = 1 + 4 = 5$.
+\end{aisolution}
 
 All of that is very familiar from plane geometry as in a Calculus course.  Multiplication also has a geometric meaning, which may be less familiar.  If we think of complex numbers as being in polar coordinates, i.e. $r(\cos \theta + i \sin \theta)$ for the polar point $(r,\theta)$, then multiplication has this nice interpretation:
 \[
@@ -3887,6 +4002,13 @@ Is $[1,0] = [i,0]$?
 Is $[0,1] = [1,0]$?
 Name some equivalent vectors to $[1,i]$.
 \end{quiz}
+\begin{aisolution}
+\begin{itemize}
+\item $[1,0] = [i,0]$? \emph{Yes}: $[i,0] = i\cdot[1,0]$ and $i \neq 0$, so they are scalar multiples.
+\item $[0,1] = [1,0]$? \emph{No}: there is no non-zero $\lambda$ with $[0,1] = \lambda[1,0] = [\lambda,0]$, since the second coordinate would be $0 \neq 1$.
+\item Equivalent to $[1,i]$: any $[\lambda, \lambda i]$ with $\lambda \neq 0$, for example $[i,-1]$ (take $\lambda = i$), $[2,2i]$, or $[-1,-i]$.
+\end{itemize}
+\end{aisolution}
 
 We can identify a vector $[a,b] \in \PP^1_\CC$ with the state $a |0 \rangle + b |1 \rangle$.  However, we set two conventions:
 
@@ -3904,6 +4026,15 @@ Is $|1\rangle$ equivalent to $|0 \rangle$?
 Name some equivalent vectors to $|0\rangle + |1\rangle$.
 Notice that these problems are the exact same as the last set of quick quiz questions, in the new notation.
 \end{quiz}
+\begin{aisolution}
+Writing states as vectors, $|0\rangle = [1,0]$, $|1\rangle = [0,1]$, and $i|1\rangle = [0,i]$.
+\begin{itemize}
+\item Is $|0\rangle \sim i|1\rangle$? \emph{No}: $[1,0]$ and $[0,i]$ are not scalar multiples of each other.
+\item Is $|1\rangle \sim |0\rangle$? \emph{No}: $[0,1]$ and $[1,0]$ are not scalar multiples.
+\item Equivalent to $|0\rangle + |1\rangle = [1,1]$: any $[\lambda,\lambda]$ with $\lambda \neq 0$, e.g. $i|0\rangle + i|1\rangle = [i,i]$ or $-|0\rangle - |1\rangle = [-1,-1]$.
+\end{itemize}
+As noted, these are exactly the previous questions rewritten in ket notation.
+\end{aisolution}
 
 The possible combinations $a |0\rangle + b|1\rangle$ up to the rules above (i.e. scaling to length 1 and so that first entry is positive real) are the possible states of a single qubit.   Since this is a copy of $\mathbb{P}^1_\mathbb{C}$, all that matters is $b/a$, i.e. the ratio of the two coefficients.  That ratio could be anything in $\mathbb{C} \cup \{ \infty \}$.  So the space of states for a single qubit is the complex plane, together with one extra "infinity point".  Six points on this space have special names:
 
@@ -3952,6 +4083,13 @@ Then \textbf{relative phase} is the angle the complex number $b/a$ makes with th
 Locate $\frac{1}{\sqrt{5}}\left( |0\rangle + 2|1 \rangle \right)$ on the plane and on the sphere.  (Why do I have a normalization of $\frac{1}{\sqrt{5}}$ out front?)
 Locate $\frac{1}{\sqrt{2}}\left( |0\rangle + i|1 \rangle \right)$ on the plane and on the sphere.
 \end{quiz}
+\begin{aisolution}
+The $\frac{1}{\sqrt5}$ is there to normalize the state: with $a = \frac{1}{\sqrt5}$, $b = \frac{2}{\sqrt5}$ we get $|a|^2 + |b|^2 = \frac{1}{5} + \frac{4}{5} = 1$, so the vector has length $1$ and is a valid state.
+
+For the first state the ratio is $b/a = 2$, a positive real number, so on the plane ($\CC\cup\{\infty\}$) it sits at the point $2$ on the real axis.  On the sphere its relative phase is $\varphi = 0$ and its relative magnitude is $\tan(\theta/2) = 2$, giving $\theta = 2\arctan 2 \approx 2.21$ rad; so it lies on the $\varphi = 0$ meridian (the great circle through $|0\rangle,|+\rangle,|1\rangle$), below the equator and toward $|1\rangle$ (since the magnitude $2 > 1$).
+
+For the second state, $b/a = i$: this is exactly $|i\rangle$.  On the plane it is the point $i$ (unit distance up the imaginary axis), and on the sphere it is the corner $|i\rangle$ on the equator, at $(\theta,\varphi) = (\pi/2, \pi/2)$.
+\end{aisolution}
 
 
 The six `corners' of the Bloch sphere, thought of as projective vectors, are labelled $| 0 \rangle$, $| 1 \rangle$, $| 1 \rangle$, $| -1 \rangle$ $| i \rangle$, and $| -i \rangle$, representing slopes of $0$, $\infty$, $1$, $-1$, $i$, and $-i$ respectively.  In physics language, these are written as
@@ -4748,6 +4886,15 @@ In this state, if I measure the 1st qubit, and obtain a $0$, then the second qub
 \begin{quiz}
 Prove what I just said.  That is, work out the table of probabilities and states after measuring the first qubit, and then after measuring the second qubit, like in the last section.
 \end{quiz}
+\begin{aisolution}
+Write the Bell state with amplitudes $\alpha_{00} = \alpha_{11} = \frac{1}{\sqrt2}$ and $\alpha_{01} = \alpha_{10} = 0$.
+
+\emph{Measuring the first qubit.}  The probability of outcome $0$ is $|\alpha_{00}|^2 + |\alpha_{01}|^2 = \frac12 + 0 = \frac12$, and the collapsed (renormalized) state is $|00\rangle$, so the second qubit is then certainly $0$.  The probability of outcome $1$ is $|\alpha_{10}|^2 + |\alpha_{11}|^2 = 0 + \frac12 = \frac12$, and the collapsed state is $|11\rangle$, so the second qubit is certainly $1$.
+
+\emph{Measuring the second qubit.}  By the symmetry of the state, outcome $0$ has probability $\frac12$ and collapses to $|00\rangle$ (first qubit certainly $0$), and outcome $1$ has probability $\frac12$ and collapses to $|11\rangle$ (first qubit certainly $1$).
+
+In every case the two qubits agree, which is exactly the claimed perfect correlation.
+\end{aisolution}
 
 To check that this state is entangled, we could try to solve the system of equations
 \[
@@ -6940,6 +7087,15 @@ These properties mean that, mathematically speaking, the Hamming distance is a m
 \begin{quiz}
     Prove these properties.
 \end{quiz}
+\begin{aisolution}
+Write $d(u,v)$ for the number of positions $i$ at which $u_i \neq v_i$.
+\begin{enumerate}
+\item $d(u,v) \geq 0$ because it is a count of positions, which cannot be negative.
+\item $d(u,v) = 0$ means there are \emph{no} positions where $u$ and $v$ differ, which is exactly the statement that $u = v$ (and conversely, equal strings differ nowhere).
+\item Symmetry: the position $i$ satisfies $u_i \neq v_i$ if and only if $v_i \neq u_i$, so the two counts $d(u,v)$ and $d(v,u)$ are equal.
+\item Triangle inequality: consider any position $i$ counted by $d(u,v)$, i.e. $u_i \neq v_i$.  Then we cannot have both $u_i = w_i$ and $w_i = v_i$ (that would force $u_i = v_i$).  Hence $i$ is counted by $d(u,w)$ or by $d(w,v)$ (or both).  Summing over all such positions, $d(u,v) \leq d(u,w) + d(w,v)$.
+\end{enumerate}
+\end{aisolution}
 
 Wikipedia has a cool Hamming distance visualization!
 
@@ -6973,6 +7129,9 @@ One particularly useful idea in this context is the notion of a \textbf{subspace
 \begin{quiz}
     Explain why the zero vector must be in any subspace.\footnote{Because scaling by zero results in the zero vector, and the definition of subspace says all scalings are also in the subspace.}
 \end{quiz}
+\begin{aisolution}
+A subspace is nonempty, so it contains some vector $v$.  A subspace is closed under scalar multiplication, so it must also contain $0\cdot v = \mathbf{0}$, the zero vector.  Hence every subspace contains $\mathbf{0}$.
+\end{aisolution}
 
 A subspace is itself a vector space \KS{does this need more explanation?  it isn't a standard form vector space, i.e. standard basis vectors}, so it has a \textbf{dimension}.  So the possible sizes of subspaces of $\FF_p^k$ are $1$ (the set of just the zero vector by itself), $p$ (lines), $p^2$ (planes), $p^3$, etc., up to $p^{k-1}$ and $p^k$ (the full space).
 
@@ -7046,6 +7205,9 @@ For the code $\mathbf{C}$ in the example above, some cosets are:
 0010+\mathbf{C} = 0100+\mathbf{C}.
 \]
 \end{quiz}
+\begin{aisolution}
+Computing the coset directly, $0010 + \mathbf{C} = \{0010,\,1001,\,0100,\,1111\}$, which is the same set of four strings as $0100 + \mathbf{C} = \{0100,\,1111,\,0010,\,1001\}$.  More cleanly: $0010 = 0100 + 0110$ and $0110 \in \mathbf{C}$, so $0010 \in 0100 + \mathbf{C}$; since two cosets that share an element are equal, $0010 + \mathbf{C} = 0100 + \mathbf{C}$.
+\end{aisolution}
 
 Cosets have some very nice properties.
 
