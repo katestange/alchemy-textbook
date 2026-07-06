@@ -19,6 +19,11 @@
 // theme.css).
 import { renderStreamedMath, escapeHtml } from './mathRender.js';
 import { mountEditableCell } from './sageCell.js';
+import { mountDesmosCalculator } from './desmos.js';
+
+// An applet whose code begins with this marker is a Desmos graph rather than a
+// Sage cell (the model chooses per selection -- see the applet prompt).
+const DESMOS_MARKER = '[[DESMOS]]';
 
 // --- Per-reader "hide" list (author feedback: too many chips can be confusing
 // to navigate; let a student banish ones they don't want). Non-destructive and
@@ -106,7 +111,8 @@ function mountAppletIfPending(item) {
   }
 }
 
-// Turns the applet body into a live, editable SageCell seeded with `code`.
+// Turns the applet body into a live, editable demo seeded with `code` -- a
+// Desmos graph if the code is marked [[DESMOS]], otherwise a SageCell.
 function mountApplet(body, code) {
   if (body.dataset.appletMounted === 'true') return;
   body.dataset.appletMounted = 'true';
@@ -114,7 +120,12 @@ function mountApplet(body, code) {
   const host = document.createElement('div');
   host.className = 'applet-host';
   body.appendChild(host);
-  mountEditableCell(host, code); // async; renders its own fallback on failure
+  const trimmed = code.trimStart();
+  if (trimmed.startsWith(DESMOS_MARKER)) {
+    mountDesmosCalculator(host, trimmed.slice(DESMOS_MARKER.length));
+  } else {
+    mountEditableCell(host, code); // async; renders its own fallback on failure
+  }
 }
 
 // Models are told to emit raw Sage only, but strip stray ```-fences defensively
@@ -283,20 +294,43 @@ export function markEphemeral(box) {
   const item = box.closest('.ai-item');
   if (!item) return;
   item.classList.add('ephemeral');
-  const tag = box.querySelector('.ai-result-head .tag');
+  const head = box.querySelector('.ai-result-head');
+  const tag = head && head.querySelector('.tag');
   if (tag) tag.textContent = 'One-time note · not saved';
-  box
-    .querySelectorAll('.ai-result-head .hide, .ai-result-head .dismiss')
-    .forEach((b) => b.remove());
-  setTimeout(() => {
-    const onDown = (e) => {
-      if (!item.contains(e.target)) {
-        item.remove();
-        document.removeEventListener('mousedown', onDown, true);
-      }
-    };
-    document.addEventListener('mousedown', onDown, true);
-  }, 0);
+  // Nothing to keep, so drop the collapse/hide controls...
+  if (head) head.querySelectorAll('.hide, .dismiss').forEach((b) => b.remove());
+
+  // ...and offer both dismiss affordances a reader might reach for: an × at
+  // the top-right, an "ok!" button at the end, and a click anywhere outside.
+  function remove() {
+    document.removeEventListener('mousedown', onDown, true);
+    item.remove();
+  }
+  function onDown(e) {
+    if (!item.contains(e.target)) remove();
+  }
+
+  if (head) {
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'ephemeral-close';
+    close.setAttribute('aria-label', 'Dismiss this note');
+    close.textContent = '✕';
+    close.addEventListener('click', remove);
+    head.appendChild(close);
+  }
+
+  const okRow = document.createElement('div');
+  okRow.className = 'ephemeral-ok-row';
+  const ok = document.createElement('button');
+  ok.type = 'button';
+  ok.className = 'ephemeral-ok';
+  ok.textContent = 'ok!';
+  ok.addEventListener('click', remove);
+  okRow.appendChild(ok);
+  box.appendChild(okRow);
+
+  setTimeout(() => document.addEventListener('mousedown', onDown, true), 0);
 }
 
 // Applet rendering: while streaming, show the code accumulating as read-only
@@ -316,7 +350,7 @@ function renderApplet(box, body, code, streaming) {
     body.innerHTML = '';
     const el = document.createElement(hasCode ? 'pre' : 'div');
     el.className = hasCode ? 'sage-src' : 'applet-placeholder';
-    el.textContent = hasCode ? code : 'Writing the Sage demo…';
+    el.textContent = hasCode ? code.replace(/^\s*\[\[DESMOS\]\]\s*/, '') : 'Writing the demo…';
     body.appendChild(el);
     return;
   }

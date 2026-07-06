@@ -20,6 +20,7 @@
   import { chatStore } from '../stores/chatStore.js';
   import { builtinApplets } from '../builtinApplets.js';
   import { mountEditableCell } from '../sageCell.js';
+  import { mountDesmosCalculator } from '../desmos.js';
 
   export let chapter;
   // A fragment id to scroll to once the (possibly just-navigated) chapter is
@@ -173,7 +174,12 @@
       wrap.appendChild(bar);
       wrap.appendChild(host);
       anchorEl.insertAdjacentElement('afterend', wrap);
-      mountEditableCell(host, app.code); // async; renders its own fallback
+      // async; each mounts its own fallback on failure
+      if (app.tool === 'desmos') {
+        mountDesmosCalculator(host, app.code);
+      } else {
+        mountEditableCell(host, app.code);
+      }
     }
   }
 

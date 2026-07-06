@@ -799,6 +799,24 @@ button {
   color: var(--color-ink-soft);
   font-size: 0.9em;
 }
+/* Interactive Desmos graph host + its load-failure fallback. */
+.desmos-graph {
+  border: 1px solid var(--color-rule);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.desmos-fallback {
+  margin: 0.3rem 0;
+  padding: 0.5rem 0.6rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-rule);
+  border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
 /* Graceful degradation if the SageCell library can't load. */
 .sagecell-fallback {
   margin: 0.3rem 0;
@@ -895,4 +913,34 @@ button {
 .ai-item.ephemeral .ai-result-head .tag {
   border-style: dashed;
   font-style: italic;
+}
+.ephemeral-close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--color-ink-soft);
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.ephemeral-close:hover {
+  color: var(--color-ink);
+}
+.ephemeral-ok-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.6rem;
+}
+.ephemeral-ok {
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.2rem 1rem;
+  border: 1px solid var(--color-ink-soft);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--color-ink) 8%, transparent);
+  color: var(--color-ink);
+  cursor: pointer;
+}
+.ephemeral-ok:hover {
+  filter: brightness(0.96);
 }
