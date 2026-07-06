@@ -579,6 +579,35 @@ button {
   display: none;
 }
 
+/* ---- AI-written solutions (LaTeX aisolution env), hidden behind a click.
+   The admin toggle governs whether they're served at all. ---- */
+.reading-pane .ai-solution.ai-solution-collapsed {
+  display: none;
+}
+.reading-pane .ai-solution.ai-solution-open {
+  border-left: 3px solid var(--accent-gold);
+  background: var(--wash-gold);
+  padding: 0.4rem 0.9rem;
+  border-radius: 0 6px 6px 0;
+  margin: 0.4rem 0 1rem;
+}
+.ai-solution-toggle {
+  display: inline-block;
+  margin: 0.3rem 0 0.6rem;
+  background: none;
+  border: 1px dashed var(--accent-gold);
+  border-radius: 6px;
+  color: var(--accent-gold);
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  padding: 0.15rem 0.7rem;
+  cursor: pointer;
+}
+.ai-solution-toggle:hover,
+.ai-solution-toggle:focus-visible {
+  filter: brightness(0.92);
+}
+
 /* ---- Banners (Decision 60 / budget / auth) ---- */
 
 .banner {

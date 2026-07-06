@@ -480,3 +480,25 @@ def orphan_delete(item_id: int, request: Request):
         return _login_redirect()
     core.db_execute("DELETE FROM cached_content WHERE id = ?", (item_id,))
     return RedirectResponse("/admin/orphans", status_code=303)
+
+
+# ---------------------------------------------------------------------------
+# Settings (Decision 75): the solutions availability toggle
+# ---------------------------------------------------------------------------
+
+@router.get("/settings", response_class=HTMLResponse)
+def settings_page(request: Request):
+    if not is_admin(request):
+        return _login_redirect()
+    return _render(request, "admin/settings.html",
+                   {"solutions_enabled": core.solutions_enabled(),
+                    "active": "settings"})
+
+
+@router.post("/settings/solutions")
+async def settings_solutions(request: Request):
+    if not is_admin(request):
+        return _login_redirect()
+    form = await request.form()
+    core.set_setting("solutions_enabled", "1" if form.get("enabled") == "on" else "0")
+    return RedirectResponse("/admin/settings", status_code=303)

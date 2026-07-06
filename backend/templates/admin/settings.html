@@ -1,0 +1,33 @@
+{% extends "admin/base.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<h1>Settings</h1>
+
+<section class="block">
+  <h2>AI-written solutions</h2>
+  <p class="hint">
+    Every question and Quick Check has an AI-written solution in the textbook,
+    marked <em>&ldquo;AI Generated; needs review&rdquo;</em>. This toggle controls
+    whether students can see them.
+  </p>
+  <ul class="hint">
+    <li><strong>Off</strong> &mdash; solutions are stripped from the served pages
+      entirely. They are not available at all (not even hidden in the page source).</li>
+    <li><strong>On</strong> &mdash; solutions are served, each hidden behind a
+      &ldquo;Show solution&rdquo; click.</li>
+  </ul>
+
+  <form method="post" action="/admin/settings/solutions">
+    <label style="display:flex; align-items:center; gap:0.6rem; font-size:1.05rem;">
+      <input type="checkbox" name="enabled" {% if solutions_enabled %}checked{% endif %}>
+      Make solutions available to students (behind click-to-show)
+    </label>
+    <p style="margin-top:0.9rem;">
+      <button type="submit">Save</button>
+      <span class="hint" style="margin-left:0.8rem;">
+        Currently: <strong>{{ "ON — solutions available" if solutions_enabled else "OFF — solutions hidden" }}</strong>
+      </span>
+    </p>
+  </form>
+</section>
+{% endblock %}

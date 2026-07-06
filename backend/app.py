@@ -22,7 +22,7 @@ from pathlib import Path
 from anthropic import AsyncAnthropic
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request, Response
-from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, StreamingResponse
 
 # ---------------------------------------------------------------------------
 # Paths and configuration
@@ -410,6 +410,10 @@ CREATE TABLE IF NOT EXISTS admin (
     failed_attempts INTEGER NOT NULL DEFAULT 0,  -- lockout (Decision 57)
     locked_until TIMESTAMP                       -- lockout (Decision 57)
 );
+CREATE TABLE IF NOT EXISTS settings (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+);
 """
 
 DEV_CODE = "DEV-TEST-1"
@@ -466,6 +470,77 @@ def db_execute(sql: str, params=()) -> int:
         cur = _db.execute(sql, params)
         _db.commit()
         return cur.lastrowid
+
+
+def get_setting(key: str, default: str = "") -> str:
+    rows = db_query("SELECT value FROM settings WHERE key = ?", (key,))
+    return rows[0]["value"] if rows else default
+
+
+def set_setting(key: str, value: str) -> None:
+    db_execute(
+        "INSERT INTO settings (key, value) VALUES (?, ?) "
+        "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+        (key, value),
+    )
+
+
+# AI-written solutions (marked "needs review" in the LaTeX) render as
+# <div class="ltx_theorem ltx_theorem_aisolution">. When the instructor's
+# toggle is OFF they are stripped from the served chapter HTML entirely (not
+# merely hidden), so they're genuinely unavailable. Default: OFF.
+_AISOLUTION_CLASS = "ltx_theorem_aisolution"
+
+
+def solutions_enabled() -> bool:
+    return get_setting("solutions_enabled", "0") == "1"
+
+
+def _next_div(html: str, start: int) -> int:
+    """Index of the next real <div (followed by space or >), or -1."""
+    i = start
+    while True:
+        i = html.find("<div", i)
+        if i == -1:
+            return -1
+        nxt = html[i + 4:i + 5]
+        if nxt in (" ", ">", "\t", "\n", "/"):
+            return i
+        i += 4
+
+
+def strip_aisolutions(html: str) -> str:
+    """Remove every balanced <div ...ltx_theorem_aisolution...>...</div> block."""
+    out = []
+    pos = 0
+    while True:
+        start = _next_div(html, pos)
+        if start == -1:
+            out.append(html[pos:])
+            break
+        tag_end = html.find(">", start)
+        if tag_end == -1:
+            out.append(html[pos:])
+            break
+        if _AISOLUTION_CLASS in html[start:tag_end + 1]:
+            depth, scan = 1, tag_end + 1
+            while depth > 0:
+                nd = _next_div(html, scan)
+                cd = html.find("</div>", scan)
+                if cd == -1:
+                    break
+                if nd != -1 and nd < cd:
+                    depth += 1
+                    scan = nd + 4
+                else:
+                    depth -= 1
+                    scan = cd + 6
+            out.append(html[pos:start])
+            pos = scan
+        else:
+            out.append(html[pos:tag_end + 1])
+            pos = tag_end + 1
+    return "".join(out)
 
 
 # ---------------------------------------------------------------------------
@@ -534,6 +609,12 @@ def chapter(n: str):
     path = BUILD_DIR / "html" / filename
     if not path.exists():
         raise HTTPException(status_code=404, detail="Chapter file missing")
+    # When the solutions toggle is OFF, strip AI-written solutions entirely so
+    # they're unavailable (not merely hidden). When ON, they're served and the
+    # reader hides each behind a "Show solution" click.
+    if not solutions_enabled():
+        html = path.read_text(encoding="utf-8")
+        return HTMLResponse(strip_aisolutions(html))
     return FileResponse(path, media_type="text/html")
 
 

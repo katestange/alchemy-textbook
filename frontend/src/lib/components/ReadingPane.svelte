@@ -71,6 +71,7 @@
     // After the chapter HTML is in the DOM, surface any existing AI content
     // for this chapter (one request, not one per block).
     await tick();
+    wireAiSolutions();
     hydrateChapterContent(n);
     injectBuiltinApplets();
     if (scrollTo) {
@@ -138,6 +139,30 @@
       });
       if (box) updateResultBox(box, e.response);
     }
+  }
+
+  // AI-written solutions (LaTeX `aisolution` env -> .ltx_theorem_aisolution)
+  // are hidden behind a per-solution "Show solution" click. When the admin
+  // toggle is OFF the backend has already stripped them, so this finds none.
+  function wireAiSolutions() {
+    if (!containerEl) return;
+    containerEl.querySelectorAll('.ltx_theorem_aisolution').forEach((sol) => {
+      if (sol.dataset.aiSolWired) return;
+      sol.dataset.aiSolWired = '1';
+      sol.classList.add('ai-solution', 'ai-solution-collapsed');
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ai-solution-toggle';
+      btn.textContent = 'Show solution ▸';
+      btn.setAttribute('aria-expanded', 'false');
+      btn.addEventListener('click', () => {
+        const open = sol.classList.toggle('ai-solution-open');
+        sol.classList.toggle('ai-solution-collapsed', !open);
+        btn.textContent = open ? 'Hide solution ▾' : 'Show solution ▸';
+        btn.setAttribute('aria-expanded', String(open));
+      });
+      sol.parentNode.insertBefore(btn, sol);
+    });
   }
 
   // Inject the pre-authored SageMath demos (builtinApplets.js) for whichever
