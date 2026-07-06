@@ -142,7 +142,7 @@
         collapsed: true,
         selectionText: e.selection_text,
         skipIfHidden: true,
-        own: e.own,
+        canDelete: e.own || $session.isInstructor,
         contentId: e.id
       });
       if (box) updateResultBox(box, e.response);
@@ -302,7 +302,7 @@
         collapsed: true,
         selectionText: e.selection_text,
         skipIfHidden: true,
-        own: e.own,
+        canDelete: e.own || $session.isInstructor,
         contentId: e.id
       });
       if (box) updateResultBox(box, e.response);
@@ -361,7 +361,7 @@
     const box = ensureResultBox(anchorEl, creatureType, anchor.block.content_hash, 'unreviewed', {
       selectionText,
       injectAfter,
-      own: true // a fresh generation is always the caller's own
+      canDelete: true // your own fresh generation
     });
     updateResultBox(box, '');
     // The anchor block can sit well above a long selected/displayed element
@@ -458,7 +458,7 @@
     const box = ensureResultBox(anchorEl, 'eureka', d.contentHash || d.xmlId, 'unreviewed', {
       collapsed: false,
       selectionText: d.selectionText,
-      own: true,
+      canDelete: true,
       contentId: d.contentId
     });
     if (box) {

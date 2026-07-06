@@ -11,14 +11,22 @@ function createSessionStore() {
   const { subscribe, set, update } = writable({
     claimed: false,
     anonymous: false,
+    isInstructor: false, // logged into the admin dashboard in this browser
     budgetRemainingMicrodollars: null,
     error: null
   });
 
   return {
     subscribe,
-    setClaimed(budgetRemainingMicrodollars) {
-      update((s) => ({ ...s, claimed: true, anonymous: false, budgetRemainingMicrodollars, error: null }));
+    setClaimed(budgetRemainingMicrodollars, isInstructor = false) {
+      update((s) => ({
+        ...s,
+        claimed: true,
+        anonymous: false,
+        isInstructor: !!isInstructor,
+        budgetRemainingMicrodollars,
+        error: null
+      }));
     },
     // Reader chose "continue without a code" (Q5: anonymous reader tier) --
     // can read the base textbook + already-approved AI content, but AI

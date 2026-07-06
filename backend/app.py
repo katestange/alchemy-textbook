@@ -732,7 +732,11 @@ def api_whoami(request: Request):
         "FROM invite_codes WHERE code = ? AND NOT revoked", (code,))
     if not row:
         return {"ok": False}
-    return {"ok": True, "budget_remaining_microdollars": row[0]["remaining"]}
+    return {
+        "ok": True,
+        "budget_remaining_microdollars": row[0]["remaining"],
+        "is_admin": _admin.is_admin(request),
+    }
 
 
 @app.get("/api/content/{block_hash}")
@@ -766,13 +770,15 @@ def api_delete_content(content_id: int, request: Request):
     student should be able to purge their own bad AI output). Removes it for
     everyone, and from the instructor's review queue."""
     code = caller_code(request)
-    if not code:
+    is_admin = _admin.is_admin(request)
+    if not code and not is_admin:
         raise HTTPException(status_code=401, detail="Not signed in")
     rows = db_query(
         "SELECT created_by_code FROM cached_content WHERE id = ?", (content_id,))
     if not rows:
         return {"ok": True}  # already gone
-    if rows[0]["created_by_code"] != code:
+    # The creator may delete their own; an instructor may delete anyone's.
+    if not is_admin and rows[0]["created_by_code"] != code:
         raise HTTPException(status_code=403, detail="You can only delete your own AI content")
     db_execute("DELETE FROM content_flags WHERE cached_content_id = ?", (content_id,))
     db_execute("DELETE FROM cached_content WHERE id = ?", (content_id,))

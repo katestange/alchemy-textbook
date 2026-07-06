@@ -834,6 +834,19 @@ button {
 .applet-host {
   margin: 0.3rem 0;
   min-height: 1.5rem;
+  /* Keep applets within the reading column (author feedback: a Sage cell
+     overflowed the column and got covered by the chat panel). Anything wider
+     scrolls inside its own strip instead of spilling into the right gutter. */
+  max-width: 100%;
+  overflow-x: auto;
+}
+.applet-host .sagecell {
+  max-width: 100%;
+}
+/* Belt-and-suspenders: the whole AI/builtin box never exceeds the column. */
+.ai-result,
+.builtin-applet {
+  max-width: 100%;
 }
 /* Streaming code, before the live cell is mounted. */
 .ai-result .sage-src {

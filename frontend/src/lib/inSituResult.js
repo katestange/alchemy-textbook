@@ -219,10 +219,11 @@ export function ensureResultBox(anchorEl, creatureType, key, status = 'unreviewe
   tag.textContent = `AI-generated · ${status}`;
   head.appendChild(tag);
 
-  // Delete-forever, creator only (author feedback: purge a bad AI output).
-  // For a fresh generation the content id arrives with the `done` event and is
-  // stamped on the box then; clicking before that just removes it locally.
-  if (opts.own) {
+  // Delete-forever (author feedback: purge a bad AI output). Shown to the
+  // creator on their own content, and to an instructor on anyone's. The
+  // content id arrives with the `done` event / hydration and is stamped on the
+  // box; clicking before that just removes it locally.
+  if (opts.canDelete) {
     const del = document.createElement('button');
     del.className = 'delete-forever';
     del.type = 'button';

@@ -187,7 +187,7 @@ async def login_submit(request: Request):
     _admin_sessions[token] = _now() + datetime.timedelta(hours=ADMIN_SESSION_HOURS)
     resp = RedirectResponse("/admin/review", status_code=303)
     resp.set_cookie(ADMIN_COOKIE, token, httponly=True, samesite="lax",
-                    max_age=ADMIN_SESSION_HOURS * 3600, path="/admin")
+                    max_age=ADMIN_SESSION_HOURS * 3600, path="/")
     return resp
 
 
@@ -197,7 +197,7 @@ def logout(request: Request):
     if token:
         _admin_sessions.pop(token, None)
     resp = _login_redirect()
-    resp.delete_cookie(ADMIN_COOKIE, path="/admin")
+    resp.delete_cookie(ADMIN_COOKIE, path="/")
     return resp
 
 

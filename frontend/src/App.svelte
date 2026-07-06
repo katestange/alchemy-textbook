@@ -15,7 +15,7 @@
   // skip code entry and restore the live budget.
   onMount(async () => {
     const me = await whoami();
-    if (me.ok) session.setClaimed(me.budget_remaining_microdollars ?? null);
+    if (me.ok) session.setClaimed(me.budget_remaining_microdollars ?? null, me.is_admin);
   });
 
   function formatBudget(microdollars) {
