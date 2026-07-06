@@ -82,15 +82,20 @@ const CREATURE_CHIP_LABEL = {
 
 // Finds (or creates) the shared cluster sibling that holds every chip+box
 // pair anchored to `anchorEl`.
-function getOrCreateCluster(anchorEl) {
-  const clusterId = `ai-cluster-${cssEscape(anchorEl.id || '')}`;
+function getOrCreateCluster(anchorEl, injectAfter) {
+  // `injectAfter` (e.g. the <li> or heading the reader selected inside) is a
+  // better insertion point than the big enclosing block; fall back to the
+  // anchor block element. The cluster id keys off the insertion host so
+  // separate list items get separate clusters.
+  const host = injectAfter || anchorEl;
+  const clusterId = `ai-cluster-${cssEscape(host.id || anchorEl.id || '')}`;
   let cluster = document.getElementById(clusterId);
   if (cluster) return cluster;
 
   cluster = document.createElement('div');
   cluster.id = clusterId;
   cluster.className = 'ai-cluster';
-  anchorEl.insertAdjacentElement('afterend', cluster);
+  host.insertAdjacentElement('afterend', cluster);
   return cluster;
 }
 
@@ -164,7 +169,7 @@ export function ensureResultBox(anchorEl, creatureType, key, status = 'unreviewe
     persistHidden();
   }
 
-  const cluster = getOrCreateCluster(anchorEl);
+  const cluster = getOrCreateCluster(anchorEl, opts.injectAfter);
   let item = cluster.querySelector(`[data-item-key="${itemKey}"]`);
   if (item) {
     const existing = item.querySelector('.ai-result');

@@ -4,7 +4,7 @@
   import { session } from '../stores/session.js';
   import { refreshRequired, budgetNotice } from '../stores/banners.js';
   import { fetchChapterHtml, fetchCachedContent, fetchChapterContent, streamGenerate } from '../api.js';
-  import { resolveSelectionAnchorFromRange } from '../selectionWalker.js';
+  import { resolveSelectionAnchorFromRange, chooseInjectAfter } from '../selectionWalker.js';
   import {
     ensureResultBox,
     updateResultBox,
@@ -250,7 +250,10 @@
       top: rect.bottom + window.scrollY - offset.top + 6,
       left: rect.left + window.scrollX - offset.left,
       anchor,
-      selectionText: selection.toString()
+      selectionText: selection.toString(),
+      // where the result should be inserted (after the <li>/heading selected,
+      // not after the big enclosing block); null => after the anchor block
+      injectAfter: chooseInjectAfter(range)
     };
     promptBox = null;
 
@@ -315,7 +318,8 @@
       left: toolbar.left,
       creatureType,
       anchor: toolbar.anchor,
-      selectionText: toolbar.selectionText
+      selectionText: toolbar.selectionText,
+      injectAfter: toolbar.injectAfter
     };
     toolbar = null;
   }
@@ -333,7 +337,7 @@
   }
 
   async function submitPrompt(promptText) {
-    const { creatureType, anchor, selectionText } = promptBox;
+    const { creatureType, anchor, selectionText, injectAfter } = promptBox;
     promptBox = null;
 
     if ($session.anonymous) {
@@ -345,7 +349,8 @@
     if (!anchorEl) return;
 
     const box = ensureResultBox(anchorEl, creatureType, anchor.block.content_hash, 'unreviewed', {
-      selectionText
+      selectionText,
+      injectAfter
     });
     updateResultBox(box, '');
     // The anchor block can sit well above a long selected/displayed element

@@ -2,7 +2,8 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import {
   findEnclosingBlock,
   resolveSelectionAnchor,
-  resolveSelectionAnchorFromRange
+  resolveSelectionAnchorFromRange,
+  chooseInjectAfter
 } from '../src/lib/selectionWalker.js';
 import { buildBlockMap } from '../src/lib/manifestMap.js';
 
@@ -134,6 +135,60 @@ describe('findEnclosingBlock / resolveSelectionAnchor', () => {
 
   // A figure-only selection: no anchorable ancestor, so fall back to the
   // nearest preceding anchorable block (the paragraph above the figure).
+  // Heading selections: anchor to the section's FIRST block (below), not the
+  // previous section's last block (which would place the item above the heading).
+  it('resolveSelectionAnchorFromRange anchors a heading selection to the following block', () => {
+    const prev = document.createElement('p');
+    prev.id = 'S1.SS1.p1'; // previous section's last paragraph
+    prev.appendChild(document.createTextNode('previous'));
+    const section = document.createElement('section');
+    const h = document.createElement('h3');
+    h.className = 'ltx_title ltx_title_subsection';
+    const hText = document.createTextNode('A New Subsection');
+    h.appendChild(hText);
+    const first = document.createElement('p');
+    first.id = 'S1.Thmtheorem1'; // first anchorable block of the section
+    section.appendChild(h);
+    section.appendChild(first);
+    document.body.appendChild(prev);
+    document.body.appendChild(section);
+
+    const range = document.createRange();
+    range.selectNodeContents(h);
+    const anchor = resolveSelectionAnchorFromRange(range, blockMap);
+    expect(anchor.xml_id).toBe('S1.Thmtheorem1'); // following, not preceding
+  });
+
+  it('chooseInjectAfter returns the <li> for a selection inside a list item', () => {
+    const ol = document.createElement('ol');
+    const li = document.createElement('li');
+    li.className = 'ltx_item';
+    li.id = 'S1.I1.i2';
+    const t = document.createTextNode('item text');
+    li.appendChild(t);
+    ol.appendChild(li);
+    document.body.appendChild(ol);
+    const range = document.createRange();
+    range.selectNodeContents(li);
+    expect(chooseInjectAfter(range)).toBe(li);
+  });
+
+  it('chooseInjectAfter returns the heading for a heading selection, null in plain prose', () => {
+    const h = document.createElement('h2');
+    h.className = 'ltx_title';
+    h.appendChild(document.createTextNode('Title'));
+    const p = document.createElement('p');
+    p.appendChild(document.createTextNode('prose'));
+    document.body.appendChild(h);
+    document.body.appendChild(p);
+    const rH = document.createRange();
+    rH.selectNodeContents(h);
+    expect(chooseInjectAfter(rH)).toBe(h);
+    const rP = document.createRange();
+    rP.selectNodeContents(p);
+    expect(chooseInjectAfter(rP)).toBeNull();
+  });
+
   it('resolveSelectionAnchorFromRange falls back to the preceding block for a figure-only selection', () => {
     const section = document.createElement('section');
     const p = document.createElement('p');

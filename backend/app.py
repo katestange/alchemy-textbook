@@ -62,7 +62,9 @@ MAX_CONVERSATION_MESSAGES = 40
 
 MODEL_BY_CREATURE = {
     "example": "claude-haiku-4-5",
-    "applet": "claude-sonnet-5",  # explicit, though it's the default
+    # Applet code (Sage/Desmos/GeoGebra) needs to actually run -- give it the
+    # strongest model (author feedback: apps were producing buggy code).
+    "applet": "claude-opus-4-8",
     # justify / counterexample / intuition / chat / quiz / fun /
     # summarize / eureka all default to Sonnet for now (Q3 table refines this).
 }
@@ -72,6 +74,7 @@ DEFAULT_MODEL = "claude-sonnet-5"
 PRICES = {
     "claude-haiku-4-5": {"in": 1.0, "out": 5.0},
     "claude-sonnet-5": {"in": 3.0, "out": 15.0},
+    "claude-opus-4-8": {"in": 5.0, "out": 25.0},
 }
 CACHE_WRITE_MULT = 2.0   # 1-hour TTL cache write premium (Decision 53)
 CACHE_READ_MULT = 0.1    # cache-read rate

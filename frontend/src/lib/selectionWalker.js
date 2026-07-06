@@ -49,6 +49,8 @@ export function resolveSelectionAnchor(startNode, blockMap) {
 // usually sit inside a real text block), and finally fall back to the nearest
 // preceding anchorable block in document order (so even a figure-only
 // selection attaches to the paragraph just above it).
+const HEADING_SEL = '.ltx_title, h1, h2, h3, h4, h5, h6';
+
 export function resolveSelectionAnchorFromRange(range, blockMap) {
   if (!range) return null;
   for (const node of [range.startContainer, range.commonAncestorContainer, range.endContainer]) {
@@ -57,7 +59,52 @@ export function resolveSelectionAnchorFromRange(range, blockMap) {
   }
   let el = range.startContainer;
   if (el && el.nodeType !== 1) el = el.parentElement;
+  // A section heading isn't itself a manifest block; anchoring to the nearest
+  // *preceding* block would attach the content to the previous section (and
+  // place it above the heading). Prefer the section's FIRST block instead.
+  const heading = el && el.closest && el.closest(HEADING_SEL);
+  if (heading) {
+    return followingAnchorable(heading, blockMap) || precedingAnchorable(el, blockMap);
+  }
   return precedingAnchorable(el, blockMap);
+}
+
+// The DOM element the result cluster should be inserted AFTER, so it lands
+// next to what the reader actually selected rather than after a big enclosing
+// block. A list item or a heading is a far better insertion point than the
+// paragraph/section block the content is anchored to. Returns null to fall
+// back to the anchor block element.
+export function chooseInjectAfter(range) {
+  if (!range) return null;
+  let node = range.endContainer;
+  if (node && node.nodeType !== 1) node = node.parentElement;
+  if (!node || !node.closest) return null;
+  return node.closest('li.ltx_item, li') || node.closest(HEADING_SEL) || null;
+}
+
+// Nearest anchorable block AFTER `el` in document order (mirror of
+// precedingAnchorable): scan following siblings and their descendants,
+// climbing ancestors.
+function followingAnchorable(el, blockMap) {
+  const ok = (id) => {
+    if (!id || !blockMap.has(id)) return null;
+    const block = blockMap.get(id);
+    return !block || block.anchorable !== false ? { xml_id: id, block } : null;
+  };
+  let node = el;
+  while (node && node.nodeType === 1) {
+    for (let nx = node.nextElementSibling; nx; nx = nx.nextElementSibling) {
+      const self = ok(nx.id);
+      if (self) return self;
+      const inner = nx.querySelectorAll ? nx.querySelectorAll('[id]') : [];
+      for (let i = 0; i < inner.length; i++) {
+        const hit = ok(inner[i].id);
+        if (hit) return hit;
+      }
+    }
+    node = node.parentElement;
+  }
+  return null;
 }
 
 // Nearest anchorable block that appears before `el` in document order: scan
