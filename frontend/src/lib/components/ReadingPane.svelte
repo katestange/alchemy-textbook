@@ -187,7 +187,15 @@
     return { top: rect.top + window.scrollY, left: rect.left + window.scrollX };
   }
 
-  async function handleMouseUp() {
+  async function handleMouseUp(e) {
+    // Clicks inside our own injected UI (AI result boxes, built-in applets)
+    // must NOT re-run the selection-anchor flow. Otherwise, because the text
+    // that summoned the box often stays highlighted, clicking a control like
+    // "Show solution" is seen as a fresh selection and re-hydrates the box,
+    // wiping the reveal (the "flicker in and out" bug).
+    if (e && e.target && e.target.closest && e.target.closest('.ai-item, .builtin-applet')) {
+      return;
+    }
     const selection = window.getSelection();
     if (!selection || selection.isCollapsed || selection.rangeCount === 0) {
       return;
@@ -369,12 +377,11 @@
     if (el.closest && (el.closest('.creature-toolbar') || el.closest('.prompt-box'))) {
       return;
     }
-    // A plain click (no drag-selection) elsewhere dismisses the floating UI;
-    // mouseup selection handling above will re-open it if a new selection
-    // is made.
-    if (window.getSelection().isCollapsed) {
-      toolbar = null;
-    }
+    // Any mousedown outside the floating UI dismisses it immediately -- don't
+    // wait for the selection to collapse (checking isCollapsed here needed a
+    // second click, because on the first mousedown the old selection is still
+    // live). A fresh drag-selection re-opens the toolbar on mouseup.
+    toolbar = null;
   }
 
   // "N hidden — show" restore control (author feedback). hiddenCount() is

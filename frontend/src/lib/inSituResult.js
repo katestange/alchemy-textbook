@@ -184,6 +184,12 @@ export function ensureResultBox(anchorEl, creatureType, key, status = 'unreviewe
   const head = document.createElement('div');
   head.className = 'ai-result-head';
 
+  // Type title (author feedback: the header should say what KIND it is).
+  const name = document.createElement('span');
+  name.className = 'creature-name';
+  name.textContent = creatureLabel;
+  head.appendChild(name);
+
   const tag = document.createElement('span');
   tag.className = 'tag';
   tag.textContent = `AI-generated · ${status}`;

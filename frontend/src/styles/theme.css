@@ -482,6 +482,13 @@ button {
   quotes: '\201C' '\201D';
 }
 
+.ai-result .creature-name {
+  font-variant-caps: small-caps;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--color-ink);
+}
+
 .ai-result .tag {
   border: 1px solid currentColor;
   border-radius: 999px;
