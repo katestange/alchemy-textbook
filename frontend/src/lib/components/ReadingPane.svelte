@@ -78,6 +78,7 @@
     // for this chapter (one request, not one per block).
     await tick();
     wireAiSolutions();
+    wireWideMath();
     hydrateChapterContent(n);
     injectBuiltinApplets();
     if (scrollTo) {
@@ -173,6 +174,19 @@
     });
   }
 
+  // Only give a horizontal scrollbar to displayed math that is GENUINELY wider
+  // than the column (big matrices), not to ordinary equations -- a blanket
+  // overflow:auto produced phantom 1-2px scrollbars in Chrome. The 6px buffer
+  // ignores sub-pixel rounding.
+  function wireWideMath() {
+    if (!containerEl) return;
+    containerEl
+      .querySelectorAll('math[display="block"], .ltx_equation, .ltx_equationgroup')
+      .forEach((el) => {
+        if (el.scrollWidth > el.clientWidth + 6) el.classList.add('math-scroll');
+      });
+  }
+
   // Inject the pre-authored SageMath demos (builtinApplets.js) for whichever
   // of their anchor blocks exist in this chapter -- an editable, always-on
   // SageCell right after the block. Idempotent (guarded by a per-anchor id).
@@ -213,6 +227,9 @@
       if (app.replaceFigure) {
         // Swap out the static figure image for the applet, in place: hide the
         // <img> and drop the applet above the caption inside the same figure.
+        // The figure was sized to the small image (centered); widen it to the
+        // full column so the applet has room.
+        anchorEl.classList.add('applet-figure');
         const img = anchorEl.querySelector('img');
         if (img) img.style.display = 'none';
         const cap = anchorEl.querySelector('figcaption');

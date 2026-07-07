@@ -224,12 +224,17 @@ button {
 .reading-pane .ltx_page_content :is(img, table, .ltx_picture, .ltx_tabular) {
   max-width: 100%;
 }
-/* Wide displayed math (e.g. big matrices) scrolls within its own strip so it
-   never widens the page (author feedback: a displayed matrix selection). */
+/* Displayed math stays within the column width. Only math that is GENUINELY
+   wider than the column gets a horizontal scrollbar (added as .math-scroll by
+   wireWideMath in ReadingPane) -- a blanket overflow-x:auto produced 1-2px
+   phantom scrollbars on ordinary equations in Chrome (author feedback). */
 .reading-pane .ltx_page_content :is(.ltx_equation, .ltx_equationgroup),
 .reading-pane .ltx_page_content math[display='block'] {
   max-width: 100%;
+}
+.reading-pane .ltx_page_content .math-scroll {
   overflow-x: auto;
+  overflow-y: hidden;
 }
 
 /* LaTeXML emits its own classes (ltx_*); keep the injected content readable
@@ -913,6 +918,18 @@ button {
   font-size: 0.85em;
   white-space: pre-wrap;
   overflow-x: auto;
+}
+
+/* A figure whose static image was replaced by an applet: give it the full
+   column width (it was sized to the small centered image). */
+.reading-pane .ltx_figure.applet-figure {
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+}
+.applet-figure .builtin-applet {
+  width: 100%;
 }
 
 /* Pre-authored built-in demos embedded in the reading column. Collapsible via

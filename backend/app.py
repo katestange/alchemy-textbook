@@ -647,7 +647,11 @@ def chapter_graphic(name: str):
     fname = "x" + name
     if not _GRAPHIC_RE.match(fname):
         raise HTTPException(status_code=404)
-    for base in (BUILD_DIR, BUILD_DIR / "html"):
+    # Serve from build/html/ FIRST: that's the --split output the reader's
+    # chapters reference, and its figure numbering + (transparent) processing
+    # match the source. The single-file build/ copies use a different numbering
+    # and flattened variants -- serving those was showing opaque/wrong images.
+    for base in (BUILD_DIR / "html", BUILD_DIR):
         path = base / fname
         if path.is_file():
             return FileResponse(path)
