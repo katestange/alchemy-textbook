@@ -210,7 +210,17 @@
       });
       wrap.appendChild(bar);
       wrap.appendChild(host);
-      anchorEl.insertAdjacentElement('afterend', wrap);
+      if (app.replaceFigure) {
+        // Swap out the static figure image for the applet, in place: hide the
+        // <img> and drop the applet above the caption inside the same figure.
+        const img = anchorEl.querySelector('img');
+        if (img) img.style.display = 'none';
+        const cap = anchorEl.querySelector('figcaption');
+        if (cap) anchorEl.insertBefore(wrap, cap);
+        else anchorEl.appendChild(wrap);
+      } else {
+        anchorEl.insertAdjacentElement('afterend', wrap);
+      }
       // async; each mounts its own fallback on failure
       if (app.tool === 'desmos') {
         mountDesmosCalculator(host, app.code);

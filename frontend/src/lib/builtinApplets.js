@@ -11,6 +11,19 @@
 
 export const builtinApplets = [
   {
+    // §5.1 Figure 16 (S5.F16) — replace the static elliptic-curve example with
+    // an interactive Desmos plot whose coefficients a, b are editable sliders.
+    xmlId: 'S5.F16',
+    replaceFigure: true,
+    title: 'Try it — edit the coefficients of the elliptic curve',
+    tool: 'desmos',
+    code: `# The elliptic curve y^2 = x^3 + ax + b. Drag the a and b sliders
+# (or type new values) to change the coefficients and watch the curve.
+a = -3
+b = 5
+y^2 = x^3 + ax + b`
+  },
+  {
     // §1.5 Key Exchange — modular exponentiation as a mixing map.
     xmlId: 'S1.SS5.SSS1.p2',
     title: 'Try it — modular exponentiation as a mixing map',
@@ -47,6 +60,8 @@ G.plot(pos=pos)`
 c: y^2 = x^3 - 3x + 5
 P = Point(c)
 Q = Point(c)
+SetCoords(P, -1.7, 2.28)
+SetCoords(Q, 2.5, 3.62)
 line1 = Line(P, Q)
 t = (y(Q) - y(P)) / (x(Q) - x(P))
 u = t^2 - x(P) - x(Q)
