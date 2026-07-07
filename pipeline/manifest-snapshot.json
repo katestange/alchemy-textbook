@@ -1,5 +1,5 @@
 {
- "total_blocks": 845,
+ "total_blocks": 853,
  "total_sections": 154,
  "duplicate_hash_groups": 2,
  "chapters": {
@@ -9,11 +9,11 @@
    "theorem": 1
   },
   "2": {
-   "aisolution": 16,
+   "aisolution": 20,
    "checkin": 19,
    "corollary": 1,
    "definition": 10,
-   "example": 1,
+   "example": 3,
    "paragraph": 184,
    "philosophy": 1,
    "problem": 2,
@@ -39,7 +39,7 @@
   "5": {
    "aisolution": 3,
    "checkin": 1,
-   "example": 4,
+   "example": 5,
    "fact": 3,
    "paragraph": 93,
    "quiz": 2
@@ -47,7 +47,7 @@
   "6": {
    "aisolution": 5,
    "definition": 1,
-   "example": 1,
+   "example": 2,
    "paragraph": 177,
    "question": 4,
    "quiz": 5,

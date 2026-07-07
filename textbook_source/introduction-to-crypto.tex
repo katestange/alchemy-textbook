@@ -937,6 +937,26 @@ With all of this mathematical formalism in hand, we can now provide the decrypti
 
 \KS{Put in an example of breaking the affine cipher with a system of equations}
 
+% >>> AI-GENERATED EXAMPLE (needs review) >>>
+\begin{example}
+Suppose Eve intercepts a message encrypted with an affine cipher $Enc: m \mapsto \alpha m + \beta \pmod{26}$, but she does not know the key $(\alpha, \beta)$.  Using a frequency analysis of the ciphertext, she conjectures that the plaintext letter \texttt{E} $(=4)$ is enciphered as \texttt{C} $(=2)$, and that \texttt{T} $(=19)$ is enciphered as \texttt{Z} $(=25)$.  Each guessed correspondence gives one linear equation in the unknowns $\alpha$ and $\beta$:
+\[
+\alpha \cdot 4 + \beta \equiv 2 \pmod{26}, \qquad \alpha \cdot 19 + \beta \equiv 25 \pmod{26}.
+\]
+Subtracting the first equation from the second eliminates $\beta$:
+\[
+\alpha(19 - 4) \equiv 25 - 2 \pmod{26}, \quad \text{that is} \quad 15\alpha \equiv 23 \pmod{26}.
+\]
+To solve for $\alpha$, we multiply by the inverse of $15$ modulo $26$.  Since $15 \cdot 7 = 105 \equiv 1 \pmod{26}$, that inverse is $7$, and
+\[
+\alpha \equiv 7 \cdot 23 \equiv 161 \equiv 5 \pmod{26}.
+\]
+Substituting back into the first equation, $\beta \equiv 2 - 5 \cdot 4 \equiv 2 - 20 \equiv -18 \equiv 8 \pmod{26}$.  So the key is $(\alpha, \beta) = (5, 8)$, and Eve can now decrypt the entire message using $Dec: c \mapsto 5^{-1}(c - 8) \equiv 21(c-8) \pmod{26}$ (using $5^{-1} \equiv 21 \pmod{26}$).
+
+Notice that this attack required the coefficient $15$ to be invertible modulo $26$.  Had it shared a factor with $26$, Eve would have needed a different pair of letters, or would have had to test the few remaining possibilities by hand.
+\end{example}
+% <<< END AI-GENERATED EXAMPLE <<<
+
 \subsubsection{Functions:  injective, surjective and bijective}
 
 \KS{here are the barebones definitions and facts; to be fleshed out}
@@ -1632,6 +1652,9 @@ Here's a puzzle to get you started:  try to compute $3^{32}$ modulo $n$, using a
 \begin{checkin}
         How many multiplications do you need to do, to compute $3^{32}$?
 \end{checkin}
+\begin{aisolution}
+Five.  Since $32 = 2^5$, we can reach $3^{32}$ purely by repeated squaring: compute $3^2$, then $3^4 = (3^2)^2$, then $3^8$, $3^{16}$, and finally $3^{32}$.  Each step squares the previous value, so this is exactly five calls to the multiply subroutine.
+\end{aisolution}
 
 
 One clever approach is to repeatedly square.  That is, compute, in order:
@@ -1643,6 +1666,9 @@ Each new value is a square of an existing value, so this requires calling the `m
 \begin{checkin}
     How many multiplications do you need to do, to compute $3^{36}$?
 \end{checkin}
+\begin{aisolution}
+Six.  First build the successive squares $3^2, 3^4, 3^8, 3^{16}, 3^{32}$ (five multiplications).  Since $36 = 32 + 4$, one further multiplication $3^{32}\cdot 3^4 = 3^{36}$ finishes the job, for six in total.
+\end{aisolution}
 
 In this example, you might compute the same list as for the previous example, and then do one more multiplication:
 \[
@@ -1652,6 +1678,9 @@ In this example, you might compute the same list as for the previous example, an
 \begin{checkin}
     How many multiplications do you need to do, to compute $3^{39}$?
 \end{checkin}
+\begin{aisolution}
+Eight.  The same five squarings produce $3^2, 3^4, 3^8, 3^{16}, 3^{32}$.  Since $39 = 32 + 4 + 2 + 1$, we then form $3^{32}\cdot 3^4 \cdot 3^2 \cdot 3 = 3^{39}$; combining these four factors takes three more multiplications.  The total is $5 + 3 = 8$.
+\end{aisolution}
 
 We might observe that
 \[
@@ -1679,6 +1708,9 @@ This is called the method of successive squares.  To summarize:
 \begin{checkin}
     What is the maximal number of multiplications that this method may require to compute a power to an exponent $e$?
 \end{checkin}
+\begin{aisolution}
+At most $2\lfloor \log_2 e\rfloor - 1$ multiplications.  The largest power of two we need is $2^{\lfloor \log_2 e\rfloor}$, so the list of successive squares $3^2, 3^4, \ldots, 3^{2^{\lfloor \log_2 e\rfloor}}$ costs $\lfloor \log_2 e\rfloor$ multiplications to build.  Combining the squares picked out by the binary expansion of $e$ costs at most $\lfloor \log_2 e\rfloor - 1$ more (start from one of the squares and multiply in the others).  Hence the worst case is $2\lfloor \log_2 e\rfloor - 1$, which is exponentially smaller than $e$ itself---the key fact that makes fast modular exponentiation, and thus public-key cryptography, possible.
+\end{aisolution}
 
 To answer this question, we first observe that the highest power of two needed will be given by $\lfloor(\log_2(e))\rfloor$.  For example, $5 < \log_2(39) < 6$, since $2^5 = 32 < 39 < 64 = 2^6$.  So we need five powers.
 
@@ -1882,6 +1914,28 @@ Then, rearranging, we have
 In other words, having found a collision, we see immediately that the solution (the exponent we seek) is $j+kN$.
 
 \KS{Insert an example}
+
+% >>> AI-GENERATED EXAMPLE (needs review) >>>
+\begin{example}
+Let us solve the discrete logarithm problem $2^x \equiv 5 \pmod{29}$, where $g = 2$ is a primitive root modulo the prime $p = 29$.  Here $p - 1 = 28$, so we set $N = \lceil \sqrt{28} \rceil = 6$.
+
+\emph{Baby steps.}  We list $g^j = 2^j \pmod{29}$ for $j = 0, 1, \ldots, 5$:
+\[
+2^0 \equiv 1, \quad 2^1 \equiv 2, \quad 2^2 \equiv 4, \quad 2^3 \equiv 8, \quad 2^4 \equiv 16, \quad 2^5 \equiv 3 \pmod{29}.
+\]
+
+\emph{Giant steps.}  We list $h \cdot g^{-Nk} = 5 \cdot 2^{-6k} \pmod{29}$.  First we need $g^{-N} = 2^{-6} \pmod{29}$: since $2^6 \equiv 6$ and $6 \cdot 5 \equiv 30 \equiv 1 \pmod{29}$, we have $2^{-6} \equiv 5$.  Then, multiplying by $5$ at each step,
+\[
+k = 0:\ 5, \qquad k = 1:\ 25, \qquad k = 2:\ 9, \qquad k = 3:\ 16 \pmod{29}.
+\]
+
+\emph{Collision.}  The value $16$ appears in both lists: it is the baby step $g^4$ (with $j = 4$) and the giant step with $k = 3$.  Setting these equal,
+\[
+g^{4} \equiv h \cdot g^{-6 \cdot 3} \pmod{29}, \quad \text{so} \quad h \equiv g^{4 + 18} \equiv g^{22} \pmod{29}.
+\]
+Therefore $x = j + kN = 4 + 3 \cdot 6 = 22$.  Indeed, one checks that $2^{22} \equiv 5 \pmod{29}$.  Notice that we found the answer after computing only $6 + 4 = 10$ powers, rather than searching through all $28$ possible exponents.
+\end{example}
+% <<< END AI-GENERATED EXAMPLE <<<
 
 \KS{Insert runtime analysis}
 
@@ -3222,6 +3276,36 @@ Here's a temporary addition and multiplication table for $\FF_2[x]/(x^2+x+1)$ (w
 
 \KS{add an example computing all pts mod p}
 
+% >>> AI-GENERATED EXAMPLE (needs review) >>>
+\begin{example}
+Let us find \emph{all} points of the elliptic curve $E: y^2 \equiv x^3 + 2x + 4 \pmod{5}$.  (This is the curve we will use for the group-law example below.)  A point is a pair $(x,y)$ with $x, y \in \ZZ/5\ZZ$ satisfying the equation, together with the special point at infinity $\infty$.
+
+We proceed by trying each value of $x \in \{0,1,2,3,4\}$, computing the right-hand side $x^3 + 2x + 4 \pmod 5$, and asking whether it is a square modulo $5$.  The squares modulo $5$ are
+\[
+0^2 \equiv 0, \quad 1^2 \equiv 1, \quad 2^2 \equiv 4, \quad 3^2 \equiv 4, \quad 4^2 \equiv 1 \pmod 5,
+\]
+so the nonzero squares are $\{1, 4\}$; a value of $1$ has square roots $\pm 1 = \{1, 4\}$, and a value of $4$ has square roots $\pm 2 = \{2, 3\}$.
+
+\begin{center}
+\begin{tabular}{c|c|c}
+$x$ & $x^3 + 2x + 4 \pmod 5$ & $y$ with $y^2 \equiv$ this \\
+\hline
+$0$ & $4$ & $2, 3$ \\
+$1$ & $7 \equiv 2$ & none \\
+$2$ & $16 \equiv 1$ & $1, 4$ \\
+$3$ & $37 \equiv 2$ & none \\
+$4$ & $76 \equiv 1$ & $1, 4$ \\
+\end{tabular}
+\end{center}
+
+Collecting the solutions, the curve $E$ has exactly seven points:
+\[
+(0,2), \quad (0,3), \quad (2,1), \quad (2,4), \quad (4,1), \quad (4,4), \quad \text{and} \quad \infty.
+\]
+In particular, the points $P = (0,2)$ and $Q = (2,4)$ used in the next example do lie on $E$.
+\end{example}
+% <<< END AI-GENERATED EXAMPLE <<<
+
 For our purposes, an elliptic curve is an equation of the form $y^2 = x^3 + ax^2 + bx + c$ (this is called \textbf{Weierstrass form}).  Given an equation like this, we might be interested in the solutions, or \textbf{points} of the elliptic curve, over a particular field.  Over $\RR$, the points can be drawn with a graph, as in Figure~\ref{fig:ellcurve-eg}.
 
 One thing to notice about the graph is that there's a reflectional symmetry across the $x$-axis, thanks to the particular form the of the equation.  That is, if $(x,y)$ is a point, then so is $(x,-y)$.  This will be useful later.
@@ -3665,28 +3749,29 @@ Compare this formalism to Section~\ref{sec:baby-giant} (2.8.1).
 
 Elliptic Curve El Gamal is exactly like regular El Gamal except that we substitute the collection of points on $E$ modulo $p$, denoted $E(\FF_p)$, for the multiplicative group $(\ZZ/p\ZZ)^*$.  This means that we are working on a cycle of points\footnote{Created by ChatGPT, which is good at tikz!}
 
-\begin{tikzpicture}[->, >=Latex, shorten >=1pt, auto, node distance=2cm, 
-    main node/.style={font=\sffamily\Large}]
-
-    % Define the circle radius
-    \def\radius{3cm}
-    
-    % Draw the points in a circle
-    \node[main node] (1) at ({360/5 * 1}:\radius) {P};
-    \node[main node] (2) at ({360/5 * 2}:\radius) {2P};
-    \node[main node] (3) at ({360/5 * 3}:\radius) {3P};
-    \node[main node] (4) at ({360/5 * 4}:\radius) {\dots};
-    \node[main node] (5) at ({360/5 * 5}:\radius) {NP = \(\infty\)};
-    
-    % Draw the arrows connecting the points in the circle with outward bends
-    \path[every node/.style={font=\sffamily\small}]
-        (1) edge [->, bend right=30] (2)
-        (2) edge [->, bend right=30] (3)
-        (3) edge [->, bend right=30] (4)
-        (4) edge [->, bend right=30] (5)
-        (5) edge [->, bend right=30] (1);
-
+\begin{center}
+\begin{tikzpicture}[->, >=Latex, shorten >=2pt, thick]
+    \def\R{2.2cm}
+    % dots on the ring (clockwise from the top)
+    \node[circle, fill=black, inner sep=1.7pt] (1) at (90:\R) {};
+    \node[circle, fill=black, inner sep=1.7pt] (2) at (18:\R) {};
+    \node[circle, fill=black, inner sep=1.7pt] (3) at (-54:\R) {};
+    \node[circle, fill=black, inner sep=1.7pt] (4) at (-126:\R) {};
+    \node[circle, fill=black, inner sep=1.7pt] (5) at (-198:\R) {};
+    % labels, pushed outside the ring so the arcs never cross them
+    \node at (90:{\R+0.5cm})  {$P$};
+    \node at (18:{\R+0.6cm})  {$2P$};
+    \node at (-54:{\R+0.6cm}) {$3P$};
+    \node at (-126:{\R+0.5cm}) {$\cdots$};
+    \node at (-198:{\R+1.0cm}) {$NP=\infty$};
+    % arrows around the cycle
+    \path (1) edge[bend right=12] (2)
+          (2) edge[bend right=12] (3)
+          (3) edge[bend right=12] (4)
+          (4) edge[bend right=12] (5)
+          (5) edge[bend right=12] (1);
 \end{tikzpicture}
+\end{center}
 
 instead of the cycle of powers of $g \in (\ZZ/p\ZZ)^*$.  The cycle is of size $N$, where $N$ is the order of $P$.  The \textbf{order} of a point $P$ on an elliptic curve is the smallest positive integer $N$ so that $NP = \infty$.
 
@@ -3759,26 +3844,26 @@ That's it!  Notice that it is only when $p \equiv 3 \pmod{4}$ that $\frac{p+1}{4
 \textbf{Why does this work?}  We return to the observation that $(\ZZ/p\ZZ)^*$ is a cyclic group.  Let $g$ be a generator.  Then taking powers of $g$, we obtain all the residues of $(\ZZ/p\ZZ)^*$, forming a single cycle. 
 
 \begin{center}
-\begin{tikzpicture}[->, >=Latex, shorten >=1pt, auto, node distance=2cm, 
-    main node/.style={font=\sffamily\Large}]
-
-    % Define the circle radius
-    \def\radius{3cm}
-    
-    % Draw the points in a circle
-    \node[main node] (1) at ({360/5 * 1}:\radius) {$g$};
-    \node[main node] (2) at ({360/5 * 2}:\radius) {$g^2$};
-    \node[main node] (3) at ({360/5 * 3}:\radius) {$g^3$};
-    \node[main node] (4) at ({360/5 * 4}:\radius) {$\dots$};
-    \node[main node] (5) at ({360/5 * 5}:\radius) {$g^{p-1} = 1$};
-    
-    % Draw the arrows connecting the points in the circle with outward bends
-    \path[every node/.style={font=\sffamily\small}]
-        (1) edge [->, bend right=30] (2)
-        (2) edge [->, bend right=30] (3)
-        (3) edge [->, bend right=30] (4)
-        (4) edge [->, bend right=30] (5)
-        (5) edge [->, bend right=30] (1);
+\begin{tikzpicture}[->, >=Latex, shorten >=2pt, thick]
+    \def\R{2.2cm}
+    % dots on the ring (clockwise from the top)
+    \node[circle, fill=black, inner sep=1.7pt] (1) at (90:\R) {};
+    \node[circle, fill=black, inner sep=1.7pt] (2) at (18:\R) {};
+    \node[circle, fill=black, inner sep=1.7pt] (3) at (-54:\R) {};
+    \node[circle, fill=black, inner sep=1.7pt] (4) at (-126:\R) {};
+    \node[circle, fill=black, inner sep=1.7pt] (5) at (-198:\R) {};
+    % labels, pushed outside the ring
+    \node at (90:{\R+0.5cm})  {$g$};
+    \node at (18:{\R+0.6cm})  {$g^2$};
+    \node at (-54:{\R+0.6cm}) {$g^3$};
+    \node at (-126:{\R+0.5cm}) {$\cdots$};
+    \node at (-198:{\R+1.05cm}) {$g^{p-1}=1$};
+    % arrows around the cycle
+    \path (1) edge[bend right=12] (2)
+          (2) edge[bend right=12] (3)
+          (3) edge[bend right=12] (4)
+          (4) edge[bend right=12] (5)
+          (5) edge[bend right=12] (1);
 
 \end{tikzpicture}
 \end{center}
@@ -3792,26 +3877,26 @@ a^{\frac{p-1}{2}} \equiv g^{p-1} \equiv 1 \pmod{p}.
 So if we draw the cycle of powers of $a$ up to $(p-1)/2$, it closes in on itself, with $a^{\frac{p-1}{2}} \equiv 1$.
 
 \begin{center}
-\begin{tikzpicture}[->, >=Latex, shorten >=1pt, auto, node distance=2cm, 
-    main node/.style={font=\sffamily\Large}]
-
-    % Define the circle radius
-    \def\radius{3cm}
-    
-    % Draw the points in a circle
-    \node[main node] (1) at ({360/5 * 1}:\radius) {$a = a^{\frac{p+1}{2}}$};
-    \node[main node] (2) at ({360/5 * 2}:\radius) {$a^2$};
-    \node[main node] (3) at ({360/5 * 3}:\radius) {$a^3$};
-    \node[main node] (4) at ({360/5 * 4}:\radius) {$\dots$};
-    \node[main node] (5) at ({360/5 * 5}:\radius) {$1 = a^{\frac{p-1}{2}}$};
-    
-    % Draw the arrows connecting the points in the circle with outward bends
-    \path[every node/.style={font=\sffamily\small}]
-        (1) edge [->, bend right=30] (2)
-        (2) edge [->, bend right=30] (3)
-        (3) edge [->, bend right=30] (4)
-        (4) edge [->, bend right=30] (5)
-        (5) edge [->, bend right=30] (1);
+\begin{tikzpicture}[->, >=Latex, shorten >=2pt, thick]
+    \def\R{2.2cm}
+    % dots on the ring (clockwise from the top)
+    \node[circle, fill=black, inner sep=1.7pt] (1) at (90:\R) {};
+    \node[circle, fill=black, inner sep=1.7pt] (2) at (18:\R) {};
+    \node[circle, fill=black, inner sep=1.7pt] (3) at (-54:\R) {};
+    \node[circle, fill=black, inner sep=1.7pt] (4) at (-126:\R) {};
+    \node[circle, fill=black, inner sep=1.7pt] (5) at (-198:\R) {};
+    % labels, pushed outside the ring
+    \node at (90:{\R+0.9cm})  {$a = a^{\frac{p+1}{2}}$};
+    \node at (18:{\R+0.6cm})  {$a^2$};
+    \node at (-54:{\R+0.6cm}) {$a^3$};
+    \node at (-126:{\R+0.5cm}) {$\cdots$};
+    \node at (-198:{\R+0.95cm}) {$1 = a^{\frac{p-1}{2}}$};
+    % arrows around the cycle
+    \path (1) edge[bend right=12] (2)
+          (2) edge[bend right=12] (3)
+          (3) edge[bend right=12] (4)
+          (4) edge[bend right=12] (5)
+          (5) edge[bend right=12] (1);
 
 \end{tikzpicture}
 \end{center}
@@ -5551,6 +5636,21 @@ Thought of this way, it is easy to think of such a function as the vector in $\C
 \]
 So this space of functions is isomorphic to $\CC^m$.  If we add two functions, we are adding them coordinatewise
 \KS{do example}
+
+% >>> AI-GENERATED EXAMPLE (needs review) >>>
+\begin{example}
+Take $m = 4$, and let $f, g \colon \ZZ/4\ZZ \rightarrow \CC$ be the functions
+\[
+f = (f(0), f(1), f(2), f(3)) = (2,\ i,\ -1,\ 3), \qquad
+g = (g(0), g(1), g(2), g(3)) = (1,\ 1,\ i,\ -3).
+\]
+Their sum $f + g$ is computed one coordinate at a time, $(f+g)(x) = f(x) + g(x)$:
+\[
+f + g = (2 + 1,\ i + 1,\ -1 + i,\ 3 - 3) = (3,\ 1+i,\ -1+i,\ 0).
+\]
+This is exactly the usual vector addition in $\CC^4$, which is why we regard the space of functions $\{f \colon \ZZ/4\ZZ \rightarrow \CC\}$ as being $\CC^4$.
+\end{example}
+% <<< END AI-GENERATED EXAMPLE <<<
 
 There is a very natural standard choice of basis for these functions, which, written as vectors, looks just like the usual standard basis.  That is, $f_i$ is the function which is $1$ at $i$ and $0$ everywhere else.  Explicitly, 
 There is a very natural standard choice of basis for these functions, which, written as vectors, looks just like the usual standard basis.  That is, $f_i$ is the function which is $1$ at $i$ and $0$ everywhere else.  Explicitly, 
