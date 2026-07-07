@@ -843,6 +843,18 @@ button {
 .applet-host .sagecell {
   max-width: 100%;
 }
+/* Loading placeholder that reserves the applet's height (no page jump). */
+.applet-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: inherit;
+  color: var(--color-ink-soft);
+  font-style: italic;
+  background: var(--color-bg);
+  border: 1px dashed var(--color-rule);
+  border-radius: 6px;
+}
 /* Belt-and-suspenders: the whole AI/builtin box never exceeds the column. */
 .ai-result,
 .builtin-applet {

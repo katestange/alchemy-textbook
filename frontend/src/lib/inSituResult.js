@@ -128,11 +128,20 @@ function mountApplet(body, code) {
   body.textContent = '';
   const host = document.createElement('div');
   host.className = 'applet-host';
-  body.appendChild(host);
   const trimmed = code.trimStart();
-  if (trimmed.startsWith(DESMOS_MARKER)) {
+  const isDesmos = trimmed.startsWith(DESMOS_MARKER);
+  const isGeoGebra = trimmed.startsWith(GEOGEBRA_MARKER);
+  // Reserve the height with a loading placeholder so the box doesn't jump when
+  // the (async) library finishes loading.
+  host.style.minHeight = isDesmos || isGeoGebra ? '440px' : '160px';
+  const ph = document.createElement('div');
+  ph.className = 'applet-loading';
+  ph.textContent = 'Loading interactive demo…';
+  host.appendChild(ph);
+  body.appendChild(host);
+  if (isDesmos) {
     mountDesmosCalculator(host, trimmed.slice(DESMOS_MARKER.length));
-  } else if (trimmed.startsWith(GEOGEBRA_MARKER)) {
+  } else if (isGeoGebra) {
     mountGeoGebra(host, trimmed.slice(GEOGEBRA_MARKER.length));
   } else {
     mountEditableCell(host, code); // async; renders its own fallback on failure

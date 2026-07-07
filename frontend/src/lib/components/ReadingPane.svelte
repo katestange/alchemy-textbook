@@ -201,6 +201,9 @@
       bar.appendChild(title);
       const host = document.createElement('div');
       host.className = 'applet-host';
+      // Reserve the applet's height up front with a loading placeholder, so
+      // the surrounding text doesn't jump when the library finishes loading.
+      reserveAppletSpace(host, app.tool);
       bar.addEventListener('click', () => {
         const collapsed = wrap.classList.toggle('collapsed');
         bar.setAttribute('aria-expanded', String(!collapsed));
@@ -217,6 +220,17 @@
         mountEditableCell(host, app.code);
       }
     }
+  }
+
+  // Reserve an applet's eventual height with a "Loading…" placeholder so the
+  // page doesn't reflow when the (async) library finishes loading. The mount
+  // functions clear the placeholder but the host's min-height persists.
+  function reserveAppletSpace(host, tool) {
+    host.style.minHeight = tool === 'sage' ? '160px' : '440px';
+    const ph = document.createElement('div');
+    ph.className = 'applet-loading';
+    ph.textContent = 'Loading interactive demo…';
+    host.appendChild(ph);
   }
 
   function containerOffset() {

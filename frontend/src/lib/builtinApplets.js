@@ -41,14 +41,18 @@ G.plot(pos=pos)`
     title: 'Try it — adding two points P + Q on an elliptic curve',
     tool: 'geogebra',
     code: `# y^2 = x^3 - 3x + 5. Drag P and Q along the curve; P+Q is built by
-# the chord-and-tangent law: line PQ meets the curve at a third point,
-# then reflect over the x-axis.
+# the chord-and-tangent law: line PQ meets the curve at a third point R,
+# then reflect R over the x-axis. R is found algebraically (the three
+# x-coordinates on the line sum to the slope squared).
 c: y^2 = x^3 - 3x + 5
 P = Point(c)
 Q = Point(c)
 line1 = Line(P, Q)
-R = Intersect(c, line1, 3)
-Sum = (x(R), -y(R))
+t = (y(Q) - y(P)) / (x(Q) - x(P))
+u = t^2 - x(P) - x(Q)
+v = t*(u - x(P)) + y(P)
+R = (u, v)
+Sum = (u, -v)
 SetCaption(Sum, "P+Q")
 seg1 = Segment(R, Sum)`
   },
