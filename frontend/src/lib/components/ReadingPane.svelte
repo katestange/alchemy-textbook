@@ -48,6 +48,7 @@
   const DEFAULT_PROMPTS = {
     example: 'Create a worked example for this.',
     intuition: 'Explain the intuition behind this.',
+    detail: 'Unpack this in more detail — fill in the omitted steps.',
     applet: 'Make a small, editable interactive Sage demo for this.'
   };
 
@@ -155,7 +156,10 @@
   // toggle is OFF the backend has already stripped them, so this finds none.
   function wireAiSolutions() {
     if (!containerEl) return;
-    containerEl.querySelectorAll('.ltx_theorem_aisolution').forEach((sol) => {
+    // Both AI-written solutions AND the author's own \begin{solution} blocks
+    // are hidden behind a per-solution "Show solution" click (author feedback:
+    // §5.4.1 solutions weren't expandable).
+    containerEl.querySelectorAll('.ltx_theorem_aisolution, .ltx_theorem_solution').forEach((sol) => {
       if (sol.dataset.aiSolWired) return;
       sol.dataset.aiSolWired = '1';
       sol.classList.add('ai-solution', 'ai-solution-collapsed');

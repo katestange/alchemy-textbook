@@ -253,6 +253,15 @@ button {
   border-radius: 0 6px 6px 0;
 }
 
+/* Calming highlight of the passage a note is anchored to, while it's expanded
+   (author feedback: nothing garish). A soft amber wash on parchment. */
+.reading-pane .ai-anchor-highlight {
+  background: color-mix(in srgb, var(--accent-gold) 15%, transparent);
+  border-radius: 4px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-gold) 15%, transparent);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
 /* ---- Selection toolbar (quiet-mode typed-icon chips, Decision 56) ---- */
 
 .creature-toolbar {
@@ -285,6 +294,10 @@ button {
 .creature-chip[data-creature='intuition'] {
   border-color: var(--accent-gold);
   color: var(--accent-gold);
+}
+.creature-chip[data-creature='detail'] {
+  border-color: var(--color-ink-soft);
+  color: var(--color-ink-soft);
 }
 .creature-chip[data-creature='applet'] {
   border-color: var(--accent-red);
@@ -408,6 +421,11 @@ button {
   background: var(--wash-gold);
   border-color: var(--accent-gold);
   color: var(--accent-gold);
+}
+.ai-chip[data-creature='detail'] {
+  background: var(--color-bg-raised);
+  border-color: var(--color-ink-soft);
+  color: var(--color-ink-soft);
 }
 /* Eureka: the salamander's sealing-wax red (Decision 31). */
 .ai-chip[data-creature='eureka'] {
@@ -845,8 +863,17 @@ button {
   max-width: 100%;
   overflow-x: auto;
 }
-.applet-host .sagecell {
-  max-width: 100%;
+.applet-host .sagecell,
+.applet-host .sagecell_editor,
+.applet-host .sagecell_output,
+.applet-host .sagecell img,
+.applet-host .sagecell table {
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+/* SageCell's output (plots, wide matrices) scrolls within the column. */
+.applet-host .sagecell_output {
+  overflow-x: auto;
 }
 /* Loading placeholder that reserves the applet's height (no page jump). */
 .applet-loading {

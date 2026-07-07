@@ -180,6 +180,17 @@ CREATURE_INSTRUCTIONS = {
         "proofs are not. Write flowing prose only: no headings, no lists of "
         "steps, and no [[solution]] markers."
     ),
+    "detail": (
+        "You are the Detail creature. The student wants MORE detail on the "
+        "selection below -- unpack what the text compresses or takes for "
+        "granted. Fill in the omitted algebra or steps, spell out a "
+        "definition the passage leans on, state the small assumption being "
+        "used, and show the intermediate working the text skipped, all "
+        "grounded in the selection and the chapter's notation. Stay tightly "
+        "focused on THIS passage -- expand it, don't wander into new topics "
+        "or re-teach the whole section. Write flowing prose (small concrete "
+        "numbers welcome); no headings, no title, no [[solution]] markers."
+    ),
     # V1 PROMPT -- applet creature: output is dropped verbatim into an
     # editable SageCell code cell, so the ENTIRE response must be runnable
     # Sage code (iterate after quality testing like the prompts above).

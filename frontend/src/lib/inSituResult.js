@@ -69,6 +69,7 @@ export function unhideAll() {
 const CREATURE_LABEL = {
   example: 'Example',
   intuition: 'Intuition',
+  detail: 'Detail',
   applet: 'Applet',
   eureka: 'Eureka'
 };
@@ -76,6 +77,7 @@ const CREATURE_LABEL = {
 const CREATURE_CHIP_LABEL = {
   example: 'Ex.',
   intuition: 'Int.',
+  detail: 'Det.',
   applet: 'App.',
   eureka: '💡'
 };
@@ -107,6 +109,17 @@ function setExpanded(item, expanded) {
   // An applet's SageCell is heavy (loads the SageCell library + an editor), so
   // a collapsed/hydrated applet defers mounting until it's actually expanded.
   if (expanded) mountAppletIfPending(item);
+  updateAnchorHighlight(item.closest('.ai-cluster'));
+}
+
+// While any note in a cluster is expanded, softly highlight the passage it's
+// anchored to (the element the cluster sits right after) -- a calming cue that
+// links the note to its text (author feedback).
+function updateAnchorHighlight(cluster) {
+  if (!cluster) return;
+  const anchor = cluster.previousElementSibling;
+  if (!anchor || !anchor.classList) return;
+  anchor.classList.toggle('ai-anchor-highlight', !!cluster.querySelector('.ai-item.expanded'));
 }
 
 // If this item is an applet whose code is stashed but not yet turned into a
@@ -249,7 +262,9 @@ export function ensureResultBox(anchorEl, creatureType, key, status = 'unreviewe
           new CustomEvent('alchemy:delete-content', { detail: { contentId: Number(id) } })
         );
       }
+      const cluster = item.closest('.ai-cluster');
       item.remove();
+      updateAnchorHighlight(cluster);
     });
     head.appendChild(del);
   }
@@ -263,7 +278,9 @@ export function ensureResultBox(anchorEl, creatureType, key, status = 'unreviewe
   hide.addEventListener('click', () => {
     hiddenSet.add(itemKey);
     persistHidden();
+    const cluster = item.closest('.ai-cluster');
     item.remove();
+    updateAnchorHighlight(cluster);
   });
   head.appendChild(hide);
 
