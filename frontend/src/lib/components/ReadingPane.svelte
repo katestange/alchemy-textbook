@@ -187,7 +187,9 @@
     containerEl
       .querySelectorAll('math[display="block"], .ltx_equation, .ltx_equationgroup')
       .forEach((el) => {
-        if (el.scrollWidth > el.clientWidth + 6) el.classList.add('math-scroll');
+        // Generous buffer so ordinary equations never get a phantom scrollbar
+        // from Chrome's MathML metrics; only real overflow (wide matrices).
+        if (el.scrollWidth > el.clientWidth + 16) el.classList.add('math-scroll');
       });
   }
 
