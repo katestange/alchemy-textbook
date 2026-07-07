@@ -125,6 +125,7 @@ export function mountGeoGebra(hostEl, commands, opts = {}) {
         showToolBar: false,
         showMenuBar: false,
         showAlgebraInput: true,
+        showKeyboardOnFocus: false, // don't pop the on-screen math keyboard on load
         width: 800,
         height: 440,
         appletOnLoad: (api) => {
