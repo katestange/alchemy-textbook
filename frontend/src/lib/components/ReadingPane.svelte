@@ -468,6 +468,8 @@
       removeResultItem(box);
     } else if (code === 'auth_required') {
       session.reset();
+    } else if (code === 'rate_limited') {
+      showResultError(box, 'Whoa — that’s a lot of requests very fast. Give it a few seconds and try again.');
     } else {
       showResultError(box, 'Something went wrong generating this. Please try again.');
     }

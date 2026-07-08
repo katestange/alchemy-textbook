@@ -140,6 +140,8 @@
     } else if (code === 'conversation_too_long') {
       panelError =
         "This conversation has grown long enough to bump into the model's limits — start a new conversation to keep going.";
+    } else if (code === 'rate_limited') {
+      panelError = 'Whoa — too many requests very fast. Give it a few seconds and try again.';
     } else {
       panelError = 'Something went wrong. Please try again.';
     }
