@@ -171,12 +171,15 @@
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'ai-solution-toggle';
-      btn.textContent = 'Show solution ▸';
+      // Caret is a CSS-drawn triangle (::after), not a glyph -- EB Garamond has
+      // no ▸/▾ so those rendered as tofu squares (author feedback).
+      btn.textContent = 'Show solution';
       btn.setAttribute('aria-expanded', 'false');
       btn.addEventListener('click', () => {
         const open = sol.classList.toggle('ai-solution-open');
         sol.classList.toggle('ai-solution-collapsed', !open);
-        btn.textContent = open ? 'Hide solution ▾' : 'Show solution ▸';
+        btn.textContent = open ? 'Hide solution' : 'Show solution';
+        btn.classList.toggle('open', open);
         btn.setAttribute('aria-expanded', String(open));
       });
       sol.parentNode.insertBefore(btn, sol);

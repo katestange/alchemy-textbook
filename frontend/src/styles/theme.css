@@ -262,6 +262,12 @@ button {
 .reading-pane math munderover[accentunder="true"] > *:not(:first-child) [mathsize] {
   font-size: 1em;
 }
+/* ...and enlarge the arrow glyph itself (LaTeXML emits it stretchy="false", so
+   it stayed a tiny → dwarfed by the equation) so the operation reads clearly
+   (author feedback: make the arrow bigger). */
+.reading-pane math munderover[accentunder="true"] > mo:first-child {
+  font-size: 1.7em;
+}
 
 /* "Recipe cards" (\card = \tcbhighmath{\parbox{...}}): MathML Core dropped
    <menclose>, so these lost their box entirely and rendered as bare stacked
@@ -310,6 +316,15 @@ button {
   font-family: math;
 }
 
+/* A footnote's own number is already implied by the marker you clicked/hovered;
+   don't repeat it inside the pop-up body (author feedback). Hides both the
+   absolute badge and the inline tag; the in-text reference marker (outside
+   .ltx_note_content) is untouched. */
+.reading-pane .ltx_note_content .ltx_note_mark,
+.reading-pane .ltx_note_content .ltx_tag_note {
+  display: none;
+}
+
 /* Display tables (e.g. the Vigenere square) get a solid white base so the
    parchment doesn't show through the grid gaps -- the row shading (white/gray)
    was designed for a white page, and on parchment it read as washed-out
@@ -334,12 +349,17 @@ button {
   cursor: pointer;
   user-select: none;
 }
+/* CSS-drawn caret (no glyph -- EB Garamond has no triangle, which tofu'd). */
 .reading-pane .ltx_proof .proof-toggle::before {
-  content: '▾';
+  content: '';
   display: inline-block;
-  margin-right: 0.35em;
-  font-size: 0.8em;
-  color: var(--color-ink-soft);
+  width: 0;
+  height: 0;
+  margin-right: 0.5em;
+  vertical-align: middle;
+  border-style: solid;
+  border-width: 0.3em 0.26em 0 0.26em;
+  border-color: var(--color-ink-soft) transparent transparent transparent;
   transition: transform 0.15s ease;
 }
 .reading-pane .ltx_proof:not(.proof-open) .proof-toggle::before {
@@ -778,7 +798,9 @@ button {
   margin: 0.4rem 0 1rem;
 }
 .ai-solution-toggle {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
   margin: 0.3rem 0 0.6rem;
   background: none;
   border: 1px dashed var(--accent-gold);
@@ -788,6 +810,19 @@ button {
   font-size: 0.85rem;
   padding: 0.15rem 0.7rem;
   cursor: pointer;
+}
+/* CSS-drawn caret (EB Garamond has no triangle glyph -- ▸ rendered as tofu). */
+.ai-solution-toggle::after {
+  content: '';
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0.3em 0 0.3em 0.42em;
+  border-color: transparent transparent transparent currentColor;
+  transition: transform 0.15s ease;
+}
+.ai-solution-toggle.open::after {
+  transform: rotate(90deg);
 }
 .ai-solution-toggle:hover,
 .ai-solution-toggle:focus-visible {
