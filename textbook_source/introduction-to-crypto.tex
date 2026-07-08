@@ -1888,6 +1888,7 @@ using part (3).  Thus $h^{(p-1)/2} \equiv 1 \pmod p$ if $x$ is even, and $\equiv
 
 
 \subsubsection{The Baby-Step Giant-Step Algorithm}
+\KS{AI: this is the section referenced elsewhere as \texttt{sec:baby-giant}, but it has no matching label, so that cross-reference renders as "LABEL:sec:baby-giant" in the EC El~Gamal section. Add \texttt{\textbackslash label\{sec:baby-giant\}} right here to fix it.}
 
 The first algorithm we will study which is faster than exhaustive search for the Discrete Logarithm Problem is known as the \emph{Baby-Step-Giant-Step} algorithm, and is due to Shanks \KS{add citation}.  It is an example of a \emph{meet-in-the-middle} algorithm, because we compute two lists and look for a collision.  To motivate the algorithm, suppose we compute two lists of randomly generated elements of $\ZZ/p\ZZ$.  The first list consists of elements of the form $g^j$, i.e., random powers of the generator $g$.  The second list consists of elements of the form $hg^k$, i.e. random powers of $g$, all multiplied by $h$.  If we notice a collision, i.e. $g^j = h g^k$, then rearranging, we obtain $g^{j-k} = h$ and $j-k$ is the solution to the problem.  
 
@@ -3741,7 +3742,7 @@ which we can then solve as
 Q = (j + kN)P.
 \]
 
-Compare this formalism to Section~\ref{sec:baby-giant} (2.8.1).
+Compare this formalism to Section~\ref{sec:baby-giant} (2.8.1).\KS{AI: \texttt{\textbackslash ref\{sec:baby-giant\}} here is undefined (renders as "LABEL:sec:baby-giant") -- the label is missing at the Baby-Step Giant-Step subsubsection; add it there. Also, the hand-written "(2.8.1)" should then become the automatic reference number.}
 
 \subsection{Elliptic Curve Diffie-Hellman}
 

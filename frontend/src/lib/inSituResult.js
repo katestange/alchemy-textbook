@@ -70,6 +70,9 @@ const CREATURE_LABEL = {
   example: 'Example',
   intuition: 'Intuition',
   detail: 'Detail',
+  justify: 'Justify',
+  counterexample: 'Counterexample',
+  fun: 'Fun',
   applet: 'Applet',
   eureka: 'Eureka'
 };
@@ -78,6 +81,9 @@ const CREATURE_CHIP_LABEL = {
   example: 'Ex.',
   intuition: 'Int.',
   detail: 'Det.',
+  justify: 'Just.',
+  counterexample: 'CtEx.',
+  fun: 'Fun',
   applet: 'App.',
   eureka: '💡'
 };

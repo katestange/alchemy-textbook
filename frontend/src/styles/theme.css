@@ -299,6 +299,18 @@ button {
   border-color: var(--color-ink-soft);
   color: var(--color-ink-soft);
 }
+.creature-chip[data-creature='justify'] {
+  border-color: var(--accent-teal);
+  color: var(--accent-teal);
+}
+.creature-chip[data-creature='counterexample'] {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
+.creature-chip[data-creature='fun'] {
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+}
 .creature-chip[data-creature='applet'] {
   border-color: var(--accent-red);
   color: var(--accent-red);
@@ -426,6 +438,21 @@ button {
   background: var(--color-bg-raised);
   border-color: var(--color-ink-soft);
   color: var(--color-ink-soft);
+}
+.ai-chip[data-creature='justify'] {
+  background: var(--wash-teal);
+  border-color: var(--accent-teal);
+  color: var(--accent-teal);
+}
+.ai-chip[data-creature='counterexample'] {
+  background: var(--wash-gold);
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
+.ai-chip[data-creature='fun'] {
+  background: var(--wash-red);
+  border-color: var(--accent-red);
+  color: var(--accent-red);
 }
 /* Eureka: the salamander's sealing-wax red (Decision 31). */
 .ai-chip[data-creature='eureka'] {

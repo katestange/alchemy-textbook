@@ -49,6 +49,9 @@
     example: 'Create a worked example for this.',
     intuition: 'Explain the intuition behind this.',
     detail: 'Unpack this in more detail — fill in the omitted steps.',
+    justify: 'Justify this — why is it true?',
+    counterexample: 'Give a counterexample or show where this fails.',
+    fun: 'Give a fun, memorable take on this.',
     applet: 'Make a small, editable interactive Sage demo for this.'
   };
 

@@ -44,10 +44,15 @@ SESSION_COOKIE = "session"
 SESSION_LIFETIME_DAYS = 180  # "end of semester" (Decision 58 drops sessions then)
 
 # v1 output cap: generous enough for one worked example, cheap enough to test.
-# Tune per creature once real usage is measured (Q14 action item).
-MAX_OUTPUT_TOKENS = 700
-# Conversational turns (chat/quiz) are a dialogue, not an essay -- shorter cap.
-MAX_OUTPUT_TOKENS_CONVERSATIONAL = 600
+# Tune per creature once real usage is measured (Q14 action item). These
+# models (Sonnet 5 etc.) have always-on adaptive thinking whose tokens count
+# against max_tokens; reasoning creatures (justify/counterexample) were
+# exhausting a 700 cap entirely on thinking and emitting no answer, so the cap
+# must leave room for BOTH the thinking and a few paragraphs of output.
+MAX_OUTPUT_TOKENS = 1600
+# Conversational turns (chat/quiz) are a dialogue, not an essay -- shorter, but
+# still enough that a turn that needs to reason (quiz feedback) can finish.
+MAX_OUTPUT_TOKENS_CONVERSATIONAL = 1100
 
 # Creatures that hold a client-side conversation (Decision 66): history is
 # resent per turn, nothing is written to cached_content, no content_id.
@@ -190,6 +195,38 @@ CREATURE_INSTRUCTIONS = {
         "focused on THIS passage -- expand it, don't wander into new topics "
         "or re-teach the whole section. Write flowing prose (small concrete "
         "numbers welcome); no headings, no title, no [[solution]] markers."
+    ),
+    "justify": (
+        "You are the Justify creature. The student wants to know WHY the "
+        "claim in the selection below is true. Give the argument: the "
+        "reasoning or proof sketch that establishes it, grounded in the "
+        "chapter's definitions and notation and building only on what the "
+        "text has already introduced. Be rigorous but readable -- name the "
+        "key step or theorem that does the work; a short honest proof beats "
+        "a hand-wave. If the claim genuinely relies on something proved later "
+        "or omitted, say so plainly. Flowing prose; no headings, no title, "
+        "no [[solution]] markers."
+    ),
+    "counterexample": (
+        "You are the Counterexample creature. Probe the boundary of the "
+        "selection below: give a concrete counterexample that shows why a "
+        "hypothesis is needed -- what breaks if a condition is dropped, why "
+        "the statement would be false without it, or a case that violates a "
+        "tempting-but-wrong generalization of it. Use the smallest concrete "
+        "numbers that make the point, and end by naming exactly which "
+        "assumption the counterexample was violating. If the statement is "
+        "genuinely unconditional (no counterexample exists), say so and "
+        "instead show a near-miss that illuminates why it always holds. "
+        "Flowing prose; no headings, no title, no [[solution]] markers."
+    ),
+    "fun": (
+        "You are the Fun creature. Give a short, delightful take on the "
+        "selection below -- a surprising connection, a bit of history, a "
+        "vivid or whimsical analogy, or a genuinely good joke that makes the "
+        "idea stick. Keep it BRIEF (a few sentences) and keep it correct: "
+        "the fun must illuminate the actual mathematics, not distract from "
+        "it or mislead. Match the textbook's warm, playful asides. Flowing "
+        "prose; no headings, no title, no [[solution]] markers."
     ),
     # V1 PROMPT -- applet creature: output is dropped verbatim into an
     # editable SageCell code cell, so the ENTIRE response must be runnable
