@@ -6462,7 +6462,7 @@ First, we try $\alpha = 27$.  Suppose when we make the final measurement in the 
 \item Draw the state $\frac{1}{2} \zeroket + \frac{\sqrt{3}i}{2} \oneket$ on the Bloch sphere.
 \item Draw the state $\frac{i}{2} \zeroket + \frac{\sqrt{3}}{2} \oneket$ on the Bloch sphere.
 
-\emph{Solution.}
+\begin{solution}
 To place a state on the Bloch sphere, we need to normalize it (by a global scaling factor) so that its first entry (the coefficient of $\zeroket$ is a positive real number.  Since it is currently $i/2$, we can do this by multiplying the entire state by $i^{-1} = -i$.  That is, we get
 \[
 -i \left( \frac{i}{2} \zeroket + \frac{\sqrt{3}}{2} \oneket \right)
@@ -6480,6 +6480,7 @@ The solution to $\cos(\theta/2) = 1/2$ is $\theta= 2\pi/3$.  This has $\sin(\the
 \begin{center}
     \includegraphics[width=2in]{review8blochsphere.png}
 \end{center}
+\end{solution}
 
 \item Determine the expression for $| i \rangle$ in terms of the basis $\zeroket$, $\oneket$.  To do this, use the Bloch sphere (find $|i \rangle$ on the picture of the sphere and figure out the angles needed).
 \item Determine the expression for $| i \rangle$ in terms of the basis $\plusket$, $\minusket$.  To do this, use linear algebra, knowing already how to write $i\rangle$, $\plusket$ and $\minusket$ in terms of $\zeroket$ and $\oneket$.
@@ -6495,7 +6496,7 @@ The solution to $\cos(\theta/2) = 1/2$ is $\theta= 2\pi/3$.  This has $\sin(\the
     \item Determine the probabilities and outcomes for measuring this state.
 \end{enumerate}
 
-\emph{Solution.}
+\begin{solution}
 To check that it is normalized, we compute
 \[
 |a|^2 + |b|^2 =
@@ -6517,6 +6518,7 @@ So yes, it is normalized.
 Probabilities:  If we measure this state in the $\zeroket$, $\oneket$ basis, we obtain $\zeroket$ with probability $1/3$ and $\oneket$ with probability $2/3$ (I'm reading this off from the computation we just did).
 
 Outcomes:  If we measure $\zeroket$, then the state collapses to $\zeroket$.  If we measure $\oneket$, then the state collapses to $\oneket$.
+\end{solution}
 
 \item Here's a 3-qubit state:
 \[
@@ -6598,12 +6600,14 @@ Outcomes:  If we measure $\zeroket$, then the state collapses to $\zeroket$.  If
         Let $\alpha = 3$.  Suppose you run the quantum part of the algorithm and you obtain a final measurement of $y=921$.  Complete the rest of the algorithm and discover a proper factor of $N$.
     \end{enumerate}
 
-    \emph{Solution.}
+    \begin{solution}
     For part (a), we need to choose $m_0$ qubits so that $m = 2^{m_0} > N^2$.  Since $77^2 = 5929$, the next power of $2$ above that is $2^{13} = 8192$.  Hence we need $13$ qubits.
-    
+    \end{solution}
+
     \item Suppose you wish to factor $N=65$ using Shor's algorithm.  You use $10$ qubits in the first register and $6$ qubits in the second register.  You use $\alpha = 11$.  The final measurement on the quantum computer is $y=171$.  Complete Shor's algorithm to factor $N$.
 
-    \emph{Solution.}  Since we have $10$ qubits in the first register, $m = 2^{10} = 1024$.  We measure $y=171$, so we are searching for $r$ such that
+    \begin{solution}
+    Since we have $10$ qubits in the first register, $m = 2^{10} = 1024$.  We measure $y=171$, so we are searching for $r$ such that
     \[
         \frac{y}{m} \approx \frac{c}{r}.
     \]
@@ -6658,6 +6662,7 @@ Outcomes:  If we measure $\zeroket$, then the state collapses to $\zeroket$.  If
     = \gcd(11^3-1, 65) = \gcd(1330,65) = 5.
     \]
     We have found a factor of 65, namely 5.
+    \end{solution}
 \end{enumerate}
 
 
