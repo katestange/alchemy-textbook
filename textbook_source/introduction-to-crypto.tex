@@ -1239,7 +1239,8 @@ Find the inverse of the following matrix whose entries are considered modulo $26
 \]
 
 
-\emph{Solution}.  The determinant is $33 - 26 \equiv 33 \equiv 7 \pmod{26}$.  The inverse of $7$ modulo $26$ (by using the table) is $15$.  So using the formula for the inverse of a $2 \times 2$ matrix, one obtains
+\begin{solution}
+The determinant is $33 - 26 \equiv 33 \equiv 7 \pmod{26}$.  The inverse of $7$ modulo $26$ (by using the table) is $15$.  So using the formula for the inverse of a $2 \times 2$ matrix, one obtains
 \[
 	7^{-1}
 	\begin{pmatrix}
@@ -1255,11 +1256,13 @@ Find the inverse of the following matrix whose entries are considered modulo $26
 		19 & 13 \\ 22 & 9
 	\end{pmatrix}.
 \]
+\end{solution}
 
 \emph{Problem 2.}
 The matrix given in the last exercise was used as a key to a Hill cipher to encrypt a favourite vegetable of mine, and the resulting ciphertext was YGFI.  What is the vegetable?
 
-\emph{Solution}.  YGFI is $24, 6, 5, 8$.  The inverse of the encryption matrix is the decryption matrix.  We computed this in part Exercise 1.  We can decrypt the ciphertext block by block by matrix multiplication.  For example, for the first block $(24, 6)$, we do 
+\begin{solution}
+YGFI is $24, 6, 5, 8$.  The inverse of the encryption matrix is the decryption matrix.  We computed this in part Exercise 1.  We can decrypt the ciphertext block by block by matrix multiplication.  For example, for the first block $(24, 6)$, we do 
 \[
 	\begin{pmatrix}
 		19 & 13 \\ 22 & 9
@@ -1273,12 +1276,15 @@ The matrix given in the last exercise was used as a key to a Hill cipher to encr
 	\end{pmatrix}.
 \]
 This is OK.  The second block is done similarly. The plaintext was OKRA.  Yes, that's a vegetable.
+\end{solution}
 
 
 \emph{Problem 3.}
 A $2 \times 2$ Hill cipher encrypted the plaintext SOLVED to give the ciphertext GEZXDS.  Find the encryption matrix.
 
-\emph{Solution 1:  Direct approach (longish)}.  You have an unknown key which we can write as
+\begin{solution}
+\emph{Direct approach (longish).}
+You have an unknown key which we can write as
 \[
 	\begin{pmatrix}
 		a & b \\ c & d
@@ -1348,8 +1354,10 @@ So the correct final matrix is:
 		12 & 11 \\ 3 & 2
 	\end{pmatrix}.
 \]
+\end{solution}
 
-\emph{Solution 2:  Using matrices (a bit slicker and interesting)}
+\begin{solution}
+\emph{Using matrices (a bit slicker and interesting).}
 
 
 Instead of thinking of the plaintext/ciphertext pair giving 3 matrix equations, one for each block, we combine two blocks to give a matrix equation of this form:
@@ -1401,6 +1409,7 @@ Therefore,
 		12 & 11 \\ 3 & 2
 	\end{pmatrix}.
 \]
+\end{solution}
 
 \emph{Problem 4.}
 Suppose the matrix
@@ -1414,13 +1423,15 @@ Suppose the matrix
 		\item Find two plaintexts that encrypt to the same ciphertext.
 	\end{enumerate}
 
-	\emph{Solution.} First part: The determinant is $4 - 6 = -2$.  This is not invertible, which means the matrix is not invertible, which means the matrix is a bad choice for encryption because there is no associated decryption matrix.
+	\begin{solution}
+First part: The determinant is $4 - 6 = -2$.  This is not invertible, which means the matrix is not invertible, which means the matrix is a bad choice for encryption because there is no associated decryption matrix.
 
 	Second part:  By linear algebra, if two plaintexts $\mathbf{v}_1$ and $\mathbf{v}_2$ encrypt to the same ciphertext, then their difference encrypts to $\mathbf{0}$.  So this is really a question about the kernel of the matrix.  That is, we would like to solve
 	\[
 		x + 2y \equiv 0, \quad 3x + 4y \equiv 0.
 	\]
 	Notice that $y$ is always multiplied by $2$, so taking $y=13$ will be the same as taking $y=0$ in this equation (take a look at the column for multiplication by $2$ in the table).  Hence the plaintexts $(0,0)$ and $(0,13)$ will encrypt to the same ciphertext, namely $(0, 0)$.
+\end{solution}
 
 
 
@@ -2380,13 +2391,14 @@ In the next row, the smaller pile becomes the new larger pile, and the remainder
 \begin{example}
 Compute gcd(180,196).
 
-Solution:
+\begin{solution}
 \begin{align*}
 	196 &= 1 \cdot 180 + 16 \\
 	180 &= 11 \cdot 16 + 4 \\
 	16 &= 4 \cdot 4 + 0
 \end{align*}
 Therefore, $\gcd(180,196) = 4$.
+\end{solution}
 \end{example}
 
 The most important and stunning property of this algorithm is its runtime.
@@ -5048,7 +5060,7 @@ This has no solution.
 			\item What is the state after this measurement?
 				\vspace{1em}
 
-				\emph{Solution}
+				\begin{solution}
 
 				The classical state $\ket{11}$ drops off, and we obtain, after normalizing by the length
 				\[
@@ -5056,16 +5068,18 @@ This has no solution.
 					=
 					\frac{\sqrt{2}}{\sqrt{3}}\ket{00} + \frac{1}{\sqrt{3}}\ket{01}.
 				\]
+				\end{solution}
 
 
 			\item If you now measure the second qubit, what are the possible results and probabilities of those results?
 				\vspace{1em}
 
-				\emph{Solution}
+				\begin{solution}
 
 				We have probability $2/3$ that we obtain $00$ and probability $1/3$ that we obtain $01$.
 
 				Fortunately, these add up to $1$ (always a good check to do).
+				\end{solution}
 
 		\end{enumerate}
 	\item Suppose instead you measure the first qubit and obtain a measurement of $\ket{1}$.
@@ -5073,27 +5087,29 @@ This has no solution.
 			\item What is the state after this measurement?
 				\vspace{1em}
 
-				\emph{Solution}
+				\begin{solution}
 
 				The classical state $\ket{11}$ is the only one surviving, and we obtain, after normalizing by the length
 				\[
 					\ket{11}.
 				\]
+				\end{solution}
 
 
 			\item If you now measure the second qubit, what are the possible results and probabilities of those results?
 				\vspace{1em}
 
-				\emph{Solution}
+				\begin{solution}
 
 				We have probability $1$ that we obtain $11$.
+				\end{solution}
 
 		\end{enumerate}
 	\item Is this an entangled state?  Justify.
 
-		\emph{Solution}
+		\begin{solution}
 
-		Yes.  
+		Yes.
 
 		One way to see this is that in the two different outcomes to measuring the first qubit, we get differing probabilities for the outcome of the second.  Hence they are not independent.
 
@@ -5102,6 +5118,7 @@ This has no solution.
 			\frac{1}{\sqrt{2}} = a_1a_2, \quad \frac{1}{2} = a_1b_2, \quad 0 = b_1a_2 \quad \frac{1}{2} = b_1b_2.
 		\]
 		But this is harder in general (here it's not bad at all).
+		\end{solution}
 
 
 \item 	Suppose you have $n+1$ qubits.  We will write $\ket{\vec{x}}$ to mean the $n$-qubit classical state given by the number $x$ in binary.  So for example, if $n=2$ then $\ket{\vec{0}} = \ket{00}$, $\ket{\vec{3}} = \ket{11}$ etc.  Suppose the qubits are in this state:
@@ -5112,35 +5129,39 @@ This has no solution.
 \begin{enumerate}
 	\item What is the resulting state if we measure the last qubit and obtain $\ket{0}$?  Make sure you have normalized your state.
 
-		\emph{Solution}
+		\begin{solution}
 
 		All the states with last qubit $\ket{1}$ disappear from the summation.  That leaves exactly half of them, i.e. those where $x$ is even.  Therefore we have
 \[
 	\frac{1}{\sqrt{2^{n-1}}} \sum_{x=0}^{2^{n-1}-1} \ket{\overrightarrow{2x}}\ket{0}.
 		\]
  Notice that the length of the vector has changed (it has half as many non-zero entries), so the scalar out front has altered.  That's the normalization.
+		\end{solution}
 
 
 	\item What is the resulting state if we measure the last qubit and obtain $\ket{1}$?  Make sure you have normalized your state.
 
 	
-		\emph{Solution}
+		\begin{solution}
 		All the states with last qubit $\ket{0}$ disappear from the summation.  That leaves exactly half of them, i.e. those where $x$ is odd.  Therefore we have
 \[
 	\frac{1}{\sqrt{2^{n-1}}} \sum_{x=0}^{2^{n-1}-1} \ket{\overrightarrow{2x+1}}\ket{1}.
 		\]
+		\end{solution}
 
 
 \end{enumerate}
 
 \item Can you measure the first qubit of the state $\frac{1}{\sqrt{2}} |00 \rangle + \frac{1}{\sqrt{2}}|01 \rangle$ and get $1$?
 
-\emph{Solution.}
+\begin{solution}
 No, you cannot.  None of the classical states with non-zero coefficients have a $1$ in the left (first) position.
+\end{solution}
 
 \item Consider the quantum state $\frac{1}{2} |00 \rangle + \frac{1}{2} |01 \rangle + \frac{1}{2} |10 \rangle + \frac{1}{2} |11 \rangle$. Is this entangled?
 
-\emph{Solution.}  No, this is the result of the following multiplication:
+\begin{solution}
+No, this is the result of the following multiplication:
 \[
 \left(
 \frac{1}{\sqrt{2}} |0 \rangle 
@@ -5151,10 +5172,12 @@ No, you cannot.  None of the classical states with non-zero coefficients have a 
 \right)
 \]
 Another way to discover this is to consider the resulting state after measuring the first qubit, supposing it was a $0$ and supposing it was a $1$.  In both cases you end up with the same collapsed state.
+\end{solution}
 
 \item Measure the quantum state $\frac{2}{\sqrt{7}} |00 \rangle + \frac{1}{\sqrt{7}} |01 \rangle + \frac{1}{\sqrt{7}} |10 \rangle + \frac{1}{\sqrt{7}} |11 \rangle$ in the first coordinate.  What are the probabilities of the possible results, and the resulting quantum states?
 
-\emph{Solution.}  If we measure in the first coordinate, we may end up with a zero, with probability
+\begin{solution}
+If we measure in the first coordinate, we may end up with a zero, with probability
 \[
 \left| \frac{2}{\sqrt{7}} \right|^2 + 
 \left| \frac{1}{\sqrt{7}} \right|^2 = \frac{5}{7}
@@ -5178,6 +5201,7 @@ Similarly, if we measured a $1$, then the resulting state is
 \[
 \frac{1}{\sqrt{2}} |10 \rangle + \frac{1}{\sqrt{2}} |11 \rangle
 \]
+\end{solution}
 
 \end{enumerate}
 
@@ -5351,7 +5375,8 @@ We will need one more powerful ingredient to use a state like this.  The idea is
 
 \item Apply the Pauli Y gate to the state $\frac{1}{\sqrt{5}} |0\rangle + \frac{2}{\sqrt{5}} |1 \rangle$.  What is the result?
 
-\emph{Solution.}  The Pauli $Y$ matrix is
+\begin{solution}
+The Pauli $Y$ matrix is
 \[
 Y = \begin{pmatrix}
     0 & -i \\ i & 0 
@@ -5373,11 +5398,13 @@ so we have to evaluate
 \end{pmatrix}
 \]
 So the resulting state is $\frac{-2i}{\sqrt{5}} |0\rangle + \frac{i}{\sqrt{5}} |1 \rangle$.
+\end{solution}
 
 
 \item Check that the Hadamard gate is unitary.
 
-\emph{Solution.}  We have
+\begin{solution}
+We have
 \[
 H = \frac{1}{\sqrt{2}}\begin{pmatrix}
     1 & 1 \\ 1 & -1 
@@ -5408,10 +5435,12 @@ H^\dagger H = H^2 = \frac{1}{{2}}
 \end{pmatrix}.
 \]
 The fact that this came out to the identity means that, yes, it is unitary.
+\end{solution}
 
 \item Apply the CNOT gate to the state $\frac{1}{\sqrt{5}}|00\rangle + \frac{2}{\sqrt{5}} |11 \rangle$.  What is the result?
 
-\emph{Solution.}  The CNOT gate in terms of the basis in the usual order is 
+\begin{solution}
+The CNOT gate in terms of the basis in the usual order is
 \[
 \begin{pmatrix}
 1 & 0 & 0 & 0 \\
@@ -5442,6 +5471,7 @@ That is, the resulting state is
 $\frac{1}{\sqrt{5}}|00\rangle + \frac{2}{\sqrt{5}} |10 \rangle$.
 
 Another way to do this problem is to apply the CNOT rule to each classical state.  CNOT flips the second bit whenever the first bit is a 1, so it changes $11$ to $10$ and leaves $00$ unchanged.
+\end{solution}
 
 	\item Here's a new gate called the square root of not (presented in the $\ket{0}$, $\ket{1}$ basis as usual):
 		\[
@@ -5458,7 +5488,7 @@ Another way to do this problem is to apply the CNOT rule to each classical state
 			\item Figure out what $\sqrt{X}\ket{1}$ is in terms of $\ket{0}$ and $\ket{1}$.
 		\end{enumerate}
 
-		\emph{Solution.}
+		\begin{solution}
 		\begin{enumerate}
 			\item The conjugate transpose is
 		\[
@@ -5490,11 +5520,12 @@ Another way to do this problem is to apply the CNOT rule to each classical state
 						\sqrt{X} \ket{1} =	\frac{1-i}{2} \ket{0} + \frac{1+i}{2} \ket{1}.
 						\]
 		\end{enumerate}
+		\end{solution}
 
 
 	\item  Define a $3$-qubit gate that can be used to compute a reversible form of OR.
 
-		\emph{Solution.}
+		\begin{solution}
 
 		We use the same trick as for AND:  we use $x,y,z \mapsto x,y,z \oplus (x \vee y)$.  Then on the inputs $x,y,0$ it gives $x,y,x \vee y$.  That is, we have
 \begin{align*}
@@ -5524,14 +5555,15 @@ Another way to do this problem is to apply the CNOT rule to each classical state
 				0 & 0 & 0 & 0 & 0 & 0 & 1 & 0
 			\end{pmatrix}
 		\]
+		\end{solution}
 
-			
+
 	\item Determine a $2$-qubit quantum circuit that will, on input $\ket{00}$, produce output
 		\[
 			\frac{1}{2} \ket{00} + \frac{1}{2} \ket{01} + \frac{1}{2} \ket{10} + \frac{1}{2} \ket{11}.
 			\]
 
-				\emph{Solution}
+				\begin{solution}
 
 				Apply a Hadamard gate to each qubit individually.  We obtain
 				\[
@@ -5559,6 +5591,7 @@ Another way to do this problem is to apply the CNOT rule to each classical state
 					\]
 
 					Note that these different solutions may not behave the same way on other inputs.
+					\end{solution}
 
 
 \end{enumerate}
@@ -5904,7 +5937,8 @@ The offset $\ell$ is absorbed into the phase of the output state, not the magnit
 
 \item Draw the 8th roots of unity in the complex plane and label them.  You can use the $8$-th root of unity notation $\omega := \omega_8 = e^{i \pi/4}$.  But simplify it so that the labels are $\{1,-1,i,-i, \omega, -\omega, i\omega, -i\omega\}$.
 
-\emph{Solution.}  Draw a unit circle, and mark it into 8 equal slices of pie.  The 8 tickmarks on the circle are labelled, in order counterclockwise from the real axis, 
+\begin{solution}
+Draw a unit circle, and mark it into 8 equal slices of pie.  The 8 tickmarks on the circle are labelled, in order counterclockwise from the real axis, 
 \[
 1, \omega, \omega^2, \omega^3, \omega^4, \omega^5, \omega^6, \omega^7.
 \]
@@ -5912,10 +5946,11 @@ If we simplify some of these, we get
 \[
 1, \omega, \omega^2 = i, \omega^3 = i \omega, \omega^4 = -1, \omega^5 = -\omega, \omega^6 = -i, \omega^7 = -i \omega.
 \]
+\end{solution}
 	
 			\item Write down the QFT matrix of dimension $8 \times 8$.  You can use the $8$-th root of unity notation $\omega := \omega_8 = e^{i \pi/4}$.  But simplify it so that the entries are all from the set $\{1,-1,i,-i, \omega, -\omega, i\omega, -i\omega\}$.
 
-				\emph{Solution.}
+				\begin{solution}
 
 				\[
 					\frac{1}{\sqrt{8}}
@@ -5930,10 +5965,11 @@ If we simplify some of these, we get
 						1 & -i\omega & -i & -\omega & -1 & i\omega & i & \omega \\
 					\end{pmatrix}
 					\]
+				\end{solution}
 
 			\item Compute where $|3\rangle = |011\rangle$ is taken by the QFT above.
 
-				\emph{Solution.}
+				\begin{solution}
 
 				This is the 4th basis vector, so we look at the fourth column:
 				\[
@@ -5948,6 +5984,7 @@ If we simplify some of these, we get
 					- \omega |111\rangle
 				\right)
 				\]
+				\end{solution}
 \KS{Fixed by AI: reading the fourth column ($\omega^{3i}$) of the $8\times8$ matrix, the $|101\rangle$ ($i=5$) coefficient is $\omega^{15}=\omega^{7}=-i\omega$ and the $|111\rangle$ ($i=7$) coefficient is $\omega^{21}=\omega^{5}=-\omega$; the original had these two swapped (and they match the matrix's own $6$th row col.\ $6$).}
 
  
@@ -5969,7 +6006,7 @@ If we simplify some of these, we get
 			\item Prove it.  (Note, there's a complex-numbers geometric/computational proof and a two-line linear algebra proof.)
 		\end{enumerate}
 
-		\emph{Solution.}
+		\begin{solution}
 
 		\begin{enumerate}
 			\item \[
@@ -5989,6 +6026,7 @@ If we simplify some of these, we get
 				\]
 				Since $\omega$ is a root of unity, if $x$ is non-zero, then this is a sum of the $m$ $m$-th roots of unity, which surround the origin symmetrically and average to $0$.  (You can use trig to do this explicitly.)  But if $x=0$, then this is a sum of $1$'s.
 		\end{enumerate}
+		\end{solution}
 
   \end{enumerate}
 
@@ -6014,7 +6052,7 @@ If we simplify some of these, we get
 			\item Prove it.
 		\end{enumerate}
 
-		\emph{Solution.}
+		\begin{solution}
 
 		\begin{enumerate}
 			\item \[
@@ -6038,6 +6076,7 @@ If we simplify some of these, we get
 				\]
 				Since $\omega$ is a root of unity, if $x$ is non-zero mod $m$, then this is a sum of the $m$ $m$-th roots of unity, which surround the origin symmetrically and average to $0$.  (You can use trig to do this explicitly.)  But if $x=0$ or $m/2$, then this is a sum of $1$'s.
 		\end{enumerate}
+		\end{solution}
 
 
 \end{enumerate}
