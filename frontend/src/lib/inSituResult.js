@@ -273,6 +273,24 @@ export function ensureResultBox(anchorEl, creatureType, key, status = 'unreviewe
     head.appendChild(del);
   }
 
+  // Flag to the instructor (author feedback): report AI content as
+  // incorrect/misleading or inappropriate. Meaningful once the content has a
+  // stored id (arrives with `done`/hydration); a still-streaming box has none.
+  const flag = document.createElement('button');
+  flag.className = 'flag-content';
+  flag.type = 'button';
+  flag.textContent = 'flag';
+  flag.title = 'Flag this AI content for your instructor';
+  flag.setAttribute('aria-label', 'Flag this AI content for your instructor');
+  flag.addEventListener('click', () => {
+    const id = box.dataset.contentId;
+    if (!id) return; // nothing persisted to flag yet
+    document.dispatchEvent(
+      new CustomEvent('alchemy:flag', { detail: { contentId: Number(id) } })
+    );
+  });
+  head.appendChild(flag);
+
   const hide = document.createElement('button');
   hide.className = 'hide';
   hide.type = 'button';
@@ -366,8 +384,8 @@ export function markEphemeral(box) {
   const head = box.querySelector('.ai-result-head');
   const tag = head && head.querySelector('.tag');
   if (tag) tag.textContent = 'One-time note · not saved';
-  // Nothing to keep, so drop the collapse/hide controls...
-  if (head) head.querySelectorAll('.hide, .dismiss').forEach((b) => b.remove());
+  // Nothing to keep, so drop the collapse/hide/flag controls...
+  if (head) head.querySelectorAll('.hide, .dismiss, .flag-content').forEach((b) => b.remove());
 
   // ...and offer both dismiss affordances a reader might reach for: an × at
   // the top-right, an "ok!" button at the end, and a click anywhere outside.

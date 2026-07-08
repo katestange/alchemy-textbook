@@ -520,8 +520,11 @@ button {
   font-variant-caps: small-caps;
   letter-spacing: 0.03em;
 }
-/* tag stays left; the hide/collapse controls cluster on the right */
-.ai-result .ai-result-head .hide {
+/* tag stays left; the flag/hide/collapse controls cluster on the right.
+   Whichever of these comes first (delete-forever if present, else flag)
+   claims the free space via margin-left:auto and carries the rest along. */
+.ai-result .ai-result-head .hide,
+.ai-result .ai-result-head .flag-content {
   margin-left: auto;
 }
 
@@ -572,6 +575,22 @@ button {
 }
 .ai-result .hide:hover {
   color: var(--color-ink);
+}
+
+/* Flag-to-instructor: quiet like "hide", but tinted with the warning colour
+   so it reads as "report a problem", not another dismiss control. */
+.ai-result .ai-result-head .flag-content {
+  background: none;
+  border: none;
+  color: var(--color-ink-soft);
+  font: inherit;
+  font-size: 0.72rem;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.ai-result .ai-result-head .flag-content:hover {
+  color: var(--accent-red);
 }
 
 /* Delete-forever (creator only): distinct from "hide" -- red, destructive. */

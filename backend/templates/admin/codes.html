@@ -17,7 +17,6 @@ your own offline record (Q5). Revoking a code also deletes its sessions.</p>
   <form method="post" action="/admin/codes/generate" class="inline-form">
     <label>Count <input type="number" name="count" value="5" min="1" max="500"></label>
     <label>Budget $ <input type="number" name="budget_dollars" value="5" step="0.01" min="0.01"></label>
-    <label>Daily limit $ <input type="number" name="daily_limit_dollars" value="1" step="0.01" min="0" placeholder="none"></label>
     <button class="primary">Generate</button>
   </form>
 </section>
@@ -26,7 +25,7 @@ your own offline record (Q5). Revoking a code also deletes its sessions.</p>
   <thead>
     <tr>
       <th>Code</th><th class="num">Budget</th><th class="num">Spent</th>
-      <th class="num">Remaining</th><th class="num">Daily limit</th>
+      <th class="num">Remaining</th>
       <th class="num">Sessions</th><th>Created</th><th>Status</th><th>Actions</th>
     </tr>
   </thead>
@@ -37,7 +36,6 @@ your own offline record (Q5). Revoking a code also deletes its sessions.</p>
       <td class="num">{{ c.budget_microdollars|dollars }}</td>
       <td class="num">{{ c.spent_microdollars|dollars }}</td>
       <td class="num">{{ (c.budget_microdollars - c.spent_microdollars)|dollars }}</td>
-      <td class="num">{% if c.daily_limit_microdollars %}{{ c.daily_limit_microdollars|dollars }}{% else %}&mdash;{% endif %}</td>
       <td class="num">{{ c.session_count }}</td>
       <td>{{ c.created_at[:10] }}</td>
       <td>{% if c.revoked %}<span class="badge revoked">revoked</span>{% else %}active{% endif %}</td>

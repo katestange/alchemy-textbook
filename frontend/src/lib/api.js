@@ -78,6 +78,32 @@ export async function deleteContent(contentId) {
   return res.ok;
 }
 
+// Flag something for the instructor (Decision: student-reported problems).
+// Either a passage of the base textbook (`contentHash`) or a piece of
+// AI-generated content (`cachedContentId`); `category` is one of
+// 'text-error' | 'incorrect' | 'inappropriate' and `comment` is an optional
+// note. Returns { ok, error? } so the caller can show a friendly message.
+export async function submitFlag({ cachedContentId, contentHash, category, comment }) {
+  try {
+    const res = await fetch('/api/flag', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: JSON_HEADERS,
+      body: JSON.stringify({
+        cached_content_id: cachedContentId,
+        content_hash: contentHash,
+        category,
+        comment
+      })
+    });
+    if (res.ok) return { ok: true };
+    if (res.status === 429) return { ok: false, error: 'rate_limited' };
+    return { ok: false, error: 'failed' };
+  } catch {
+    return { ok: false, error: 'failed' };
+  }
+}
+
 // One request per chapter view (NOT per block): all artifacts visible to the
 // caller anchored anywhere in chapter n, so existing AI content appears as
 // soon as the chapter renders (Q13: "place any cached creatures that already

@@ -71,6 +71,10 @@ MAX_SELECTION_CHARS = 2000
 MAX_PROMPT_CHARS = 1000
 MAX_MESSAGES = 80             # chat history turns kept (client resends them)
 MAX_MESSAGE_CHARS = 8000      # per chat message
+MAX_FLAG_COMMENT_CHARS = 1000  # per flag note
+
+# Categories a student may file a flag under.
+FLAG_CATEGORIES = {"incorrect", "inappropriate", "text-error"}
 
 
 def rate_limited(code: str) -> bool:
@@ -443,7 +447,6 @@ CREATE TABLE IF NOT EXISTS invite_codes (
     code TEXT PRIMARY KEY,
     budget_microdollars INTEGER NOT NULL,
     spent_microdollars INTEGER NOT NULL DEFAULT 0,
-    daily_limit_microdollars INTEGER,
     created_at TIMESTAMP NOT NULL,
     revoked BOOLEAN NOT NULL DEFAULT FALSE
 );
@@ -468,9 +471,12 @@ CREATE TABLE IF NOT EXISTS cached_content (
 );
 CREATE TABLE IF NOT EXISTS content_flags (
     id INTEGER PRIMARY KEY,
-    cached_content_id INTEGER REFERENCES cached_content(id),
-    content_hash TEXT,
+    cached_content_id INTEGER REFERENCES cached_content(id),  -- set for AI-content flags
+    content_hash TEXT,           -- set for base-textbook (text) flags
+    category TEXT,               -- 'incorrect' | 'inappropriate' | 'text-error'
     comment TEXT,
+    created_by_code TEXT,
+    resolved INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP NOT NULL
 );
 CREATE TABLE IF NOT EXISTS usage_log (
@@ -515,6 +521,19 @@ def init_db() -> None:
     _db.row_factory = sqlite3.Row
     with _db_lock:
         _db.executescript(SCHEMA)
+        # Migrations for pre-existing DBs (CREATE TABLE IF NOT EXISTS won't add
+        # columns to a table that already exists).
+        for ddl in (
+            "ALTER TABLE content_flags ADD COLUMN content_hash TEXT",
+            "ALTER TABLE content_flags ADD COLUMN category TEXT",
+            "ALTER TABLE content_flags ADD COLUMN comment TEXT",
+            "ALTER TABLE content_flags ADD COLUMN created_by_code TEXT",
+            "ALTER TABLE content_flags ADD COLUMN resolved INTEGER NOT NULL DEFAULT 0",
+        ):
+            try:
+                _db.execute(ddl)
+            except sqlite3.OperationalError:
+                pass  # column already exists
         # Sync content_manifest from build/manifest.json.
         _db.execute("DELETE FROM content_manifest")
         _db.executemany(
@@ -537,10 +556,9 @@ def init_db() -> None:
         if n == 0:
             _db.execute(
                 "INSERT INTO invite_codes "
-                "(code, budget_microdollars, spent_microdollars, "
-                " daily_limit_microdollars, created_at, revoked) "
-                "VALUES (?, ?, 0, ?, ?, FALSE)",
-                (DEV_CODE, DEV_BUDGET_MICRODOLLARS, 1_000_000, now_iso()),
+                "(code, budget_microdollars, spent_microdollars, created_at, revoked) "
+                "VALUES (?, ?, 0, ?, FALSE)",
+                (DEV_CODE, DEV_BUDGET_MICRODOLLARS, now_iso()),
             )
         _db.commit()
 
@@ -868,6 +886,53 @@ def api_delete_content(content_id: int, request: Request):
         raise HTTPException(status_code=403, detail="You can only delete your own AI content")
     db_execute("DELETE FROM content_flags WHERE cached_content_id = ?", (content_id,))
     db_execute("DELETE FROM cached_content WHERE id = ?", (content_id,))
+    return {"ok": True}
+
+
+@app.post("/api/flag")
+async def api_flag(request: Request):
+    """A student flags something for the instructor (author feedback): either a
+    passage of the base textbook they suspect is wrong ("I'm worried this is
+    wrong and AI agrees with me"), or a piece of AI-generated content that's
+    inappropriate or incorrect/misleading. Every flag can carry an optional note.
+    Flags land in the instructor's /admin/flags queue; they are not moderated
+    content and never surface to other students."""
+    code = caller_code(request)
+    if not code:
+        raise HTTPException(status_code=401, detail="Not signed in")
+    # Same burst backstop as generation, so flagging can't be used to spam.
+    if rate_limited(code):
+        raise HTTPException(status_code=429, detail="Too many requests")
+    body = await request.json()
+
+    category = str(body.get("category") or "").strip()
+    if category not in FLAG_CATEGORIES:
+        raise HTTPException(status_code=400, detail="Unknown flag category")
+    comment = str(body.get("comment") or "").strip()[:MAX_FLAG_COMMENT_CHARS] or None
+
+    content_id = body.get("cached_content_id")
+    content_hash = body.get("content_hash")
+    if content_id is not None:
+        # Flagging a specific AI artifact.
+        try:
+            content_id = int(content_id)
+        except (TypeError, ValueError):
+            raise HTTPException(status_code=400, detail="Bad content id")
+        if not db_query("SELECT 1 FROM cached_content WHERE id = ?", (content_id,)):
+            raise HTTPException(status_code=404, detail="No such content")
+        content_hash = None
+    elif isinstance(content_hash, str) and content_hash.strip():
+        # Flagging a passage of the base textbook.
+        content_hash = content_hash.strip()
+    else:
+        raise HTTPException(status_code=400, detail="Nothing to flag")
+
+    db_execute(
+        "INSERT INTO content_flags "
+        "(cached_content_id, content_hash, category, comment, created_by_code, "
+        " resolved, created_at) VALUES (?, ?, ?, ?, ?, 0, ?)",
+        (content_id, content_hash, category, comment, code, now_iso()),
+    )
     return {"ok": True}
 
 

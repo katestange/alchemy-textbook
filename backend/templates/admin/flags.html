@@ -1,0 +1,71 @@
+{% extends "admin/base.html" %}
+{% block title %}Flags{% endblock %}
+{% block content %}
+<h1>Flags</h1>
+<p class="hint">
+  {{ items|length }} open flag{{ '' if items|length == 1 else 's' }} from students &mdash;
+  suspected textbook errors and reports on AI-generated content. Resolving a
+  flag just clears it from this list; it doesn't remove any content
+  (use the <a href="/admin/review">Review queue</a> for that).
+</p>
+
+{% if not items %}
+  <p class="empty">No open flags. Nothing to look at.</p>
+{% endif %}
+
+{% for item in items %}
+<article class="item" data-id="{{ item.id }}">
+  <div class="meta">
+    {% if item.category == 'text-error' %}
+      <span class="badge creature">{{ item.category_label }}</span>
+    {% else %}
+      <span class="badge status-flagged">{{ item.category_label }}</span>
+    {% endif %}
+    <span>by <code>{{ item.created_by_code or "?" }}</code></span>
+    <span>{{ item.created_at[:16].replace("T", " ") }}</span>
+    {% if item.is_ai %}
+      <span class="badge creature">{{ item.creature_type }}</span>
+      {% if item.cc_status %}<span class="badge status-{{ item.cc_status }}">{{ item.cc_status }}</span>{% endif %}
+    {% endif %}
+  </div>
+
+  <div class="anchor">
+    {% if item.preview %}
+      In <strong>&sect;{{ item.section_id }}</strong>: {{ item.preview }}
+    {% elif item.section_id %}
+      Section <strong>&sect;{{ item.section_id }}</strong>
+    {% else %}
+      <span class="badge status-flagged">no longer in build</span>
+      (content may have changed since it was flagged)
+    {% endif %}
+  </div>
+
+  {% if item.comment %}
+  <blockquote class="selection">{{ item.comment }}</blockquote>
+  {% else %}
+  <p class="hint" style="margin:0.3rem 0;">No note left.</p>
+  {% endif %}
+
+  {% if item.is_ai and item.response %}
+    {% if item.creature_type == 'applet' %}
+    <div class="response js-sage-applet" data-src="{{ item.response }}"><pre>{{ item.response }}</pre></div>
+    {% else %}
+    <div class="response js-latex" data-src="{{ item.response }}">{{ item.response }}</div>
+    {% endif %}
+  {% endif %}
+
+  <div class="actions">
+    <form method="post" action="/admin/flags/{{ item.id }}/resolve">
+      <button class="primary">Resolve</button>
+    </form>
+    {% if item.is_ai %}
+    <a href="/admin/review"><button type="button">Open in review queue</button></a>
+    {% endif %}
+  </div>
+</article>
+{% endfor %}
+{% endblock %}
+
+{% block script %}
+<script src="/admin-render.js"></script>
+{% endblock %}

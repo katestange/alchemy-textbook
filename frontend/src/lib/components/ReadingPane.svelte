@@ -23,6 +23,7 @@
   import SelectionToolbar from './SelectionToolbar.svelte';
   import PromptBox from './PromptBox.svelte';
   import ChatPanel from './ChatPanel.svelte';
+  import FlagDialog from './FlagDialog.svelte';
   import { chatStore } from '../stores/chatStore.js';
   import { builtinApplets } from '../builtinApplets.js';
   import { mountEditableCell } from '../sageCell.js';
@@ -44,6 +45,7 @@
 
   let toolbar = null; // { top, left, anchor, selectionText }
   let promptBox = null; // { top, left, creatureType }
+  let flagTarget = null; // { mode: 'text'|'ai', contentHash?|contentId? }
 
   const DEFAULT_PROMPTS = {
     example: 'Create a worked example for this.',
@@ -391,6 +393,21 @@
     toolbar = null;
   }
 
+  // Flag the selected passage of the base textbook for the instructor
+  // (author feedback: "I'm worried this is wrong and AI agrees with me").
+  function flagSelection() {
+    if (!toolbar || !toolbar.anchor || !toolbar.anchor.block) return;
+    flagTarget = { mode: 'text', contentHash: toolbar.anchor.block.content_hash };
+    toolbar = null;
+  }
+
+  // Flag a piece of AI-generated content, dispatched from its box header
+  // (inSituResult.js) with the stored content id.
+  function onFlagContent(e) {
+    const id = e.detail && e.detail.contentId;
+    if (id != null) flagTarget = { mode: 'ai', contentId: id };
+  }
+
   function cancelPrompt() {
     promptBox = null;
   }
@@ -530,12 +547,14 @@
     document.addEventListener('alchemy:hidden-changed', onHiddenChanged);
     document.addEventListener('alchemy:eureka', onEurekaCreated);
     document.addEventListener('alchemy:delete-content', onDeleteContent);
+    document.addEventListener('alchemy:flag', onFlagContent);
   });
   onDestroy(() => {
     document.removeEventListener('mousedown', handleDocumentMouseDown);
     document.removeEventListener('alchemy:hidden-changed', onHiddenChanged);
     document.removeEventListener('alchemy:eureka', onEurekaCreated);
     document.removeEventListener('alchemy:delete-content', onDeleteContent);
+    document.removeEventListener('alchemy:flag', onFlagContent);
   });
 </script>
 
@@ -567,6 +586,7 @@
         panelOpen={$chatStore.open}
         onSelect={openPrompt}
         onQuote={quoteSelection}
+        onFlag={flagSelection}
       />
     {/if}
     {#if promptBox}
@@ -585,6 +605,9 @@
     {/if}
   {/if}
  </div>
+ {#if flagTarget}
+   <FlagDialog target={flagTarget} onClose={() => (flagTarget = null)} />
+ {/if}
  {#if $chatStore.open}
    <aside class="panel-slot">
      <ChatPanel />

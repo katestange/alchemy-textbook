@@ -309,8 +309,6 @@ async def codes_generate(request: Request):
     try:
         n = max(1, min(500, int(form.get("count") or 1)))
         budget = int(round(float(form.get("budget_dollars") or 5) * 1_000_000))
-        daily_raw = str(form.get("daily_limit_dollars") or "").strip()
-        daily = int(round(float(daily_raw) * 1_000_000)) if daily_raw else None
     except ValueError:
         return RedirectResponse("/admin/codes", status_code=303)
     made = []
@@ -320,9 +318,9 @@ async def codes_generate(request: Request):
             code = _new_code()
         core.db_execute(
             "INSERT INTO invite_codes (code, budget_microdollars, "
-            " spent_microdollars, daily_limit_microdollars, created_at, revoked) "
-            "VALUES (?, ?, 0, ?, ?, FALSE)",
-            (code, budget, daily, core.now_iso()))
+            " spent_microdollars, created_at, revoked) "
+            "VALUES (?, ?, 0, ?, FALSE)",
+            (code, budget, core.now_iso()))
         made.append(code)
     return RedirectResponse(
         "/admin/codes?generated=" + ",".join(made), status_code=303)
@@ -502,3 +500,49 @@ async def settings_solutions(request: Request):
     form = await request.form()
     core.set_setting("solutions_enabled", "1" if form.get("enabled") == "on" else "0")
     return RedirectResponse("/admin/settings", status_code=303)
+
+
+# ---------------------------------------------------------------------------
+# Flags (student-reported problems: suspect passages + bad AI content)
+# ---------------------------------------------------------------------------
+
+CATEGORY_LABEL = {
+    "text-error": "Suspected textbook error",
+    "incorrect": "AI: incorrect / misleading",
+    "inappropriate": "AI: inappropriate",
+}
+
+
+@router.get("/flags", response_class=HTMLResponse)
+def flags_screen(request: Request):
+    if not is_admin(request):
+        return _login_redirect()
+    rows = core.db_query(
+        "SELECT f.id, f.cached_content_id, f.content_hash, f.category, "
+        "       f.comment, f.created_by_code, f.created_at, "
+        "       cc.creature_type, cc.response, cc.status AS cc_status, "
+        "       COALESCE(cm.text_preview, ccm.text_preview) AS preview, "
+        "       COALESCE(cm.section_id, ccm.section_id, cc.section_id) AS section_id "
+        "FROM content_flags f "
+        "LEFT JOIN cached_content cc ON cc.id = f.cached_content_id "
+        "LEFT JOIN content_manifest cm ON cm.content_hash = f.content_hash "
+        "LEFT JOIN content_manifest ccm ON ccm.content_hash = cc.content_hash "
+        "WHERE f.resolved = 0 "
+        "ORDER BY f.created_at DESC, f.id DESC")
+    items = []
+    for r in rows:
+        d = dict(r)
+        d["category_label"] = CATEGORY_LABEL.get(r["category"], r["category"])
+        d["is_ai"] = r["cached_content_id"] is not None
+        items.append(d)
+    return _render(request, "admin/flags.html",
+                   {"items": items, "active": "flags"})
+
+
+@router.post("/flags/{flag_id}/resolve")
+def flags_resolve(flag_id: int, request: Request):
+    if not is_admin(request):
+        return _login_redirect()
+    core.db_execute(
+        "UPDATE content_flags SET resolved = 1 WHERE id = ?", (flag_id,))
+    return RedirectResponse("/admin/flags", status_code=303)

@@ -14,6 +14,7 @@
   export let panelOpen = false;
   export let onSelect = (_creatureType) => {};
   export let onQuote = () => {};
+  export let onFlag = () => {};
 
   const IN_SITU = [
     { type: 'example', label: 'Ex.', title: 'Example' },
@@ -47,4 +48,23 @@
       Quote into conversation
     </button>
   {/if}
+  <button
+    class="creature-chip flag-chip"
+    type="button"
+    title="Flag this passage for your instructor"
+    on:click={onFlag}
+  >
+    ⚑ Flag
+  </button>
 </div>
+
+<style>
+  /* The flag action is not a creature — set it apart from the study-tool chips
+     with a quiet warning tint so it doesn't read as "generate something". */
+  .flag-chip {
+    color: var(--color-flag, #b42318);
+  }
+  .flag-chip:hover {
+    border-color: var(--color-flag, #b42318);
+  }
+</style>
