@@ -295,10 +295,6 @@ button {
   border-color: var(--accent-gold);
   color: var(--accent-gold);
 }
-.creature-chip[data-creature='detail'] {
-  border-color: var(--color-ink-soft);
-  color: var(--color-ink-soft);
-}
 .creature-chip[data-creature='justify'] {
   border-color: var(--accent-teal);
   color: var(--accent-teal);
@@ -433,11 +429,6 @@ button {
   background: var(--wash-gold);
   border-color: var(--accent-gold);
   color: var(--accent-gold);
-}
-.ai-chip[data-creature='detail'] {
-  background: var(--color-bg-raised);
-  border-color: var(--color-ink-soft);
-  color: var(--color-ink-soft);
 }
 .ai-chip[data-creature='justify'] {
   background: var(--wash-teal);

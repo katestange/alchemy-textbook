@@ -18,7 +18,6 @@
   const IN_SITU = [
     { type: 'example', label: 'Ex.', title: 'Example' },
     { type: 'intuition', label: 'Int.', title: 'Intuition' },
-    { type: 'detail', label: 'Det.', title: 'Detail — unpack the omitted steps' },
     { type: 'justify', label: 'Just.', title: 'Justify — why is this true?' },
     { type: 'counterexample', label: 'CtEx.', title: 'Counterexample — where does this fail?' },
     { type: 'fun', label: 'Fun', title: 'Fun — a playful, memorable take' },

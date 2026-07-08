@@ -69,7 +69,6 @@ export function unhideAll() {
 const CREATURE_LABEL = {
   example: 'Example',
   intuition: 'Intuition',
-  detail: 'Detail',
   justify: 'Justify',
   counterexample: 'Counterexample',
   fun: 'Fun',
@@ -80,7 +79,6 @@ const CREATURE_LABEL = {
 const CREATURE_CHIP_LABEL = {
   example: 'Ex.',
   intuition: 'Int.',
-  detail: 'Det.',
   justify: 'Just.',
   counterexample: 'CtEx.',
   fun: 'Fun',
