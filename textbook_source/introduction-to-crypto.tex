@@ -109,9 +109,9 @@ This is a work in progress (since 2022) that may become a cryptography textbook 
 
 This is very much a work in progress and frequently in flux.  Corrections are most welcome.  These notes are available for your use, but my preferred method of sharing them is to post a link to this repository:
 
-\begin{centering}
+\begin{center}
 \url{https://www.overleaf.com/project/6303c691a35f843709cd5abd}
-\end{centering}
+\end{center}
 \end{abstract}
 
 \tableofcontents
@@ -4306,7 +4306,7 @@ The rules for measurement are as follows:  given a state
 a | 0 \rangle + b | 1 \rangle,
 \]
 if we measure in the basis $|0 \rangle$, $|1 \rangle$, then we obtain one of two answers: $|0\rangle$ or $|1 \rangle$.  The probability of obtaining the first is $|a|^2$ and the probability of obtaining the second is $|b|^2$.  Let's display this in a table:
-\begin{centering}
+\begin{center}
 
 \begin{tabular}{cc}
 result & probability \\
@@ -4315,7 +4315,7 @@ $|0\rangle$ & $|a|^2$ \\
 $|1\rangle$ & $|b|^2$ \\
 \end{tabular}
 
-\end{centering}
+\end{center}
 
 These probabilities add to $1$, as they must (if they are to be probabilities), because of our convention that qubit states are written so that $|a|^2 + |b|^2 = 1$.
 
@@ -4329,7 +4329,7 @@ b\left(  \frac{1}{\sqrt{2} }|+\rangle - \frac{1}{\sqrt{2}} |-\rangle \right)
 \frac{a-b}{\sqrt{2}} |-\rangle.
 \]
 Now, the probabilities for a measurement in the $|+\rangle$, $|-\rangle$ basis are given by the following table:
-\begin{centering}
+\begin{center}
 
 \begin{tabular}{cc}
 result & probability \\
@@ -4338,7 +4338,7 @@ $|+\rangle$ & $|a+b|^2/2$ \\
 $|-\rangle$ & $|a-b|^2/2$ \\
 \end{tabular}
 
-\end{centering}
+\end{center}
 
 It is reassuring to compute that these probabilities add to $1$:
 \[
@@ -4676,7 +4676,7 @@ These bases have the following\footnote{I have ordered the bases so as to guaran
 The really important thing about this setup is that if we measure either of the $L$ basis elements in the $V$ basis, we have a $50-50$ chance of obtaining $|\nwarrow\rangle$ or $|\nearrow\rangle$; and similarly for measuring $V$ basis elements in the $L$ basis.  The table below lists the complete the behaviour we obtain from this:
 \vspace{1em}
 
-\begin{centering}
+\begin{center}
 
 \begin{tabular}{ccc}
 photon & basis & result \\
@@ -4691,7 +4691,7 @@ $|\nwarrow \rangle$ & V & $ |\nwarrow \rangle$ with probability $1$ \\
 $|\nearrow \rangle$ & V & $ |\nearrow \rangle$ with probability $1$ \\
 \end{tabular}
 
-\end{centering}
+\end{center}
 \vspace{1em}
 
 The key distribution exploits the properties described in the table above.  The process is as follows, occurring in three phases:\\
@@ -4705,7 +4705,7 @@ The key distribution exploits the properties described in the table above.  The 
 \item For each pair of bit with basis, Alice creates a photon according to the chart below, and sends it to Bob:
 %\vspace{1em}
 %
-%\begin{centering}
+%\begin{center}
 %\begin{tabular}{ccc}
 %bit & basis & photon \\
 %\hline
@@ -4714,14 +4714,14 @@ The key distribution exploits the properties described in the table above.  The 
 %0 & V & $|\nwarrow \rangle$ \\
 %1 & V & $|\nearrow \rangle$ 
 %\end{tabular}
-%\end{centering}
+%\end{center}
 %\vspace{1em}
 %
 %Here's a different way to display the same info:
 
 \vspace{1em}
 
-\begin{centering}
+\begin{center}
 
 \begin{tabular}{c|cc}
  & 0 & 1 \\
@@ -4730,7 +4730,7 @@ L & $|\uparrow \rangle$ & $|\rightarrow \rangle$ \\
 V & $|\nwarrow \rangle$ & $|\nearrow \rangle$ 
 \end{tabular}
 
-\end{centering}
+\end{center}
 \vspace{1em}
 
     \item Bob measures each incoming photon in order using the bases in his list.  The result is given according to the table further up this page.  The resulting photon is read as being a $0$ or $1$ according to the small table of the last step.  Bob records these bits.
@@ -4749,7 +4749,7 @@ V & $|\nwarrow \rangle$ & $|\nearrow \rangle$
 An example is shown in the following table.  
 \vspace{1em}
 
-\begin{centering}
+\begin{center}
 
 \begin{tabular}{ccccccc}
 Alice bit & Alice basis & photon sent & Bob basis & photon measured & bit derived & kept? \\
@@ -4763,7 +4763,7 @@ Alice bit & Alice basis & photon sent & Bob basis & photon measured & bit derive
 1 & L & $| \rightarrow \rangle$ & L & $| \rightarrow \rangle$ & 1 & keep\\
 \end{tabular}
 
-\end{centering}
+\end{center}
 \vspace{1em}
 
 For example, the first row results from the following interaction.  The first photon Alice generates is based on a bit of $0$ and a basis of $L$:  therefore it is $| \uparrow \rangle$.  Bob measures it in basis $L$, so he receives it correctly as $| \uparrow \rangle$ with probability $1$.  He decodes this as a bit of $0$.
@@ -4840,7 +4840,7 @@ where $\alpha_{ij} \in \CC$, and $|\alpha_{00}|^2+|\alpha_{01}|^2+|\alpha_{10}|^
 then we obtain one of these results.  The table below shows the probabilities:
 \vspace{1em}
 
-\begin{centering}
+\begin{center}
 
 \begin{tabular}{cccc}
 result & probability & state after measurement \\
@@ -4851,7 +4851,7 @@ $10$ & $|\alpha_{10}|^2$ & $|10 \rangle$ \\
 $11$ & $|\alpha_{11}|^2$ & $|11 \rangle$ \\
 \end{tabular}
 
-\end{centering}
+\end{center}
 \vspace{1em}
 
 So far the story is just like the story for a single qubit.
@@ -4859,7 +4859,7 @@ So far the story is just like the story for a single qubit.
 But now, suppose instead we measure only one of the two qubits, say the first one (left one).  Then, we have the following results:
 \vspace{1em}
 
-\begin{centering}
+\begin{center}
 
 \begin{tabular}{cccc}
 result & probability & state after measurement \\
@@ -4868,7 +4868,7 @@ $0$ & $|\alpha_{00}|^2+|\alpha_{01}|^2$ & $\frac{1}{\sqrt{|\alpha_{00}|^2+|\alph
 $1$ & $|\alpha_{10}|^2+|\alpha_{11}|^2$ & $\frac{1}{\sqrt{|\alpha_{10}|^2+|\alpha_{11}|^2}}\left(\alpha_{10}|10 \rangle+\alpha_{11}|11 \rangle\right)$ \\
 \end{tabular}
 
-\end{centering}
+\end{center}
 \vspace{1em}
 
 What we observe is that measuring the first qubit collapses the first qubit, so that if we measure a $0$, then the resulting state is a superposition of only $|00\rangle$ and $|01\rangle$.  In effect, we erase the other states $|10\rangle$ and $|11\rangle$ (which are now impossible) and renormalize the state to make it length $1$ (which results in the complicated factor out front).
@@ -4892,7 +4892,7 @@ To summarise this situation, we have the following table:
 
 \vspace{1em}
 
-\begin{centering}
+\begin{center}
 
 \begin{tabular}{cccccc}
 qubit 1 & qubit 2 & prob. of 2nd result conditional on 1st & probability & resulting state \\
@@ -4903,7 +4903,7 @@ $1$ & $0$ &  $|\alpha_{10}|^2\frac{1}{|\alpha_{10}|^2+|\alpha_{11}|^2}$ & $|\alp
 $1$ & $1$ &  $|\alpha_{11}|^2\frac{1}{|\alpha_{10}|^2+|\alpha_{11}|^2}$ & $|\alpha_{11}|^2$ & $|11\rangle$ \\
 \end{tabular}
 
-\end{centering}
+\end{center}
 \vspace{1em}
 
 To summarize, we observe that the order in which we measure the qubits doesn't matter, in terms of the final probabilities.
@@ -4931,7 +4931,7 @@ b_1b_2 |11\rangle.
 Then, if I measure the 1st qubit, I end up with the following:
 \vspace{1em}
 
-\begin{centering}
+\begin{center}
 
 \begin{tabular}{cccc}
 result & probability & state after measurement \\
@@ -4940,7 +4940,7 @@ $0$ & $|a_1|^2$ & $a_2|00 \rangle + b_2|01\rangle$ \\
 $1$ & $|b_1|^2$ & $a_2|10 \rangle + b_2|11\rangle$ \\
 \end{tabular}
 
-\end{centering}
+\end{center}
 \vspace{1em}
 
 So, effectively, measuring the first qubit didn't affect the resulting second qubit superposition.  In particular, if I now measure the 2nd qubit, I have the same relative probabilities of $0$ or $1$ in both cases (both lines of the table).
@@ -5669,7 +5669,7 @@ In order to discuss the fourier transform, we will consider a special vector spa
 Any such function can be thought of as a chart of values:
 \vspace{1em}
 
-\begin{centering}
+\begin{center}
 \begin{tabular}{c|c}
 $x$ & $f(x)$ \\
 \hline
@@ -5679,7 +5679,7 @@ $2$ & $f(2)$ \\
 $\vdots$ & $\vdots$ \\
 $m-1$ & $f(m-1)$
 \end{tabular}
-\end{centering}
+\end{center}
 
 Thought of this way, it is easy to think of such a function as the vector in $\CC^m$ given by
 \[
@@ -5721,7 +5721,7 @@ g_i(x) = \omega_m^{ix}.
 For example, when $m=3$, we have
 \vspace{1em}
 
-\begin{centering}
+\begin{center}
 \begin{tabular}{c|c}
 $x$ & $g_0(x)$ \\
 \hline
@@ -5744,7 +5744,7 @@ $0$ & $1$ \\
 $1$ & $\omega_3^2$ \\
 $2$ & $\omega_3$
 \end{tabular}
-\end{centering}
+\end{center}
 \vspace{1em}
 \KS{fix spacing}
 

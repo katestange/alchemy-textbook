@@ -1,5 +1,5 @@
 {
- "total_blocks": 921,
+ "total_blocks": 920,
  "total_sections": 154,
  "duplicate_hash_groups": 5,
  "chapters": {
@@ -48,7 +48,7 @@
    "aisolution": 5,
    "definition": 1,
    "example": 2,
-   "paragraph": 222,
+   "paragraph": 221,
    "question": 4,
    "quiz": 5,
    "remark": 1,
