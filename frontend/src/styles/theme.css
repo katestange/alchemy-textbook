@@ -308,12 +308,21 @@ button {
 
 /* Matrix delimiters weren't stretching: base math inherits EB Garamond, which
    has no MATH table, so the browser can't grow "(" to span a 2-row matrix
-   (author feedback: matrices look bad). Give ONLY the fence operators that
-   wrap an <mtable> the generic `math` font (which carries the stretchy-bracket
-   assembly); every other glyph stays Garamond so the math still matches the
-   prose. */
+   (author feedback: matrices look bad). The fix is to give ONLY the fence
+   operators that wrap an <mtable> a real math font (one with the OpenType MATH
+   table and its stretchy-bracket assembly); every other glyph stays Garamond so
+   the math still matches the prose.
+
+   The generic `math` keyword alone is unreliable -- Chrome on Linux doesn't map
+   it to an installed math font, so it silently fell back to a non-stretch font
+   and the parens stayed tiny. Name concrete math fonts first, then fall back to
+   the generic:
+     - Latin Modern Math / TeX Gyre * ship with any TeX install (this machine);
+     - Cambria Math is on Windows, STIX Two Math / STIXGeneral on macOS,
+       covering the great majority of students' browsers. */
 .reading-pane math mrow:has(> mtable) > mo {
-  font-family: math;
+  font-family: 'Latin Modern Math', 'STIX Two Math', 'Cambria Math',
+               'TeX Gyre Pagella Math', 'TeX Gyre Termes Math', math;
 }
 
 /* A footnote's own number is already implied by the marker you clicked/hovered;
