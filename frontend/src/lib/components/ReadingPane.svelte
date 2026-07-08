@@ -669,6 +669,7 @@
      AI items, but always give them a quiet way back). */
   .show-hidden {
     display: block;
+    clear: both; /* sit below the (now contained) footer, not beside its floats */
     margin: 1.5rem auto 0;
     background: none;
     border: 1px dashed var(--color-rule);
