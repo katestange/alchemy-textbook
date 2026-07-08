@@ -116,14 +116,96 @@ function setExpanded(item, expanded) {
   updateAnchorHighlight(item.closest('.ai-cluster'));
 }
 
-// While any note in a cluster is expanded, softly highlight the passage it's
-// anchored to (the element the cluster sits right after) -- a calming cue that
-// links the note to its text (author feedback).
+// While a note is expanded, softly highlight the passage it's anchored to -- a
+// calming cue that links the note to its text (author feedback). We paint the
+// EXACT selected sentence, not the whole enclosing paragraph, using the CSS
+// Custom Highlight API (::highlight(ai-anchor) in theme.css): it highlights a
+// Range without wrapping any DOM, so it never disturbs the LaTeXML structure or
+// inline MathML. When the browser lacks the API or the exact text can't be
+// found, we fall back to the old whole-block amber wash.
+const HL_NAME = 'ai-anchor';
+const anchorRanges = new Map(); // cluster.id -> Range[] of its expanded notes
+
+function highlightApiOk() {
+  return !!(window.CSS && CSS.highlights && typeof Highlight !== 'undefined');
+}
+
+// Locate `needleRaw` as a text Range inside `root`, matching on
+// whitespace-normalized text so newlines/indentation in the source HTML don't
+// defeat the match. Returns a Range or null.
+function findTextRange(root, needleRaw) {
+  const needle = (needleRaw || '').replace(/\s+/g, ' ').trim();
+  if (!needle) return null;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+  let hay = '';
+  const map = []; // map[i] -> { node, offset } for normalized-haystack char i
+  let prevSpace = false;
+  let node;
+  while ((node = walker.nextNode())) {
+    const t = node.nodeValue;
+    for (let i = 0; i < t.length; i++) {
+      if (/\s/.test(t[i])) {
+        if (prevSpace || hay.length === 0) continue; // collapse runs / leading ws
+        hay += ' ';
+        map.push({ node, offset: i });
+        prevSpace = true;
+      } else {
+        hay += t[i];
+        map.push({ node, offset: i });
+        prevSpace = false;
+      }
+    }
+  }
+  const idx = hay.indexOf(needle);
+  if (idx === -1) return null;
+  const start = map[idx];
+  const end = map[idx + needle.length - 1];
+  if (!start || !end) return null;
+  const range = document.createRange();
+  range.setStart(start.node, start.offset);
+  range.setEnd(end.node, end.offset + 1);
+  return range;
+}
+
+// Rebuild the single document-wide Highlight from every cluster's live ranges
+// (pruning any that were detached by a chapter reload or item removal).
+function rebuildHighlights() {
+  if (!highlightApiOk()) return;
+  const live = [];
+  for (const [id, ranges] of anchorRanges) {
+    const kept = ranges.filter((r) => r.startContainer && r.startContainer.isConnected);
+    if (kept.length) {
+      anchorRanges.set(id, kept);
+      live.push(...kept);
+    } else {
+      anchorRanges.delete(id);
+    }
+  }
+  if (live.length) CSS.highlights.set(HL_NAME, new Highlight(...live));
+  else CSS.highlights.delete(HL_NAME);
+}
+
 function updateAnchorHighlight(cluster) {
   if (!cluster) return;
   const anchor = cluster.previousElementSibling;
   if (!anchor || !anchor.classList) return;
-  anchor.classList.toggle('ai-anchor-highlight', !!cluster.querySelector('.ai-item.expanded'));
+  // Clear both mechanisms for this cluster before recomputing.
+  anchor.classList.remove('ai-anchor-highlight');
+  anchorRanges.delete(cluster.id);
+
+  const expanded = cluster.querySelectorAll('.ai-item.expanded');
+  if (expanded.length) {
+    const ranges = [];
+    if (highlightApiOk()) {
+      expanded.forEach((it) => {
+        const r = findTextRange(anchor, it.dataset.selectionText || '');
+        if (r) ranges.push(r);
+      });
+    }
+    if (ranges.length) anchorRanges.set(cluster.id, ranges);
+    else anchor.classList.add('ai-anchor-highlight'); // fallback: whole-block wash
+  }
+  rebuildHighlights();
 }
 
 // If this item is an applet whose code is stashed but not yet turned into a
@@ -336,6 +418,10 @@ export function ensureResultBox(anchorEl, creatureType, key, status = 'unreviewe
 // between the box head and body, and in the chip's hover tooltip.
 function setOnLine(box, item, selectionText) {
   const text = (selectionText || '').trim();
+  // Stash the full (untruncated) selection so the anchor highlight can locate
+  // and paint the exact sentence, not just the enclosing block.
+  if (text) item.dataset.selectionText = text;
+  else delete item.dataset.selectionText;
   let line = box.querySelector('.ai-result-on');
   if (!text) {
     if (line) line.remove();

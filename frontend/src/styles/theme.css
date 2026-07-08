@@ -262,7 +262,15 @@ button {
 }
 
 /* Calming highlight of the passage a note is anchored to, while it's expanded
-   (author feedback: nothing garish). A soft amber wash on parchment. */
+   (author feedback: nothing garish). A soft amber wash on parchment.
+   Preferred: the EXACT selected sentence via the CSS Custom Highlight API
+   (::highlight below), which paints just the chosen range without touching the
+   DOM. Fallback: the whole-block wash on .ai-anchor-highlight, used when the
+   browser lacks the API or the exact text can't be located. */
+::highlight(ai-anchor) {
+  background-color: color-mix(in srgb, var(--accent-gold) 22%, transparent);
+  border-radius: 4px;
+}
 .reading-pane .ai-anchor-highlight {
   background: color-mix(in srgb, var(--accent-gold) 15%, transparent);
   border-radius: 4px;
