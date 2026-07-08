@@ -391,7 +391,8 @@ export function ensureResultBox(anchorEl, creatureType, key, status = 'unreviewe
   const dismiss = document.createElement('button');
   dismiss.className = 'dismiss';
   dismiss.type = 'button';
-  dismiss.textContent = '✕';
+  dismiss.textContent = '×';  // U+00D7 multiplication sign; EB Garamond has it
+                              // (the heavier U+2715 close glyph tofu'd)
   dismiss.title = 'Collapse to chip';
   dismiss.setAttribute('aria-label', 'Collapse to chip');
   dismiss.addEventListener('click', () => setExpanded(item, false));
@@ -488,7 +489,7 @@ export function markEphemeral(box) {
     close.type = 'button';
     close.className = 'ephemeral-close';
     close.setAttribute('aria-label', 'Dismiss this note');
-    close.textContent = '✕';
+    close.textContent = '×';
     close.addEventListener('click', remove);
     head.appendChild(close);
   }

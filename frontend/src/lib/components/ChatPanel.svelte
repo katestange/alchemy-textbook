@@ -194,7 +194,7 @@
         on:click={() => chatStore.close()}
         aria-label="Close {title} panel"
       >
-        ✕
+        ×
       </button>
     </div>
   </div>
@@ -249,7 +249,7 @@
       <span class="draft-quote-label">Quoting:</span>
       <span class="draft-quote-text">{$chatStore.draftQuote}</span>
       <button type="button" class="draft-quote-cancel" on:click={cancelQuote} aria-label="Remove quote">
-        ✕
+        ×
       </button>
     </div>
   {/if}
