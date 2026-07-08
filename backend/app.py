@@ -34,6 +34,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 BUILD_DIR = REPO_ROOT / "build"
 MANIFEST_PATH = BUILD_DIR / "manifest.json"
 CHAPTERS_PATH = BUILD_DIR / "chapters.json"
+SOLUTIONS_PATH = BUILD_DIR / "solutions.json"
 BOOK_HTML_PATH = BUILD_DIR / "book.html"
 DB_PATH = Path(os.environ.get("TEXTBOOK_DB", REPO_ROOT / "backend" / "textbook.db"))
 
@@ -181,6 +182,19 @@ Pedagogy: prefer hints, reasoning, and Socratic questions over finished \
 answers; encourage the student to attempt the next step themselves. You are \
 a tutor teaching good habits and self-discipline for learning, not an \
 answer machine.
+
+Textbook questions and their solutions: the book contains its own questions, \
+Concept Checks, quizzes, exercises, and review problems, and the instructor \
+controls when their official solutions are visible. If a student asks you to \
+give the solution or final answer to a specific textbook question, exercise, \
+quiz, or review problem, do NOT simply hand it over. Instead offer to either \
+(a) work through a closely analogous problem in full, so they can carry the \
+method back to the original, or (b) guide them Socratically, one step at a \
+time, until they reach it themselves. You may confirm an answer they propose, \
+check their working, and give targeted hints -- but they should do the \
+reasoning, and the book's own (instructor-gated) solutions stay the canonical \
+answer key. This applies only to the book's set questions; freely give full \
+worked examples when a student is asking to understand the material itself.
 
 Unusable or non-study requests: two cases call for a throwaway redirect \
 instead of a real answer. (1) The selection is too short or nonsensical to \
@@ -368,16 +382,30 @@ BLOCKS_BY_HASH: dict = {}
 CHAPTER_PREFIX_TEXT: dict = {}  # top-level chapter number -> full chapter text
 BOOK_PREFIX_TEXT: str = ""      # all chapters in order (scope=book, Decision 51)
 TOC_TEXT: str = ""
+SOLUTIONS: list = []            # ordered [{sol_key, section_id, chapter, name, type}]
+SOLUTION_SECTIONS: list = []    # section hierarchy [{id, level, title}]
+SOLUTION_META: dict = {}        # sol_key -> its entry (for name/section lookups)
 
 
 def load_build_artifacts() -> None:
     global MANIFEST, BUILD_VERSION, CHAPTERS, BLOCKS_BY_HASH
     global CHAPTER_PREFIX_TEXT, BOOK_PREFIX_TEXT, TOC_TEXT
+    global SOLUTIONS, SOLUTION_SECTIONS, SOLUTION_META
 
     raw = MANIFEST_PATH.read_bytes()
     BUILD_VERSION = hashlib.sha256(raw).hexdigest()[:12]
     MANIFEST = json.loads(raw)
     CHAPTERS = json.loads(CHAPTERS_PATH.read_text(encoding="utf-8"))
+
+    # Solution-reveal map (pipeline/solutions.py). Best-effort: an older build
+    # without solutions.json just means no per-solution gating is available.
+    if SOLUTIONS_PATH.exists():
+        sol = json.loads(SOLUTIONS_PATH.read_text(encoding="utf-8"))
+        SOLUTIONS = sol.get("solutions", [])
+        SOLUTION_SECTIONS = sol.get("sections", [])
+    else:
+        SOLUTIONS, SOLUTION_SECTIONS = [], []
+    SOLUTION_META = {s["sol_key"]: s for s in SOLUTIONS}
 
     BLOCKS_BY_HASH = {}
     chapter_blocks: dict[str, list] = {}
@@ -505,6 +533,14 @@ CREATE TABLE IF NOT EXISTS settings (
     key TEXT PRIMARY KEY,
     value TEXT NOT NULL
 );
+-- Per-solution visibility overrides (multi-level solution reveals). A row
+-- exists only for solutions the instructor has explicitly set; anything else
+-- falls back to the `solutions_default` setting. `sol_key` is the solution
+-- block's content hash (see pipeline/solutions.py), stable across rebuilds.
+CREATE TABLE IF NOT EXISTS solution_overrides (
+    sol_key TEXT PRIMARY KEY,
+    visible INTEGER NOT NULL
+);
 """
 
 DEV_CODE = "DEV-TEST-1"
@@ -588,15 +624,58 @@ def set_setting(key: str, value: str) -> None:
     )
 
 
-# AI-written solutions (marked "needs review" in the LaTeX) render as
-# <div class="ltx_theorem ltx_theorem_aisolution">. When the instructor's
-# toggle is OFF they are stripped from the served chapter HTML entirely (not
-# merely hidden), so they're genuinely unavailable. Default: OFF.
-_AISOLUTION_CLASS = "ltx_theorem_aisolution"
+# --- solution visibility (multi-level reveals) ------------------------------
+# Every solution/aisolution <div> in the built HTML is stamped by
+# pipeline/solutions.py with data-sol-key="<hash>". The instructor controls
+# each one's visibility at the level of the whole book, a section, a
+# subsection, or the individual item (dashboard: /admin/solutions). A solution
+# with no explicit override falls back to the book-wide default. Hidden
+# solutions are stripped from the served HTML entirely (not merely collapsed),
+# so a student can't read them from the page source.
+_SOLUTION_CLASSES = ("ltx_theorem_solution", "ltx_theorem_aisolution")
+_SOL_KEY_RE = re.compile(r'data-sol-key="([0-9a-f]+)"')
 
 
-def solutions_enabled() -> bool:
-    return get_setting("solutions_enabled", "0") == "1"
+def solutions_default() -> bool:
+    """Book-wide default for solutions with no explicit override (Decision:
+    hidden by default -- the instructor opts specific items/sections in)."""
+    return get_setting("solutions_default", "0") == "1"
+
+
+def solution_overrides() -> dict:
+    """sol_key -> bool for every explicitly-set solution."""
+    return {r["sol_key"]: r["visible"] == 1
+            for r in db_query("SELECT sol_key, visible FROM solution_overrides")}
+
+
+def solution_visible(sol_key: str, overrides: dict | None = None,
+                     default: bool | None = None) -> bool:
+    if overrides is None:
+        overrides = solution_overrides()
+    if default is None:
+        default = solutions_default()
+    return overrides.get(sol_key, default)
+
+
+def set_solution_override(sol_key: str, visible: bool) -> None:
+    db_execute(
+        "INSERT INTO solution_overrides (sol_key, visible) VALUES (?, ?) "
+        "ON CONFLICT(sol_key) DO UPDATE SET visible = excluded.visible",
+        (sol_key, 1 if visible else 0))
+
+
+def bulk_set_solutions(prefix: str, visible: bool) -> int:
+    """Bulk master action: explicitly set every solution under a node on/off.
+    `prefix` is "" (whole book) or a dotted section id ("5", "5.4", "5.4.1");
+    a solution belongs to the node if its section_id equals the prefix or is a
+    dotted descendant of it. Returns the number of solutions affected."""
+    n = 0
+    for s in SOLUTIONS:
+        sec = s["section_id"]
+        if prefix == "" or sec == prefix or sec.startswith(prefix + "."):
+            set_solution_override(s["sol_key"], visible)
+            n += 1
+    return n
 
 
 def _next_div(html: str, start: int) -> int:
@@ -612,8 +691,12 @@ def _next_div(html: str, start: int) -> int:
         i += 4
 
 
-def strip_aisolutions(html: str) -> str:
-    """Remove every balanced <div ...ltx_theorem_aisolution...>...</div> block."""
+def strip_hidden_solutions(html: str) -> str:
+    """Remove every balanced solution/aisolution <div> whose data-sol-key is not
+    effectively visible. Visible solutions (and any solution div without a key,
+    as a fail-open safety) are kept for the reader to wrap in a reveal."""
+    overrides = solution_overrides()
+    default = solutions_default()
     out = []
     pos = 0
     while True:
@@ -625,7 +708,9 @@ def strip_aisolutions(html: str) -> str:
         if tag_end == -1:
             out.append(html[pos:])
             break
-        if _AISOLUTION_CLASS in html[start:tag_end + 1]:
+        tag = html[start:tag_end + 1]
+        if any(c in tag for c in _SOLUTION_CLASSES):
+            # Consume the whole balanced solution block regardless of keep/drop.
             depth, scan = 1, tag_end + 1
             while depth > 0:
                 nd = _next_div(html, scan)
@@ -638,7 +723,12 @@ def strip_aisolutions(html: str) -> str:
                 else:
                     depth -= 1
                     scan = cd + 6
-            out.append(html[pos:start])
+            m = _SOL_KEY_RE.search(tag)
+            key = m.group(1) if m else None
+            if key is not None and not solution_visible(key, overrides, default):
+                out.append(html[pos:start])   # hidden -> drop entirely
+            else:
+                out.append(html[pos:scan])    # visible (or unkeyed) -> keep
             pos = scan
         else:
             out.append(html[pos:tag_end + 1])
@@ -712,13 +802,12 @@ def chapter(n: str):
     path = BUILD_DIR / "html" / filename
     if not path.exists():
         raise HTTPException(status_code=404, detail="Chapter file missing")
-    # When the solutions toggle is OFF, strip AI-written solutions entirely so
-    # they're unavailable (not merely hidden). When ON, they're served and the
-    # reader hides each behind a "Show solution" click.
-    if not solutions_enabled():
-        html = path.read_text(encoding="utf-8")
-        return HTMLResponse(strip_aisolutions(html))
-    return FileResponse(path, media_type="text/html")
+    # Strip every solution the instructor has hidden (per-solution / section /
+    # book visibility) before the page is sent, so hidden ones aren't even in
+    # the page source. Visible ones stay and the reader wraps each in a "Show
+    # solution" click.
+    html = path.read_text(encoding="utf-8")
+    return HTMLResponse(strip_hidden_solutions(html))
 
 
 @app.get("/book")

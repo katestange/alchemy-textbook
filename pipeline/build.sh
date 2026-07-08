@@ -66,7 +66,7 @@ else
 fi
 
 echo
-echo "===== [5/5] latexmlpost --split -> chapter pages (spec Decision 50) ====="
+echo "===== [5/6] latexmlpost --split -> chapter pages (spec Decision 50) ====="
 # LaTeXML "section" level == our chapters (top-level \section in an article-
 # class book): produces build/html/S1.html..S9.html + book.html index + CSS
 # + images.  split_fixup.py then restores full xml:id anchors (LaTeXML
@@ -80,6 +80,13 @@ timeout 600 latexmlpost --dest=build/html/book.html --format=html5 --pmml \
     || { echo "FATAL: split latexmlpost failed — see build/latexmlpost-split.log"; exit 1; }
 echo "  split pass in $((SECONDS-start))s"
 python3 pipeline/split_fixup.py
+
+echo
+echo "===== [6/6] solutions -> reveal keys + solutions.json ====="
+# Stamp each solution <div> with its stable key + section and emit
+# build/solutions.json (drives the per-solution visibility toggles). Fresh
+# each build so new solutions are picked up automatically.
+python3 pipeline/solutions.py
 
 echo
 echo "===== build complete ====="

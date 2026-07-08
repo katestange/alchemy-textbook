@@ -1,0 +1,155 @@
+{% extends "admin/base.html" %}
+{% block title %}Solutions{% endblock %}
+
+{% macro node_count(vis, tot) %}
+<span class="sol-count {{ 'all' if tot and vis == tot else ('none' if vis == 0 else 'mixed') }}">
+  {{ vis }}/{{ tot }} shown
+</span>
+{% endmacro %}
+
+{% macro render_node(node) %}
+<li class="sol-node level-{{ node.level }}">
+  <div class="sol-node-head">
+    <span class="sol-sec">&sect;{{ node.id }}</span>
+    <span class="sol-title">{{ node.title }}</span>
+    {{ node_count(node.visible, node.total) }}
+    <span class="sol-master">
+      <button type="button" class="mini" data-bulk="{{ node.id }}" data-visible="1">Show all</button>
+      <button type="button" class="mini" data-bulk="{{ node.id }}" data-visible="0">Hide all</button>
+    </span>
+  </div>
+  {% if node.solutions %}
+  <ul class="sol-items">
+    {% for s in node.solutions %}
+    <li class="sol-item">
+      <label class="switch" title="{{ 'Shown' if s.visible else 'Hidden' }}">
+        <input type="checkbox" data-item="{{ s.sol_key }}" {% if s.visible %}checked{% endif %}>
+        <span class="slider"></span>
+      </label>
+      <span class="sol-name">{{ s.name }}</span>
+      {% if s.type == 'aisolution' %}<span class="badge ai-badge">AI</span>{% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% if node.children %}
+  <ul class="sol-children">
+    {% for c in node.children %}{{ render_node(c) }}{% endfor %}
+  </ul>
+  {% endif %}
+</li>
+{% endmacro %}
+
+{% block content %}
+<h1>Solutions</h1>
+<p class="hint">
+  Each of the {{ book_total }} solution reveals in the textbook can be shown or
+  hidden individually, or in bulk by section, subsection, or the whole book.
+  Hidden solutions are stripped from the page entirely &mdash; students can't
+  read them, even in the page source. This list rebuilds itself every time you
+  publish, so new solutions appear automatically.
+</p>
+
+<section class="card sol-book">
+  <div class="sol-book-row">
+    <strong>Whole textbook</strong>
+    {{ node_count(book_visible, book_total) }}
+    <span class="sol-master">
+      <button type="button" class="primary" data-bulk="" data-visible="1">Show all</button>
+      <button type="button" data-bulk="" data-visible="0">Hide all</button>
+    </span>
+  </div>
+  <div class="sol-default-row">
+    <span class="hint">Default for solutions you haven't set (and newly added ones):</span>
+    <button type="button" class="mini {{ 'sel' if default_visible }}" data-default="1">Shown</button>
+    <button type="button" class="mini {{ 'sel' if not default_visible }}" data-default="0">Hidden</button>
+  </div>
+</section>
+
+{% if not roots %}
+  <p class="empty">No solutions found in the current build.</p>
+{% else %}
+<ul class="sol-tree">
+  {% for r in roots %}{{ render_node(r) }}{% endfor %}
+</ul>
+{% endif %}
+{% endblock %}
+
+{% block script %}
+<style>
+  .sol-book { padding: 0.9rem 1.1rem; }
+  .sol-book-row { display: flex; align-items: center; gap: 0.9rem; }
+  .sol-default-row { display: flex; align-items: center; gap: 0.5rem;
+                     margin-top: 0.7rem; padding-top: 0.7rem;
+                     border-top: 1px solid var(--line); }
+  .sol-tree, .sol-children, .sol-items { list-style: none; margin: 0; padding: 0; }
+  .sol-children { margin-left: 1.1rem; padding-left: 0.9rem;
+                  border-left: 2px solid var(--line); }
+  .sol-node { margin: 0.5rem 0; }
+  .sol-node-head { display: flex; align-items: center; gap: 0.6rem;
+                   padding: 0.35rem 0.5rem; border-radius: 7px;
+                   background: var(--bg); }
+  .level-1 > .sol-node-head { background: #eef1fb; }
+  .sol-sec { font-variant-numeric: tabular-nums; color: var(--muted);
+             font-size: 0.85rem; min-width: 3.2rem; }
+  .sol-title { font-weight: 600; flex: 1; min-width: 0; }
+  .sol-master { display: flex; gap: 0.3rem; }
+  .sol-count { font-size: 0.78rem; font-weight: 600; border-radius: 999px;
+               padding: 0.05rem 0.55rem; white-space: nowrap; }
+  .sol-count.all  { background: #d3f3df; color: var(--ok); }
+  .sol-count.none { background: #fee4e2; color: var(--bad); }
+  .sol-count.mixed{ background: #fef0c7; color: var(--warn); }
+  button.mini { font-size: 0.78rem; padding: 0.15rem 0.55rem; }
+  button.mini.sel { background: var(--accent); border-color: var(--accent);
+                    color: #fff; }
+  .sol-items { margin: 0.25rem 0 0.4rem 3.8rem; }
+  .sol-item { display: flex; align-items: center; gap: 0.6rem;
+              padding: 0.2rem 0; font-size: 0.92rem; }
+  .sol-name { flex: 1; min-width: 0; }
+  .ai-badge { background: #eef1fb; color: var(--accent); }
+  /* toggle switch */
+  .switch { position: relative; display: inline-block; width: 34px; height: 20px; flex: none; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; inset: 0; cursor: pointer; background: #cfd4dc;
+            border-radius: 999px; transition: 0.15s; }
+  .slider::before { content: ""; position: absolute; height: 14px; width: 14px;
+                    left: 3px; top: 3px; background: #fff; border-radius: 50%;
+                    transition: 0.15s; }
+  .switch input:checked + .slider { background: var(--ok); }
+  .switch input:checked + .slider::before { transform: translateX(14px); }
+  .switch input:focus-visible + .slider { box-shadow: 0 0 0 2px var(--accent); }
+</style>
+<script>
+(function () {
+  "use strict";
+  function post(url, data) {
+    var body = new URLSearchParams(data);
+    return fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: body
+    }).then(function (r) {
+      if (r.ok) {
+        // Server re-renders counts/masters; keep the scroll position.
+        sessionStorage.setItem("solScroll", String(window.scrollY));
+        location.reload();
+      }
+    });
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-bulk]");
+    if (b) { post("/admin/solutions/bulk", { prefix: b.getAttribute("data-bulk"), visible: b.dataset.visible }); return; }
+    var d = e.target.closest("[data-default]");
+    if (d) { post("/admin/solutions/default", { visible: d.dataset.default }); return; }
+  });
+  document.addEventListener("change", function (e) {
+    var t = e.target.closest("[data-item]");
+    if (t) { post("/admin/solutions/item", { sol_key: t.dataset.item, visible: t.checked ? "1" : "0" }); }
+  });
+  window.addEventListener("load", function () {
+    var y = sessionStorage.getItem("solScroll");
+    if (y !== null) { window.scrollTo(0, parseInt(y, 10)); sessionStorage.removeItem("solScroll"); }
+  });
+})();
+</script>
+{% endblock %}

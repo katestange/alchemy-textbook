@@ -27,7 +27,7 @@ import secrets
 from pathlib import Path
 
 from fastapi import APIRouter, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 core = None  # the app module; set by init()
@@ -481,25 +481,15 @@ def orphan_delete(item_id: int, request: Request):
 
 
 # ---------------------------------------------------------------------------
-# Settings (Decision 75): the solutions availability toggle
+# Settings -> superseded by the per-solution Solutions page; keep a redirect so
+# an old bookmark still lands somewhere sensible.
 # ---------------------------------------------------------------------------
 
-@router.get("/settings", response_class=HTMLResponse)
+@router.get("/settings")
 def settings_page(request: Request):
     if not is_admin(request):
         return _login_redirect()
-    return _render(request, "admin/settings.html",
-                   {"solutions_enabled": core.solutions_enabled(),
-                    "active": "settings"})
-
-
-@router.post("/settings/solutions")
-async def settings_solutions(request: Request):
-    if not is_admin(request):
-        return _login_redirect()
-    form = await request.form()
-    core.set_setting("solutions_enabled", "1" if form.get("enabled") == "on" else "0")
-    return RedirectResponse("/admin/settings", status_code=303)
+    return RedirectResponse("/admin/solutions", status_code=303)
 
 
 # ---------------------------------------------------------------------------
@@ -546,3 +536,123 @@ def flags_resolve(flag_id: int, request: Request):
     core.db_execute(
         "UPDATE content_flags SET resolved = 1 WHERE id = ?", (flag_id,))
     return RedirectResponse("/admin/flags", status_code=303)
+
+
+# ---------------------------------------------------------------------------
+# Solutions: multi-level visibility (book / section / subsection / item)
+# ---------------------------------------------------------------------------
+
+def _natural_key(sid: str):
+    """Sort section ids numerically per component so 6.20 follows 6.9."""
+    try:
+        return tuple(int(p) for p in sid.split("."))
+    except ValueError:
+        return (10 ** 9,)
+
+
+def _build_solution_tree():
+    """Nested tree of sections that contain solutions, each node annotated with
+    a (visible, total) count over its subtree and each leaf solution with its
+    effective visibility. Returns (roots, book_visible, book_total)."""
+    overrides = core.solution_overrides()
+    default = core.solutions_default()
+
+    sols_by_sec: dict[str, list] = {}
+    for s in core.SOLUTIONS:
+        sols_by_sec.setdefault(s["section_id"], []).append(s)
+    titles = {s["id"]: s["title"] for s in core.SOLUTION_SECTIONS}
+
+    # Every section id with solutions, plus all its ancestors.
+    needed: set[str] = set()
+    for sec in sols_by_sec:
+        parts = sec.split(".")
+        for i in range(1, len(parts) + 1):
+            needed.add(".".join(parts[:i]))
+
+    nodes = {
+        sid: {
+            "id": sid,
+            "title": titles.get(sid, ""),
+            "level": sid.count(".") + 1,
+            "children": [],
+            "solutions": [
+                {**s, "visible": overrides.get(s["sol_key"], default)}
+                for s in sols_by_sec.get(sid, [])
+            ],
+        }
+        for sid in needed
+    }
+    roots = []
+    for sid in sorted(needed, key=_natural_key):
+        node = nodes[sid]
+        parent = nodes.get(sid.rsplit(".", 1)[0]) if "." in sid else None
+        (parent["children"] if parent else roots).append(node)
+
+    def count(node):
+        vis = sum(1 for s in node["solutions"] if s["visible"])
+        tot = len(node["solutions"])
+        for c in node["children"]:
+            cv, ct = count(c)
+            vis += cv
+            tot += ct
+        node["visible"] = vis
+        node["total"] = tot
+        return vis, tot
+
+    bvis = btot = 0
+    for r in roots:
+        v, t = count(r)
+        bvis += v
+        btot += t
+    return roots, bvis, btot
+
+
+@router.get("/solutions", response_class=HTMLResponse)
+def solutions_screen(request: Request):
+    if not is_admin(request):
+        return _login_redirect()
+    roots, bvis, btot = _build_solution_tree()
+    return _render(request, "admin/solutions.html", {
+        "roots": roots,
+        "book_visible": bvis,
+        "book_total": btot,
+        "default_visible": core.solutions_default(),
+        "active": "solutions",
+    })
+
+
+@router.post("/solutions/item")
+async def solutions_item(request: Request):
+    if not is_admin(request):
+        return JSONResponse({"ok": False}, status_code=403)
+    form = await request.form()
+    sol_key = str(form.get("sol_key") or "")
+    if not sol_key:
+        return JSONResponse({"ok": False}, status_code=400)
+    core.set_solution_override(sol_key, form.get("visible") == "1")
+    return JSONResponse({"ok": True})
+
+
+@router.post("/solutions/bulk")
+async def solutions_bulk(request: Request):
+    """Master action: set every solution under a node (prefix) on/off. An empty
+    prefix means the whole book, and also updates the book-wide default."""
+    if not is_admin(request):
+        return JSONResponse({"ok": False}, status_code=403)
+    form = await request.form()
+    prefix = str(form.get("prefix") or "")
+    visible = form.get("visible") == "1"
+    n = core.bulk_set_solutions(prefix, visible)
+    if prefix == "":
+        core.set_setting("solutions_default", "1" if visible else "0")
+    return JSONResponse({"ok": True, "affected": n})
+
+
+@router.post("/solutions/default")
+async def solutions_default_set(request: Request):
+    """Book-wide default for solutions with no explicit override (and new ones)."""
+    if not is_admin(request):
+        return JSONResponse({"ok": False}, status_code=403)
+    form = await request.form()
+    core.set_setting("solutions_default", "1" if form.get("visible") == "1" else "0")
+    return JSONResponse({"ok": True})
