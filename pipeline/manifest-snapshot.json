@@ -1,5 +1,5 @@
 {
- "total_blocks": 853,
+ "total_blocks": 854,
  "total_sections": 154,
  "duplicate_hash_groups": 2,
  "chapters": {
@@ -14,7 +14,7 @@
    "corollary": 1,
    "definition": 10,
    "example": 3,
-   "paragraph": 184,
+   "paragraph": 185,
    "philosophy": 1,
    "problem": 2,
    "proof": 7,

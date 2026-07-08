@@ -2365,10 +2365,17 @@ The Euclidean algorithm is merely a formalization of this very intuitive process
 	15 &= 3 \cdot 5 + 0
 \end{align*}
 Each row has the form:
-\[
-	(\text{larger pile}) = (\text{number of copies}) \cdot (\text{smaller pile (to become new bigger pile)}) + (\text{remainder (to become new smaller pile)})
-\]
-The number which appears as the last positive remainder is the greatest common divisor.
+% AI: reflowed onto two aligned lines and moved the "(to become ...)" role
+% notes into the following sentence -- as a single line this display was far
+% wider than the column and rendered munged in the web reader.  Original:
+% \[
+% 	(\text{larger pile}) = (\text{number of copies}) \cdot (\text{smaller pile (to become new bigger pile)}) + (\text{remainder (to become new smaller pile)})
+% \]
+\begin{align*}
+	(\text{larger pile}) = {}& (\text{number of copies}) \cdot (\text{smaller pile}) \\
+	&{} + (\text{remainder}).
+\end{align*}
+In the next row, the smaller pile becomes the new larger pile, and the remainder becomes the new smaller pile.  The number which appears as the last positive remainder is the greatest common divisor.
 
 \begin{example}
 Compute gcd(180,196).
