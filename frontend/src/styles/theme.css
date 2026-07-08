@@ -317,7 +317,10 @@ button {
    switches. System math fonts + the generic remain as fallbacks. */
 @font-face {
   font-family: 'AlchemyMath';
-  src: url('../fonts/lmmath.woff2') format('woff2');
+  /* Testing Garamond-Math (a MATH-table font designed to pair with EB Garamond)
+     so the math matches the prose. Swap back to lmmath.woff2 for the classic
+     Latin Modern look. */
+  src: url('../fonts/garamond-math.woff2') format('woff2');
   font-display: swap;
 }
 .reading-pane math,
