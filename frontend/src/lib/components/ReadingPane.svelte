@@ -188,13 +188,27 @@
   // ignores sub-pixel rounding.
   function wireWideMath() {
     if (!containerEl) return;
-    containerEl
-      .querySelectorAll('math[display="block"], .ltx_equation, .ltx_equationgroup')
-      .forEach((el) => {
-        // Generous buffer so ordinary equations never get a phantom scrollbar
-        // from Chrome's MathML metrics; only real overflow (wide matrices).
-        if (el.scrollWidth > el.clientWidth + 16) el.classList.add('math-scroll');
-      });
+    // Equation WRAPPERS (LaTeXML's ltx_equation tables / ltx_equationgroup
+    // divs) are safe to give a horizontal scrollbar. NEVER put overflow on a
+    // bare <math> element: Chromium recomputes the MathML layout against the
+    // clipped width and the glyphs pile up on top of each other (author
+    // feedback: the "(larger pile) = …" display rendered munged). The 16px
+    // buffer ignores sub-pixel rounding so ordinary equations don't get a
+    // phantom scrollbar.
+    containerEl.querySelectorAll('.ltx_equation, .ltx_equationgroup').forEach((el) => {
+      if (el.scrollWidth > el.clientWidth + 16) el.classList.add('math-scroll');
+    });
+    // Bare block math not already inside a scrollable wrapper: wrap it in a
+    // div and scroll THAT, so the <math> box itself keeps its clean layout.
+    containerEl.querySelectorAll('math[display="block"]').forEach((el) => {
+      if (el.closest('.ltx_equation, .ltx_equationgroup, .math-scroll')) return;
+      if (el.scrollWidth > el.clientWidth + 16) {
+        const wrap = document.createElement('div');
+        wrap.className = 'math-scroll';
+        el.parentNode.insertBefore(wrap, el);
+        wrap.appendChild(el);
+      }
+    });
   }
 
   // Inject the pre-authored SageMath demos (builtinApplets.js) for whichever
