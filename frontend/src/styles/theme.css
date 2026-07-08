@@ -313,16 +313,23 @@ button {
    table and its stretchy-bracket assembly); every other glyph stays Garamond so
    the math still matches the prose.
 
-   The generic `math` keyword alone is unreliable -- Chrome on Linux doesn't map
-   it to an installed math font, so it silently fell back to a non-stretch font
-   and the parens stayed tiny. Name concrete math fonts first, then fall back to
-   the generic:
-     - Latin Modern Math / TeX Gyre * ship with any TeX install (this machine);
-     - Cambria Math is on Windows, STIX Two Math / STIXGeneral on macOS,
-       covering the great majority of students' browsers. */
+   The generic `math` keyword alone is unreliable (Chrome on Linux doesn't map
+   it to a math font) and naming installed fonts only helps students who happen
+   to have them. So we BUNDLE the stretchy delimiters: a ~10 KB subset of Latin
+   Modern Math (just the fence glyphs + the MATH table's vertical assemblies),
+   guaranteed present regardless of the student's machine. System math fonts and
+   the generic remain as fallbacks. */
+@font-face {
+  font-family: 'AlchemyMathDelim';
+  src: url('../fonts/lmmath-delimiters.woff2') format('woff2');
+  font-display: swap;
+  unicode-range: U+0028-0029, U+005B, U+005D, U+007B, U+007D, U+007C, U+2016,
+                 U+2225, U+2308-2309, U+230A-230B, U+221A, U+002F, U+005C,
+                 U+27E6-27E9, U+3008-3009, U+2329-232A;
+}
 .reading-pane math mrow:has(> mtable) > mo {
-  font-family: 'Latin Modern Math', 'STIX Two Math', 'Cambria Math',
-               'TeX Gyre Pagella Math', 'TeX Gyre Termes Math', math;
+  font-family: 'AlchemyMathDelim', 'Latin Modern Math', 'STIX Two Math',
+               'Cambria Math', 'TeX Gyre Pagella Math', math;
 }
 
 /* A footnote's own number is already implied by the marker you clicked/hovered;
