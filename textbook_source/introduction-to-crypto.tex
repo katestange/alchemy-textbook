@@ -2106,9 +2106,18 @@ the probability is around $u^{-u}$. \KS{give proper citation}.  Thus, we expect 
 
 We will assume that the factoring is done by trial division in terms of the factor base (in fact, there are various improvements that can be made).
 The runtime for finding relations can then be expressed as a product:
-\[
-	(\text{\# of relations needed})(\text{average tries per success})(\text{\# of trial divisions to factor})(\text{cost of a trial division}).
-\]
+% AI: reflowed onto one factor per line -- as a single line this product of
+% four text-labelled factors was far wider than the column and got a horizontal
+% scrollbar in the web reader. Original:
+% \[
+% 	(\text{\# of relations needed})(\text{average tries per success})(\text{\# of trial divisions to factor})(\text{cost of a trial division}).
+% \]
+\begin{align*}
+	 & (\text{\# of relations needed}) \\
+	 {}\cdot{} & (\text{average tries per success}) \\
+	 {}\cdot{} & (\text{\# of trial divisions to factor}) \\
+	 {}\cdot{} & (\text{cost of a trial division}).
+\end{align*}
 Write $\pi(B)$ for the number of primes in the factor base (i.e., the number of primes less than $B$).  Since there are $\pi(B)$ variables $L_g(p_1), \ldots, L_g(p_m)$ in the linear system, we need at least $\pi(B)$ equations to narrow the solution down exactly.  Then the expression above becomes
 \[
 	\pi(B) u^u \pi(B) \operatorname{poly}(\log p).
