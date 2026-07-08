@@ -110,13 +110,18 @@ button {
   padding: 2rem 1.25rem 6rem;
 }
 
+/* Page chrome spans the full width with fixed side padding, so it reads the
+   same on the (centered) table of contents and on a chapter page (whose
+   reading column is biased left of centre to leave room for the chat panel).
+   A centred max-width bar looked aligned on the ToC but off-centre in a
+   chapter (author feedback). */
 .top-bar {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  max-width: var(--content-max-width);
-  margin: 0 auto;
-  padding: 1rem 1.25rem 0;
+  max-width: none;
+  margin: 0;
+  padding: 1rem 2rem 0;
   font-size: 0.85rem;
   color: var(--color-ink-soft);
 }
@@ -243,6 +248,53 @@ button {
   hyphens: auto;
 }
 
+/* Over/under labels on a stretchy annotated arrow (\xrightarrow[under]{over}):
+   LaTeXML stamps the labels with mathsize:140-142% instead of shrinking them to
+   script size, so they render bizarrely large above/below the arrow (author
+   feedback). Restore a proper small size. Scoped to munderover with
+   accentunder="true" -- that is exactly the labelled-arrow case, and does NOT
+   match sums (movablelimits, no accent) or \vec (mover accent, single label). */
+.reading-pane math munderover[accentunder="true"] > *:not(:first-child) {
+  font-size: 0.62em;
+}
+/* Neutralise LaTeXML's inline mathsize blow-up inside those labels so the
+   0.62em above is what actually takes effect. */
+.reading-pane math munderover[accentunder="true"] > *:not(:first-child) [mathsize] {
+  font-size: 1em;
+}
+
+/* "Recipe cards" (\card = \tcbhighmath{\parbox{...}}): MathML Core dropped
+   <menclose>, so these lost their box entirely and rendered as bare stacked
+   text (author feedback). Restyle the parbox itself as a soft parchment card --
+   a warm fill, gold-tinted hairline border, rounded corners, gentle shadow --
+   which fits the book's palette while still reading as a "card". ltx_parbox is
+   used only by \card in this book. */
+.reading-pane mtext.ltx_parbox {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.05em;
+  vertical-align: middle;
+  padding: 0.45em 0.7em;
+  background: color-mix(in srgb, var(--accent-gold) 9%, var(--color-bg-raised));
+  border: 1px solid color-mix(in srgb, var(--accent-gold) 40%, var(--color-rule));
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(60, 45, 20, 0.14);
+}
+.reading-pane mtext.ltx_parbox .ltx_p {
+  display: block;
+  margin: 0;
+  text-align: center;
+}
+/* Plain \boxed{...} (also a now-unsupported <menclose notation="box">) at least
+   gets a simple frame back, so it isn't invisible. */
+.reading-pane menclose[notation="box"]:not(:has(mtext.ltx_parbox)) {
+  display: inline-block;
+  border: 1px solid var(--color-ink-soft);
+  border-radius: 3px;
+  padding: 0.05em 0.3em;
+}
+
 /* Display tables (e.g. the Vigenere square) get a solid white base so the
    parchment doesn't show through the grid gaps -- the row shading (white/gray)
    was designed for a white page, and on parchment it read as washed-out
@@ -259,6 +311,33 @@ button {
   padding: 0.6rem 0.9rem;
   margin: 1rem 0;
   border-radius: 0 6px 6px 0;
+}
+
+/* Collapsible proofs (reader-side only; default open). The "Proof." run-in
+   heading is the toggle, prefixed with a caret that rotates when closed. */
+.reading-pane .ltx_proof.proof-collapsible .proof-toggle {
+  cursor: pointer;
+  user-select: none;
+}
+.reading-pane .ltx_proof .proof-toggle::before {
+  content: '▾';
+  display: inline-block;
+  margin-right: 0.35em;
+  font-size: 0.8em;
+  color: var(--color-ink-soft);
+  transition: transform 0.15s ease;
+}
+.reading-pane .ltx_proof:not(.proof-open) .proof-toggle::before {
+  transform: rotate(-90deg);
+}
+.reading-pane .ltx_proof.proof-collapsible:not(.proof-open) > *:not(.proof-toggle) {
+  display: none;
+}
+/* A closed proof collapses to just its heading -- tighten the box so it doesn't
+   leave a tall empty panel. */
+.reading-pane .ltx_proof.proof-collapsible:not(.proof-open) {
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
 }
 
 /* Calming highlight of the passage a note is anchored to, while it's expanded

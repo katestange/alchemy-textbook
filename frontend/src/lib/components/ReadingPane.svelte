@@ -83,6 +83,7 @@
     // for this chapter (one request, not one per block).
     await tick();
     wireAiSolutions();
+    wireProofs();
     wireWideMath();
     hydrateChapterContent(n);
     injectBuiltinApplets();
@@ -179,6 +180,37 @@
         btn.setAttribute('aria-expanded', String(open));
       });
       sol.parentNode.insertBefore(btn, sol);
+    });
+  }
+
+  // Proofs are always shown, but a reader can optionally collapse one to skim
+  // past it (author feedback: make proofs closeable, default open). The "Proof."
+  // run-in heading becomes the toggle; a caret shows the state. Unlike
+  // solutions this is purely reader-side -- nothing is ever hidden by default
+  // or stripped server-side.
+  function wireProofs() {
+    if (!containerEl) return;
+    containerEl.querySelectorAll('.ltx_proof').forEach((proof) => {
+      if (proof.dataset.proofWired) return;
+      proof.dataset.proofWired = '1';
+      proof.classList.add('proof-collapsible', 'proof-open');
+      const title = proof.querySelector('.ltx_title_proof');
+      if (!title) return;
+      title.classList.add('proof-toggle');
+      title.setAttribute('role', 'button');
+      title.setAttribute('tabindex', '0');
+      title.setAttribute('aria-expanded', 'true');
+      const toggle = () => {
+        const open = proof.classList.toggle('proof-open');
+        title.setAttribute('aria-expanded', String(open));
+      };
+      title.addEventListener('click', toggle);
+      title.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggle();
+        }
+      });
     });
   }
 
