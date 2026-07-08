@@ -306,30 +306,24 @@ button {
   padding: 0.05em 0.3em;
 }
 
-/* Matrix delimiters weren't stretching: base math inherits EB Garamond, which
-   has no MATH table, so the browser can't grow "(" to span a 2-row matrix
-   (author feedback: matrices look bad). The fix is to give ONLY the fence
-   operators that wrap an <mtable> a real math font (one with the OpenType MATH
-   table and its stretchy-bracket assembly); every other glyph stays Garamond so
-   the math still matches the prose.
-
-   The generic `math` keyword alone is unreliable (Chrome on Linux doesn't map
-   it to a math font) and naming installed fonts only helps students who happen
-   to have them. So we BUNDLE the stretchy delimiters: a ~10 KB subset of Latin
-   Modern Math (just the fence glyphs + the MATH table's vertical assemblies),
-   guaranteed present regardless of the student's machine. System math fonts and
-   the generic remain as fallbacks. */
+/* ALL math renders in a real math font, not the EB Garamond text face.
+   Forcing Garamond (a text font with no OpenType MATH table) onto MathML made
+   everything subtly wrong: stretchy delimiters ( [ | { couldn't grow to their
+   content, blackboard-bold (ℝ ℤ 𝔽) and \mathcal / \mathfrak fell back to tofu,
+   and the spacing/italic shapes were off (author feedback: "all the math looks
+   funky"). We bundle a ~350 KB subset of Latin Modern Math -- the family arXiv
+   and LaTeX use -- so it works on any device with NO dependence on the reader
+   having a math font installed. The prose stays EB Garamond; only the math
+   switches. System math fonts + the generic remain as fallbacks. */
 @font-face {
-  font-family: 'AlchemyMathDelim';
-  src: url('../fonts/lmmath-delimiters.woff2') format('woff2');
+  font-family: 'AlchemyMath';
+  src: url('../fonts/lmmath.woff2') format('woff2');
   font-display: swap;
-  unicode-range: U+0028-0029, U+005B, U+005D, U+007B, U+007D, U+007C, U+2016,
-                 U+2225, U+2308-2309, U+230A-230B, U+221A, U+002F, U+005C,
-                 U+27E6-27E9, U+3008-3009, U+2329-232A;
 }
-.reading-pane math mrow:has(> mtable) > mo {
-  font-family: 'AlchemyMathDelim', 'Latin Modern Math', 'STIX Two Math',
-               'Cambria Math', 'TeX Gyre Pagella Math', math;
+.reading-pane math,
+.ai-result .body math {
+  font-family: 'AlchemyMath', 'Latin Modern Math', 'STIX Two Math',
+               'Cambria Math', math, serif;
 }
 
 /* A footnote's own number is already implied by the marker you clicked/hovered;
