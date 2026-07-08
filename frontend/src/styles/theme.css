@@ -243,6 +243,14 @@ button {
   hyphens: auto;
 }
 
+/* Display tables (e.g. the Vigenere square) get a solid white base so the
+   parchment doesn't show through the grid gaps -- the row shading (white/gray)
+   was designed for a white page, and on parchment it read as washed-out
+   "partial transparency" (author feedback, Figure 13). */
+.reading-pane .ltx_tabular {
+  background: #ffffff;
+}
+
 .reading-pane .ltx_theorem,
 .reading-pane .ltx_proof,
 .reading-pane .ltx_example {
