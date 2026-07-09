@@ -90,6 +90,12 @@ restarts).
 - `/admin/codes` — generate batches (`CRYPTO-XXXX-XX`, crypto-random from an
   unambiguous alphabet), top up, revoke (revoking also deletes the code's
   sessions). Budgets shown in dollars, stored in microdollars.
+- `/admin/stats` — the two-audience dashboard (Decision 84): headline "pitch"
+  tiles (spend, per-active-student cost, cache leverage — surfacings per paid
+  generation, library size, chapter views) plus teaching signals (ToC usage
+  tree to subsection depth, top help-request sections with creature mix,
+  per-creature table, 14-day activity, most-surfaced artifacts). All
+  pseudonymous — no per-student drill-down.
 - `/admin/usage` — totals per ledger (student vs instructor), per creature
   type, per top-level chapter, plus the 50 most recent `usage_log` rows.
 - `/admin/flags` — student-reported problems (suspect base-textbook passages
@@ -102,11 +108,15 @@ restarts).
 ## Data
 
 SQLite at `backend/textbook.db` (git-ignored; override with `TEXTBOOK_DB`).
-Schema: invite_codes / sessions / cached_content / content_flags (categorized,
-Decision 79) / usage_log (student+instructor ledgers, microdollars) /
-content_manifest / admin / **settings** (key–value, e.g. `solutions_default`) /
-**solution_overrides** (per-solution visibility, Decision 77). The manifest
-table resyncs from `build/manifest.json` at startup.
+Schema: invite_codes / sessions / cached_content (incl. `served_count` — times
+an artifact was surfaced at selection, Decision 84) / content_flags
+(categorized, Decision 79) / usage_log (student+instructor ledgers,
+microdollars; plus per-request `model`, token breakdown, and `ephemeral` flag,
+Decision 84) / **chapter_views** (day × chapter × signed-in/anon view tallies,
+no identity, Decision 84) / content_manifest / admin / **settings** (key–value,
+e.g. `solutions_default`) / **solution_overrides** (per-solution visibility,
+Decision 77). The manifest table resyncs from `build/manifest.json` at
+startup.
 
 ## Notes
 

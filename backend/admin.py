@@ -388,6 +388,179 @@ def usage_screen(request: Request):
 
 
 # ---------------------------------------------------------------------------
+# Stats panel (Decision 84): the two-audience dashboard. "Pitch" numbers for
+# convincing colleagues (spend, cache leverage, engagement) and "teaching"
+# signals for the professor (where in the book students ask for help, what
+# kind of help, which artifacts earn their keep). Everything pseudonymous.
+# ---------------------------------------------------------------------------
+
+@router.get("/stats", response_class=HTMLResponse)
+def stats_screen(request: Request):
+    if not is_admin(request):
+        return _login_redirect()
+
+    # --- headline numbers ---------------------------------------------------
+    ledgers = {r["ledger"]: r for r in core.db_query(
+        "SELECT ledger, COUNT(*) AS n, SUM(cost_microdollars) AS total "
+        "FROM usage_log GROUP BY ledger")}
+    student = ledgers.get("student")
+    generations = student["n"] if student else 0
+    student_spend = (student["total"] or 0) if student else 0
+    instructor_spend = (ledgers["instructor"]["total"] or 0) \
+        if "instructor" in ledgers else 0
+    (ephemeral_n,) = core.db_query(
+        "SELECT COUNT(*) FROM usage_log WHERE ledger='student' AND ephemeral=1")[0]
+    (active_codes,) = core.db_query(
+        "SELECT COUNT(DISTINCT code) FROM usage_log WHERE code IS NOT NULL")[0]
+    artifacts_by_status = {r["status"]: r["n"] for r in core.db_query(
+        "SELECT status, COUNT(*) AS n FROM cached_content GROUP BY status")}
+    (served_total,) = core.db_query(
+        "SELECT COALESCE(SUM(served_count), 0) FROM cached_content")[0]
+    views_by = {r["signed_in"]: r["v"] for r in core.db_query(
+        "SELECT signed_in, SUM(views) AS v FROM chapter_views GROUP BY signed_in")}
+    views_signed = views_by.get(1, 0) or 0
+    views_anon = views_by.get(0, 0) or 0
+    (flags_open,) = core.db_query(
+        "SELECT COUNT(*) FROM content_flags WHERE resolved = 0")[0]
+    captures = {r["creature_type"]: r["n"] for r in core.db_query(
+        "SELECT creature_type, COUNT(*) AS n FROM cached_content "
+        "WHERE creature_type IN ('eureka','suggested_question') "
+        "GROUP BY creature_type")}
+
+    headline = {
+        "generations": generations,
+        "student_spend": student_spend,
+        "instructor_spend": instructor_spend,
+        "spend_per_active": (student_spend // active_codes) if active_codes else 0,
+        "active_codes": active_codes,
+        "ephemeral_n": ephemeral_n,
+        "served_total": served_total,
+        # cache leverage: how many times cached artifacts were surfaced per
+        # paid generation — the "generated once, served many times" number.
+        "leverage": (served_total / generations) if generations else 0,
+        "artifacts_total": sum(artifacts_by_status.values()),
+        "artifacts_approved": artifacts_by_status.get("approved", 0),
+        "views_signed": views_signed,
+        "views_anon": views_anon,
+        "flags_open": flags_open,
+        "eurekas": captures.get("eureka", 0),
+        "suggested_questions": captures.get("suggested_question", 0),
+    }
+
+    # --- per-creature -------------------------------------------------------
+    creature_usage = {r["creature_type"]: r for r in core.db_query(
+        "SELECT COALESCE(creature_type,'(none)') AS creature_type, COUNT(*) AS n, "
+        "       SUM(cost_microdollars) AS total, SUM(ephemeral) AS eph "
+        "FROM usage_log WHERE ledger='student' GROUP BY creature_type")}
+    creature_kept = {r["creature_type"]: r for r in core.db_query(
+        "SELECT creature_type, COUNT(*) AS artifacts, SUM(served_count) AS served "
+        "FROM cached_content GROUP BY creature_type")}
+    by_creature = []
+    for ct in sorted(set(creature_usage) | set(creature_kept),
+                     key=lambda c: -(creature_usage.get(c, {"n": 0})["n"])):
+        u, k = creature_usage.get(ct), creature_kept.get(ct)
+        by_creature.append({
+            "creature": ct,
+            "n": u["n"] if u else 0,
+            "total": (u["total"] or 0) if u else 0,
+            "eph": (u["eph"] or 0) if u else 0,
+            "artifacts": k["artifacts"] if k else 0,
+            "served": (k["served"] or 0) if k else 0,
+        })
+
+    # --- last 14 days of activity --------------------------------------------
+    gens_by_day = {r["d"]: r for r in core.db_query(
+        "SELECT substr(created_at,1,10) AS d, COUNT(*) AS n, "
+        "       SUM(cost_microdollars) AS total "
+        "FROM usage_log WHERE ledger='student' GROUP BY d")}
+    views_by_day = {r["day"]: r["v"] for r in core.db_query(
+        "SELECT day, SUM(views) AS v FROM chapter_views GROUP BY day")}
+    days = sorted(set(gens_by_day) | set(views_by_day))[-14:]
+    daily = [{
+        "day": d,
+        "n": gens_by_day[d]["n"] if d in gens_by_day else 0,
+        "total": (gens_by_day[d]["total"] or 0) if d in gens_by_day else 0,
+        "views": views_by_day.get(d, 0),
+    } for d in days]
+    daily_max_n = max((r["n"] for r in daily), default=0)
+    daily_max_views = max((r["views"] for r in daily), default=0)
+
+    # --- ToC usage tree (to subsection detail) --------------------------------
+    # Direct per-section aggregates, then rolled up so a chapter/section line
+    # includes everything beneath it.
+    sec_gens = {r["s"]: r for r in core.db_query(
+        "SELECT COALESCE(section_id,'?') AS s, COUNT(*) AS n, "
+        "       SUM(cost_microdollars) AS total "
+        "FROM usage_log WHERE ledger='student' GROUP BY section_id")}
+    sec_kept = {r["s"]: r for r in core.db_query(
+        "SELECT COALESCE(section_id,'?') AS s, COUNT(*) AS artifacts, "
+        "       SUM(served_count) AS served "
+        "FROM cached_content GROUP BY section_id")}
+    chapter_views_by = {r["chapter"]: r["v"] for r in core.db_query(
+        "SELECT chapter, SUM(views) AS v FROM chapter_views GROUP BY chapter")}
+
+    def _rollup(prefix: str) -> dict:
+        n = total = artifacts = served = 0
+        for s, r in sec_gens.items():
+            if s == prefix or s.startswith(prefix + "."):
+                n += r["n"]
+                total += r["total"] or 0
+        for s, r in sec_kept.items():
+            if s == prefix or s.startswith(prefix + "."):
+                artifacts += r["artifacts"]
+                served += r["served"] or 0
+        return {"n": n, "total": total, "artifacts": artifacts, "served": served}
+
+    toc = []
+    for s in core.MANIFEST.get("sections", []):
+        agg = _rollup(s["id"])
+        toc.append({
+            "id": s["id"], "level": s["level"], "title": s["title"],
+            **agg,
+            "views": chapter_views_by.get(s["id"]) if s["level"] == 1 else None,
+        })
+    toc_max = max((r["n"] for r in toc), default=0)
+    for r in toc:
+        r["pct"] = round(100 * r["n"] / toc_max) if toc_max else 0
+
+    # --- teaching signals ------------------------------------------------------
+    # Where students ask for help most, and what kind — the creature mix is
+    # the diagnostic (lots of justify/counterexample = confusion; lots of
+    # example = practice appetite).
+    sec_title = {s["id"]: s["title"] for s in core.MANIFEST.get("sections", [])}
+    mix_rows = core.db_query(
+        "SELECT section_id AS s, creature_type AS ct, COUNT(*) AS n "
+        "FROM usage_log WHERE ledger='student' AND section_id IS NOT NULL "
+        "GROUP BY section_id, creature_type")
+    mixes: dict[str, list] = {}
+    for r in mix_rows:
+        mixes.setdefault(r["s"], []).append((r["ct"] or "?", r["n"]))
+    top_sections = []
+    for s, r in sorted(sec_gens.items(), key=lambda kv: -kv[1]["n"])[:8]:
+        if s == "?":
+            continue
+        mix = sorted(mixes.get(s, []), key=lambda p: -p[1])
+        top_sections.append({
+            "id": s, "title": sec_title.get(s, ""), "n": r["n"],
+            "mix": ", ".join(f"{ct} ×{n}" for ct, n in mix),
+        })
+
+    top_artifacts = core.db_query(
+        "SELECT id, creature_type, section_id, status, served_count, "
+        "       selection_text "
+        "FROM cached_content WHERE served_count > 0 "
+        "ORDER BY served_count DESC, id LIMIT 10")
+
+    return _render(request, "admin/stats.html", {
+        "h": headline, "by_creature": by_creature,
+        "daily": daily, "daily_max_n": daily_max_n,
+        "daily_max_views": daily_max_views,
+        "toc": toc, "top_sections": top_sections,
+        "top_artifacts": top_artifacts, "active": "stats",
+    })
+
+
+# ---------------------------------------------------------------------------
 # Orphan re-anchor queue (Q8 / Decision 60)
 # ---------------------------------------------------------------------------
 

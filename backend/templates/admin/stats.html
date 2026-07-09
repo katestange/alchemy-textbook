@@ -1,0 +1,145 @@
+{% extends "admin/base.html" %}
+{% block title %}Stats{% endblock %}
+{% block content %}
+<style>
+  .tiles { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0.8rem 0; }
+  .tile { background: var(--panel, #fff); border: 1px solid var(--line, #ddd);
+          border-radius: 6px; padding: 0.55rem 0.9rem; min-width: 8.5rem; }
+  .tile .v { font-size: 1.35rem; font-weight: 700; }
+  .tile .k { color: var(--muted); font-size: 0.8rem; }
+  .bar { background: var(--bg, #f2f2f2); border-radius: 3px; height: 0.7rem;
+         min-width: 8rem; }
+  .bar > div { background: #7a8fd4; border-radius: 3px; height: 100%; }
+  td.toc-l2 { padding-left: 1.4rem; }
+  td.toc-l3 { padding-left: 2.8rem; color: var(--muted); }
+  .mix { color: var(--muted); font-size: 0.85rem; }
+</style>
+
+<h1>Stats</h1>
+<p class="hint">All numbers are pseudonymous (invite codes only — no names).
+"Surfaced" counts each time an existing artifact was shown to a reader at
+their selection — the work a paid generation would otherwise have done.</p>
+
+<section class="block">
+  <h2>Headlines</h2>
+  <div class="tiles">
+    <div class="tile"><div class="v">{{ h.generations }}</div><div class="k">AI generations</div></div>
+    <div class="tile"><div class="v">{{ h.student_spend|dollars }}</div><div class="k">student-ledger spend</div></div>
+    <div class="tile"><div class="v">{{ h.spend_per_active|dollars }}</div><div class="k">spend per active student</div></div>
+    <div class="tile"><div class="v">{{ h.active_codes }}</div><div class="k">active invite codes</div></div>
+    <div class="tile"><div class="v">{{ h.served_total }}</div><div class="k">cached artifacts surfaced</div></div>
+    <div class="tile"><div class="v">{{ "%.1f"|format(h.leverage) }}&times;</div><div class="k">surfacings per generation</div></div>
+    <div class="tile"><div class="v">{{ h.artifacts_total }}</div><div class="k">artifacts in library ({{ h.artifacts_approved }} approved)</div></div>
+    <div class="tile"><div class="v">{{ h.views_signed + h.views_anon }}</div><div class="k">chapter views ({{ h.views_anon }} anonymous)</div></div>
+  </div>
+  <p class="hint">Instructor-ledger (cache-write premium) spend:
+  {{ h.instructor_spend|dollars }}. Unusable-request redirects
+  ([[EPHEMERAL]]): {{ h.ephemeral_n }}.
+  Open flags: <a href="/admin/flags">{{ h.flags_open }}</a> &middot;
+  eurekas pinned: {{ h.eurekas }} &middot;
+  questions suggested for the book: {{ h.suggested_questions }}.</p>
+</section>
+
+<section class="block">
+  <h2>Where in the book (AI activity, rolled up per line)</h2>
+  <p class="hint">Bars are AI generations anchored in that chapter / section /
+  subsection, including everything beneath it. Views count chapter page loads
+  (chapter lines only).</p>
+  <table>
+    <thead><tr><th>Section</th><th>Activity</th><th class="num">Gens</th>
+               <th class="num">Spend</th><th class="num">Artifacts</th>
+               <th class="num">Surfaced</th><th class="num">Views</th></tr></thead>
+    <tbody>
+    {% for s in toc %}
+      <tr>
+        <td class="{% if s.level == 2 %}toc-l2{% elif s.level == 3 %}toc-l3{% endif %}">
+          <code>{{ s.id }}</code> {{ s.title }}</td>
+        <td><div class="bar"><div style="width: {{ s.pct }}%"></div></div></td>
+        <td class="num">{{ s.n or "" }}</td>
+        <td class="num">{% if s.total %}{{ s.total|dollars }}{% endif %}</td>
+        <td class="num">{{ s.artifacts or "" }}</td>
+        <td class="num">{{ s.served or "" }}</td>
+        <td class="num">{% if s.views is not none %}{{ s.views }}{% endif %}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="block">
+  <h2>Where students ask for help most</h2>
+  <p class="hint">The creature mix is the diagnostic: heavy
+  justify/counterexample suggests confusion; heavy example suggests appetite
+  for practice; quiz/chat suggests engagement.</p>
+  <table>
+    <thead><tr><th>Section</th><th class="num">Requests</th><th>What they asked for</th></tr></thead>
+    <tbody>
+    {% for s in top_sections %}
+      <tr><td><code>{{ s.id }}</code> {{ s.title }}</td>
+          <td class="num">{{ s.n }}</td>
+          <td class="mix">{{ s.mix }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% if not top_sections %}<p class="empty">No AI activity yet.</p>{% endif %}
+</section>
+
+<section class="block">
+  <h2>By creature</h2>
+  <table>
+    <thead><tr><th>Creature</th><th class="num">Generations</th>
+               <th class="num">Spend</th><th class="num">Redirects</th>
+               <th class="num">Artifacts kept</th><th class="num">Surfaced</th></tr></thead>
+    <tbody>
+    {% for r in by_creature %}
+      <tr><td>{{ r.creature }}</td><td class="num">{{ r.n }}</td>
+          <td class="num">{{ r.total|dollars }}</td>
+          <td class="num">{{ r.eph or "" }}</td>
+          <td class="num">{{ r.artifacts or "" }}</td>
+          <td class="num">{{ r.served or "" }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="block">
+  <h2>Last 14 active days</h2>
+  <table>
+    <thead><tr><th>Day</th><th>Generations</th><th class="num">#</th>
+               <th class="num">Spend</th><th>Chapter views</th><th class="num">#</th></tr></thead>
+    <tbody>
+    {% for d in daily %}
+      <tr>
+        <td>{{ d.day }}</td>
+        <td><div class="bar"><div style="width: {{ (100 * d.n / daily_max_n)|round if daily_max_n else 0 }}%"></div></div></td>
+        <td class="num">{{ d.n or "" }}</td>
+        <td class="num">{% if d.total %}{{ d.total|dollars }}{% endif %}</td>
+        <td><div class="bar"><div style="width: {{ (100 * d.views / daily_max_views)|round if daily_max_views else 0 }}%"></div></div></td>
+        <td class="num">{{ d.views or "" }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% if not daily %}<p class="empty">No activity yet.</p>{% endif %}
+</section>
+
+<section class="block">
+  <h2>Most-surfaced artifacts</h2>
+  <p class="hint">Cached AI content readers keep encountering — the best
+  candidates to review and approve (approved items are shown to everyone).</p>
+  <table>
+    <thead><tr><th class="num">Surfaced</th><th>Creature</th><th>Section</th>
+               <th>Status</th><th>On</th></tr></thead>
+    <tbody>
+    {% for a in top_artifacts %}
+      <tr><td class="num">{{ a.served_count }}</td>
+          <td>{{ a.creature_type }}</td>
+          <td><code>{{ a.section_id }}</code></td>
+          <td>{{ a.status }}</td>
+          <td class="mix">{{ (a.selection_text or "")[:80] }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% if not top_artifacts %}<p class="empty">Nothing surfaced yet.</p>{% endif %}
+</section>
+{% endblock %}

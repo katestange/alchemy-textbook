@@ -197,17 +197,34 @@ def record_billing(code: str, creature_type: str, section_id, model: str,
     else:
         return {"student_cost": 0, "ts": ts}  # nothing streamed, nothing billed
 
+    # Stats detail (Decision 84): token breakdown when the final usage
+    # arrived (None on the disconnect-estimate path), and whether the model
+    # judged the request unusable ([[EPHEMERAL]] — charged but never stored).
+    usage = final.usage if final is not None else None
+    tokens = (
+        (usage.input_tokens or 0,
+         usage.output_tokens or 0,
+         usage.cache_read_input_tokens or 0,
+         usage.cache_creation_input_tokens or 0)
+        if usage is not None else (None, None, None, None)
+    )
+    ephemeral = 1 if (streamed_text or "").lstrip().startswith("[[EPHEMERAL]]") else 0
+
     db_execute(
         "INSERT INTO usage_log "
-        "(code, ledger, creature_type, cost_microdollars, section_id, created_at) "
-        "VALUES (?, 'student', ?, ?, ?, ?)",
-        (code, creature_type, student_cost, section_id, ts))
+        "(code, ledger, creature_type, cost_microdollars, section_id, created_at, "
+        " model, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, "
+        " ephemeral) "
+        "VALUES (?, 'student', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (code, creature_type, student_cost, section_id, ts, model, *tokens,
+         ephemeral))
     if instructor_cost > 0:
         db_execute(
             "INSERT INTO usage_log "
-            "(code, ledger, creature_type, cost_microdollars, section_id, created_at) "
-            "VALUES (NULL, 'instructor', ?, ?, ?, ?)",
-            (creature_type, instructor_cost, section_id, ts))
+            "(code, ledger, creature_type, cost_microdollars, section_id, created_at, "
+            " model) "
+            "VALUES (NULL, 'instructor', ?, ?, ?, ?, ?)",
+            (creature_type, instructor_cost, section_id, ts, model))
     db_execute(
         "UPDATE invite_codes SET spent_microdollars = spent_microdollars + ? "
         "WHERE code = ?",
@@ -605,6 +622,13 @@ CREATE TABLE IF NOT EXISTS solution_overrides (
     sol_key TEXT PRIMARY KEY,
     visible INTEGER NOT NULL
 );
+CREATE TABLE IF NOT EXISTS chapter_views (
+    day TEXT NOT NULL,          -- UTC date, YYYY-MM-DD
+    chapter TEXT NOT NULL,
+    signed_in INTEGER NOT NULL, -- 1 = reader had a session, 0 = anonymous
+    views INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (day, chapter, signed_in)
+);
 """
 
 # Dev invite code, seeded only when TEXTBOOK_SEED_DEV_CODE=1 (local dev /
@@ -633,6 +657,16 @@ def init_db() -> None:
             "ALTER TABLE content_flags ADD COLUMN comment TEXT",
             "ALTER TABLE content_flags ADD COLUMN created_by_code TEXT",
             "ALTER TABLE content_flags ADD COLUMN resolved INTEGER NOT NULL DEFAULT 0",
+            # Stats (spec Decision 84): per-request model/token detail, the
+            # [[EPHEMERAL]] marker, and how often a cached artifact is
+            # surfaced to a reader.
+            "ALTER TABLE usage_log ADD COLUMN model TEXT",
+            "ALTER TABLE usage_log ADD COLUMN input_tokens INTEGER",
+            "ALTER TABLE usage_log ADD COLUMN output_tokens INTEGER",
+            "ALTER TABLE usage_log ADD COLUMN cache_read_tokens INTEGER",
+            "ALTER TABLE usage_log ADD COLUMN cache_write_tokens INTEGER",
+            "ALTER TABLE usage_log ADD COLUMN ephemeral INTEGER NOT NULL DEFAULT 0",
+            "ALTER TABLE cached_content ADD COLUMN served_count INTEGER NOT NULL DEFAULT 0",
         ):
             try:
                 _db.execute(ddl)
@@ -888,13 +922,20 @@ def api_chapters():
 
 
 @app.get("/chapter/{n}")
-def chapter(n: str):
+def chapter(n: str, request: Request):
     filename = CHAPTERS.get(n)
     if not filename:
         raise HTTPException(status_code=404, detail=f"No chapter '{n}'")
     path = BUILD_DIR / "html" / filename
     if not path.exists():
         raise HTTPException(status_code=404, detail="Chapter file missing")
+    # Engagement stat (Decision 84): per-day view tallies, split signed-in vs
+    # anonymous. Deliberately no code/identity attached — just counts.
+    db_execute(
+        "INSERT INTO chapter_views (day, chapter, signed_in, views) "
+        "VALUES (?, ?, ?, 1) "
+        "ON CONFLICT(day, chapter, signed_in) DO UPDATE SET views = views + 1",
+        (now_iso()[:10], n, 1 if caller_code(request) else 0))
     # Strip every solution the instructor has hidden (per-solution / section /
     # book visibility) before the page is sent, so hidden ones aren't even in
     # the page source. Visible ones stay and the reader wraps each in a "Show
@@ -1045,6 +1086,14 @@ def api_content(block_hash: str, request: Request):
         "ORDER BY created_at",
         (block_hash, code),
     )
+    # Cache-leverage stat (Decision 84): this endpoint fires when a reader's
+    # selection surfaces existing artifacts, i.e. cached content did the job
+    # a paid generation would otherwise do. Count each surfacing.
+    if rows:
+        ids = [r["id"] for r in rows]
+        db_execute(
+            "UPDATE cached_content SET served_count = served_count + 1 "
+            f"WHERE id IN ({','.join('?' * len(ids))})", ids)
     return [
         {
             "id": r["id"],
