@@ -28,7 +28,9 @@ book.toml                Per-book config: title/voice for the AI, source .tex,
                          environment names, invite prefix (edit to adopt a new book)
 adopt-book.sh            Guided onboarding for a NEW book: build + accept baselines
 ADAPTABILITY.md          Audit + phased plan for running other LaTeX textbooks
-notes-to-latex.md        AI prompt: handwritten course notes -> faithful LaTeX
+notes-to-latex.md        AI prompts: handwritten course notes -> faithful LaTeX
+                         (A: chat website, prof crops figures; B: coding agent,
+                          crops + compiles itself)
 deploy/                  Production hosting: Dockerfile, per-book compose, nginx TLS
 .env.example             Deployment secrets/env template (copy to .env)
 textbook_source/         Canonical source: the LaTeX book + its images
