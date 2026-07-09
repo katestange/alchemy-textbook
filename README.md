@@ -28,7 +28,11 @@ textbook_source/         Canonical source: the LaTeX book + its images
 pipeline/                Deterministic .tex -> web build
   preprocess.py            .tex  -> LaTeXML-safe copy (fixes/shims, logged)
   postprocess.py           LaTeXML XML -> JSON content manifest (typed, hashed)
+  solutions.py             stamps solution divs + writes solutions.json (Decision 77)
   build.sh                 orchestrates: preprocess -> latexml -> manifest -> HTML
+backend/                 FastAPI backend: auth, SSE generation, /admin dashboard
+frontend/                Svelte + Vite SPA (the reader UI)
+tests/                   Pipeline (postprocess) tests; frontend tests live in frontend/tests
 creature_art_prompts.md  Image-generation prompts for the ten creatures
 creature_art_HOWTO.md    How to turn those prompts into usable sprites
 HELPCLAUDE.txt           Host/root setup: toolchain install + API key
@@ -84,14 +88,19 @@ bash pipeline/check.sh    # rebuild + all gates (errors, warnings, structure)
 Artifacts in `build/` (git-ignored, regenerable): `book.xml` (semantic XML),
 `manifest.json` (817 content blocks with type, section, stable content hash,
 DOM anchor — what the AI tools and cache anchor to), `html/S1..S9.html`
-(chapter reader pages + `chapters.json`), `book.html` (single-file book).
+(chapter reader pages + `chapters.json`), `book.html` (single-file book),
+`solutions.json` (ordered solutions + section tree for the per-solution
+visibility dashboard, Decision 77).
 The author's source is never modified by the pipeline; the pre-processor
 adapts a copy.
 
 ## Tech stack (see spec for rationale)
 
-LaTeXML → structured HTML/JSON · Python (Flask/FastAPI) + SQLite backend ·
-Svelte SPA frontend · KaTeX · SageCell for interactives · Anthropic Claude API
+LaTeXML → structured HTML/JSON · Python **FastAPI** + SQLite backend (async, for
+SSE streaming; Flask was ruled out — spec Decision 54) · Svelte SPA frontend ·
+**native MathML** for the base text with **Temml** (LaTeX→MathML) for AI-generated
+math and a bundled Garamond-Math webfont (Decision 49; supersedes the earlier
+KaTeX plan) · SageCell / Desmos / GeoGebra for interactives · Anthropic Claude API
 (tiered models, streamed) · invite-code auth with per-student budgets.
 
 ## Secrets

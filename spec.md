@@ -158,13 +158,19 @@ the provider can be swapped later without a rewrite.
 | **Justify** (magnifying glass) | Sonnet | Requires mathematical rigor |
 | **Counterexample** | Sonnet | Requires deep understanding of hypotheses |
 | **Intuition** | Sonnet | Needs to find good analogies/explanations |
-| **Applet** (gear) | Sonnet | Must produce working SageMath code |
-| **Fun** | Haiku | Playful rewriting, creativity over rigor |
-| **Quiz** | Haiku | Question generation is straightforward |
+| **Applet** (gear) | **Opus 4.8** (impl.) | Must produce working, runnable Sage/Desmos/GeoGebra code -- upgraded from Sonnet after buggy-code feedback (Decision 69) |
+| **Fun** | Sonnet (impl.) | Playful rewriting; currently falls through to the Sonnet default (spec target was Haiku) |
+| **Quiz** | Sonnet (impl.) | Interactive quiz dialogue; currently falls through to the Sonnet default (spec target was Haiku) |
 | **Chat** | Sonnet | General-purpose, needs to be good |
-| **Summarize** (spider) | Haiku | Compression, not deep reasoning |
+| **Summarize** (spider) | Haiku | Compression, not deep reasoning -- **Planned; the summarize creature is not yet implemented** (see Decision 30's contradiction, resolved under Decision 80) |
 
 These assignments are starting points; adjust based on quality testing.
+
+**Implementation note (2026-07):** the code (`backend/app.py`, `MODEL_BY_CREATURE`)
+currently assigns **Haiku only to *example***, **Opus 4.8 to *applet*** (Decision
+69), and lets everything else -- justify, counterexample, intuition, fun, quiz,
+chat -- fall through to the **Sonnet** default. Re-tier once real usage is
+measured (Q14 action item).
 
 **Context window strategy:**
 
@@ -299,7 +305,10 @@ Chat, below).  Its visual treatment is listed with the other creatures in Q11.
   student controls exactly what gets saved by describing it in their own
   words.
 
-**Section selection:**
+**Section selection:** **(Planned -- not yet implemented.** The frontend today
+shows the text-selection creature cluster only; section-number clicks and the
+scope-filtered section-only cluster are not wired up yet.  Design retained
+below as the target.)
 - Section numbers (e.g. "3.2") are clickable.
 - Clicking a section number triggers the same creature-flutter interaction,
   but only the section-scoped creatures appear (firefly, jester, raven,
@@ -316,7 +325,10 @@ Chat, below).  Its visual treatment is listed with the other creatures in Q11.
 - Multiple rounds are possible.
 
 **Cost control:**
-- Per-student daily/weekly token caps (enforced by backend).
+- Per-code **total** budget cap (hard, enforced by backend) plus a **burst
+  throttle** (40 requests / 60 s per code) as the runaway-script backstop.
+  (The originally-planned per-student *daily* dollar cap was **not built** --
+  see Decision 78; the total budget + burst throttle replaced it.)
 - Model tier selection keeps routine operations cheap.
 - Caching means popular content is generated once, served many times.
 - When a user clicks a tool creature and cached content already exists for
@@ -376,7 +388,9 @@ a secondary option.
   Cookie persists until end of semester or revocation.
 - The code-entry endpoint is **rate-limited** (codes are short enough to
   brute-force otherwise), and the admin login locks out after repeated
-  failures.
+  failures.  **(Both implemented: `/api/claim` throttles per client IP,
+  `CLAIM_RATE_MAX = 10` attempts per window; admin login locks for 15 min
+  after 5 consecutive failures -- Decision 57.)**
 - Same code works on multiple devices, drawing from one shared budget.
 
 **Dashboard (instructor) capabilities:**
@@ -389,13 +403,20 @@ a secondary option.
 - Aggregate usage stats: total spend, per-tool breakdown, most-used sections.
 
 **Budget enforcement:**
-- Soft warning at 80% of budget consumed.
+- Soft warning at 80% of budget consumed. **(Planned -- not yet implemented;
+  the client shows remaining budget but no 80% warning banner yet.)**
 - Hard cap at 100% -- AI generation features disabled, cached content still
-  accessible.
-- Per-student daily rate limit as a safety net against runaway usage (e.g.
-  max $1/day).
+  accessible. **(Implemented.)**
+- ~~Per-student daily rate limit as a safety net against runaway usage (e.g.
+  max $1/day).~~ **Superseded (Decision 78):** the per-day dollar cap was
+  removed; a **burst throttle** (40 requests / 60 s per code) plus the total
+  budget cap are the runaway backstop instead. There is no per-day budget cap
+  and no `daily_limit_microdollars` column in the shipped schema.
 
-**Bring-your-own-key flow:**
+**Bring-your-own-key flow:** **(Planned -- not yet implemented.** The design
+below is intended and unchanged; today the backend has only the single
+instructor-key path. No per-request key field, settings panel, or proxy branch
+exists yet. Keep this design for when it is built -- see also Decisions 15/47.)
 - Available to anyone (students who exhaust their budget, non-students,
   public users).
 - User pastes their Anthropic API key in a settings panel.
@@ -431,8 +452,14 @@ available to all future readers, including those not logged in.  The textbook
    generation rate limits and one-click takedown backstop abuse.
 4. **On approval**, the content becomes public -- permanent supplementary
    material alongside the base textbook, visible to all readers.
-5. Any user can **flag** approved content for errors, with a comment, which
-   returns it to the review queue.
+5. A **signed-in** user can **flag** content (or a base-textbook passage) for a
+   problem, with a category and optional comment.  **Superseded detail
+   (Decision 79):** flags do **not** flip the item's status back to review;
+   they land in a separate instructor **`/admin/flags`** queue (categories:
+   `incorrect` / `inappropriate` / `text-error`, plus `created_by_code` and a
+   `resolved` bit).  Flagging requires an invite-code session (anonymous
+   readers cannot flag).  The `cached_content.status = 'flagged'` value is no
+   longer used (the code path that set it was removed).
 
 **The user's selection is freeform** -- they can highlight any span of text to
 trigger an AI tool.  But cached results are anchored to the nearest semantic
@@ -448,9 +475,9 @@ someone understand.
 
 | Status | Meaning | Visible? |
 |--------|---------|----------|
-| Unreviewed | AI-generated, not yet reviewed | Yes, with indicator |
-| Flagged | A user reported a problem | Yes, with indicator |
-| Approved | Instructor reviewed and confirmed | Yes, shown prominently |
+| Unreviewed | AI-generated, not yet reviewed | **Only to its creator and the instructor** (corrected to match Decision 48; the earlier "Yes, with indicator" contradicted D48) |
+| ~~Flagged~~ | ~~A user reported a problem~~ | **Retired (Decision 79):** no longer a `cached_content` status; flags live in the `content_flags` table / `/admin/flags` queue instead |
+| Approved | Instructor reviewed and confirmed | Yes, shown to all readers |
 | Removed | Instructor rejected | No |
 
 **Error reports on base textbook:** Users can also flag errors in the authored
@@ -581,6 +608,13 @@ random professor fork this."
 
 **Decision:** Fun mode is a creature, not a global toggle.
 
+**Implementation status:** The random-comic-style design below is **still
+intended** but **not yet built**.  The current implementation is an interim,
+simpler Fun creature -- its prompt asks for "a short, delightful take... a
+surprising connection, a bit of history, a vivid or whimsical analogy, or a
+genuinely good joke," not a randomly-chosen comic-style *rewrite*.  The
+comic-style redesign described here is planned; keep this text as the target.
+
 The user selects any passage and clicks the fun creature.  The AI rewrites the
 selection in a **randomly chosen comic style** (noir detective, cooking show,
 sports commentary, Shakespearean, etc.).  Each fun rewrite is different and
@@ -647,6 +681,17 @@ together.
 
 Each creature's hover-tooltip is simply its tool name ("Example," "Justify,"
 etc.).
+
+**Implementation status of the roster (2026-07):** eight tool-creatures are
+built and wired to `/api/generate` -- **example, intuition, justify,
+counterexample, fun, applet, chat, quiz** -- plus the result-only **eureka**
+(salamander) and a **suggested_question** capture (the Raven forwarding a
+question to the instructor, Decision 74).  **Spider / Summarize is not yet
+implemented** (Planned; note Decision 30 had dropped summarize, but Q3/Q11
+kept it -- resolved under Decision 80).  Because section-selection is not yet
+wired (see Q3), every built creature currently surfaces on **text** selection
+regardless of its intended Scope column above; the Scope values remain the
+design target.  An earlier "detail" creature was dropped (Decision 30).
 
 **Result-only creature:**
 
@@ -821,7 +866,7 @@ tags) persists as part of the textbook.
 | `code` | TEXT PRIMARY KEY | e.g. "CRYPTO-7X4M-Q2" |
 | `budget_microdollars` | INTEGER | Total budget in microdollars ($5 = 5,000,000; sub-cent Haiku calls must not round away -- Decision 53) |
 | `spent_microdollars` | INTEGER DEFAULT 0 | Running total |
-| `daily_limit_microdollars` | INTEGER | Safety cap per day |
+| ~~`daily_limit_microdollars`~~ | ~~INTEGER~~ | **Removed (Decision 78):** no per-day cap in the shipped schema; the burst throttle + total budget replaced it |
 | `created_at` | TIMESTAMP | |
 | `revoked` | BOOLEAN DEFAULT FALSE | |
 
@@ -841,11 +886,11 @@ tags) persists as part of the textbook.
 | `id` | INTEGER PRIMARY KEY | |
 | `content_hash` | TEXT | Hash of textbook block this is anchored to |
 | `selection_text` | TEXT | The exact text selection (for display context) |
-| `creature_type` | TEXT | "example", "justify", "counterexample", "intuition", "applet", "fun", "quiz", "summarize", "eureka" |
+| `creature_type` | TEXT | Implemented: "example", "justify", "counterexample", "intuition", "applet", "fun", "eureka", "suggested_question" (Decision 74).  Chat/quiz turns are never stored (Decision 66).  "summarize" is reserved but not yet produced (Planned). |
 | `response` | TEXT | The AI's final response (after any refinements) |
-| `model_used` | TEXT | e.g. "claude-haiku-4-5-20251001" |
+| `model_used` | TEXT | e.g. "claude-haiku-4-5" |
 | `cost_microdollars` | INTEGER | What this generation cost (student-ledger share) |
-| `status` | TEXT DEFAULT 'unreviewed' | "unreviewed", "approved", "flagged", "removed" |
+| `status` | TEXT DEFAULT 'unreviewed' | "unreviewed", "approved", "removed" (the "flagged" value is retired -- Decision 79; flags live in `content_flags`) |
 | `created_at` | TIMESTAMP | |
 | `section_id` | TEXT | Section from content manifest |
 | `created_by_code` | TEXT REFERENCES invite_codes | Which invite code generated this (moderation + revocation; a code, not a name) |
@@ -863,7 +908,10 @@ keeps the privacy posture -- see Q6.  Cost tracking for budget enforcement is in
 | `id` | INTEGER PRIMARY KEY | |
 | `cached_content_id` | INTEGER NULL REFERENCES cached_content | If flagging AI content |
 | `content_hash` | TEXT NULL | If flagging base textbook |
-| `comment` | TEXT | Description of the problem |
+| `category` | TEXT | (Decision 79) one of `incorrect` / `inappropriate` / `text-error` |
+| `comment` | TEXT | Optional description of the problem |
+| `created_by_code` | TEXT | (Decision 79) the invite code that filed the flag (flagging requires a session) |
+| `resolved` | INTEGER DEFAULT 0 | (Decision 79) instructor marks flags resolved in `/admin/flags`; flags never re-open a content item |
 | `created_at` | TIMESTAMP | |
 
 **`usage_log`** -- budget enforcement and aggregate analytics
@@ -1033,8 +1081,17 @@ before launch):
 | Mid | Claude Sonnet (`claude-sonnet-5`; intro $2 / $10 through 2026-08-31) | $3 | $15 |
 | Reserve | Claude Opus 4.8 (`claude-opus-4-8`) | $5 | $25 |
 
-The tool -> tier assignments live in Q3 (Haiku for example/fun/quiz/summarize,
-Sonnet for justify/counterexample/intuition/applet/chat).
+**Pricing note:** the code's ledger (`PRICES` in `backend/app.py`) charges the
+**list** Sonnet rate of $3 / $15, not the $2 / $10 intro rate -- a deliberate
+conservative choice so student ledgers never *under*-count while the intro
+window lasts.  Re-check all three rows against Anthropic list price before
+launch.
+
+The tool -> tier assignments live in Q3.  **As implemented (2026-07):** Haiku
+for *example* only; **Opus 4.8** for *applet* (Decision 69); Sonnet default for
+justify / counterexample / intuition / fun / quiz / chat.  (The original plan
+put fun/quiz on Haiku and applet on Sonnet -- the estimates below still reflect
+that older plan except where noted.)
 
 **The caching architecture is the heart of the cost model** (Decisions 52-53).
 Every request is assembled as `[shared prefix: core prompt + chapter text +
@@ -1066,8 +1123,9 @@ full-book cold-start; a busy evening with all chapters active ~= $2-3; semester
 
 | Tool class | Typical in / out | Model | Est. student cost |
 |------------|------------------|-------|-------------------|
-| Haiku tool (example, quiz, fun, summarize) | ~20K read + ~1K / ~800 | Haiku | ~$0.007 |
-| Sonnet tool (justify, counterexample, intuition, applet) | ~20K read + ~1K / ~1,200 | Sonnet | ~$0.03 |
+| Haiku tool (example) | ~20K read + ~1K / ~800 | Haiku | ~$0.007 |
+| Sonnet tool (justify, counterexample, intuition, fun, quiz) | ~20K read + ~1K / ~1,200 | Sonnet | ~$0.03 |
+| **Opus tool (applet)** | ~20K read + ~1K / ~1,200 | **Opus 4.8** | **~$0.05** (higher-tier model, Decision 69) |
 | Chat turn (chapter scope) | ~20K read + conv. / ~800 | Sonnet | ~$0.015-0.02 |
 | Chat turn (full-book amp-up) | ~130K read + conv. / ~800 | Sonnet | ~$0.05-0.06 |
 
@@ -1082,7 +1140,8 @@ A moderate chapter-scoped conversation lands around **$0.10-0.20 all-in**.
   uncapped but self-limiting (it only accrues when students are active).
 - Community caching (Q6) drives realized spend *below* the ceiling: approved
   content is generated once and served from the database free thereafter.
-- The per-student daily rate limit (Q5) caps a single runaway user.
+- The **burst throttle** (40 requests / 60 s per code, Decision 78) plus the
+  total budget cap the runaway user; there is no per-day dollar cap.
 - Ledger precision: costs are stored in **microdollars** (a ~$0.007 Haiku call
   must not round to 0 or 1 cent) -- see Q12.
 
@@ -1153,7 +1212,7 @@ default.
 | 12 | Stream all AI responses via SSE (Q3) | 2026-07-02 |
 | 13 | Context = current section + prior chapter sections; full textbook for chat (Q3) | 2026-07-02 |
 | 14 | Invite codes for student auth; per-student budgets; persistent cookie session (Q5) | 2026-07-02 |
-| 15 | Bring-your-own-API-key as secondary option (Q5) | 2026-07-02 |
+| 15 | Bring-your-own-API-key as secondary option (Q5) -- **Planned, not yet implemented** (only the instructor key path exists today) | 2026-07-02 |
 | 16 | Local editor + git push; GitHub Actions builds and deploys (Q8) | 2026-07-02 |
 | 17 | Content anchoring by exact hash; fuzzy match for re-anchor suggestions only (Q8) | 2026-07-02 |
 | 18 | Failed builds deploy last good build + email notification (Q8) | 2026-07-02 |
@@ -1168,13 +1227,13 @@ default.
 | 27 | One-shot with refinement (replaces, not accumulates); final version cached (Q3) | 2026-07-02 |
 | 28 | Counterexample and intuition creatures added to lineup (Q3) | 2026-07-02 |
 | 29 | Fun mode is a creature, not global toggle; random comic style (Q10) | 2026-07-02 |
-| 30 | Detail dial and summarize dropped; covered by chat or prompt editing (Q3) | 2026-07-02 |
+| 30 | Detail dial and summarize dropped; covered by chat or prompt editing (Q3) -- **note:** later sections (Q3/Q11 tables) re-listed summarize; the contradiction is resolved by Decision 80 (summarize is Planned, not built; detail stays dropped) | 2026-07-02 |
 | 31 | Octopus for counterexample; raven for quiz; salamander for eureka (Q11) | 2026-07-02 |
 | 32 | 5-color palette: green, gold, teal, red, warm grey on aged parchment (Q11) | 2026-07-02 |
 | 33 | Grimoire aesthetic: Voynich + illuminated manuscript + Deyrolle naturalist, scribble style (Q11) | 2026-07-02 |
 | 34 | AI content boxes: modern, simple, black-lined, rounded corners (Q11) | 2026-07-02 |
 | 35 | Firefly for intuition; spider for summarize (section-level only) (Q11) | 2026-07-02 |
-| 36 | Scope filtering: text selection shows 7 creatures, section click shows 5 (Q3/Q11) | 2026-07-02 |
+| 36 | Scope filtering: text selection shows 7 creatures, section click shows 5 (Q3/Q11) -- **Planned, not yet implemented** (section-number clicks aren't wired; all built creatures currently appear on text selection) | 2026-07-02 |
 | 37 | Specialized creatures justified by: purpose-built prompts + teaching reading habits (Q3) | 2026-07-02 |
 | 38 | Svelte for frontend framework (Q13) | 2026-07-02 |
 | 39 | .tex source reviewed; LaTeXML compatible with minor workarounds (Q1) | 2026-07-02 |
@@ -1185,7 +1244,7 @@ default.
 | 44 | Frontend is a plain Svelte SPA built with Vite; static assets served by the Python backend, no Node runtime in production (Q13) | 2026-07-02 |
 | 45 | Base textbook served as pre-rendered LaTeXML HTML; Svelte hydrates an interaction layer over it, anchored to block hashes (Q13) | 2026-07-02 |
 | 46 | Dark mode via CSS custom properties: warm near-black parchment, lower-lightness accents, pastel washes as accent tints (Q13) | 2026-07-02 |
-| 47 | Server is the sole cache writer; BYO keys proxied per-request and never stored; no direct browser->Anthropic path (Q5/Q6) | 2026-07-03 |
+| 47 | Server is the sole cache writer; BYO keys proxied per-request and never stored; no direct browser->Anthropic path (Q5/Q6) -- the sole-cache-writer / no-direct-path parts are implemented; the **BYO-key proxy branch is Planned** (see Decision 15) | 2026-07-03 |
 | 48 | Moderate everything: all AI content tagged with its invite code and instructor-approved before public; creator sees their own immediately (Q6/Q12) | 2026-07-03 |
 | 49 | Base math as native MathML (browser MathML Core, no JS, arXiv-style); AI math via client-side Temml (LaTeX->MathML); one pinned math webfont sized to the body; supersedes KaTeX (Q11/Q13) | 2026-07-03 |
 | 50 | Reader pages are chapters: build splits at top-level \section via latexmlpost --split (~9 long scrolling pages); ToC jumps use xml_id anchors (Q13) | 2026-07-03 |
@@ -1207,18 +1266,24 @@ default.
 | 66 | Chat and quiz turns are never written to cached_content and carry no content_id -- conversation history lives only in the client and is resent per turn (corollary of Decisions 41/48); budget/ledger accounting still applies per turn (Q12/Q14) | 2026-07-03 |
 | 67 | An AI artifact shows its originating phrase: cached content returns `selection_text`, the expanded box opens with a muted "On: ...quote..." line, and the chip tooltip carries it -- essential for later readers who never made the selection (Q3, first-user feedback) | 2026-07-04 |
 | 68 | Students can HIDE an AI item (per-reader, client-only in localStorage -- the artifact stays server-side for everyone else); a quiet "Show N hidden AI items" control always restores them; regenerating an item un-hides it. Reading measure fixed to an arXiv-ish column (was accidentally full-window from a CSS specificity bug) at a slightly larger body/math size. The chat panel's explicit "new conversation" button (Decision 65) was removed as not useful enough -- close-and-reselect covers it (Q11, first-user feedback) | 2026-07-04 |
-| -- | DEFERRED nicety (do not lose): when an AI box is opened, best-effort HIGHLIGHT the originating phrase in the reading text itself (soft wash while open). Brittle across MathML selections, so must degrade silently; ships after more pressing polish (extends Decision 67) | 2026-07-04 |
-| 69 | SageMath applets built (Q4): editable SageCell (`sagecell.sagemath.org`) cells, loaded lazily client-side (`sageCell.js`). Two channels — (a) the **Applet** in-situ creature (Sonnet) emits raw Sage only, mounted as an editable cell on expand; (b) pre-authored **built-in** demos (`builtinApplets.js`, sourced from crypto.katestange.net) injected after their anchor block on chapter load. No CSP is set today so the external scripts load freely; IF a CSP is ever added it MUST allowlist sagecell.sagemath.org (script/connect/frame). Cells are editable (SageCell default) per author decision (Q3/Q11). Each cell is **independent** (`linked:false`, one `makeSagecell` call per cell); compute + memory are ephemeral and live entirely on the SageCell server | 2026-07-05 |
+| -- | ~~DEFERRED nicety~~ **DONE:** when an AI box is opened, best-effort HIGHLIGHT the originating phrase in the reading text itself (soft wash while open). Implemented via the CSS Custom Highlight API in `frontend/src/lib/inSituResult.js` (degrades silently where unsupported). (extends Decision 67) | 2026-07-04 |
+| 69 | SageMath applets built (Q4): editable SageCell (`sagecell.sagemath.org`) cells, loaded lazily client-side (`sageCell.js`). Two channels — (a) the **Applet** in-situ creature (**Opus 4.8** in the shipped code -- upgraded from Sonnet after buggy-code feedback) emits raw Sage/Desmos/GeoGebra only, mounted as an editable cell on expand; (b) pre-authored **built-in** demos (`builtinApplets.js`, sourced from crypto.katestange.net) injected after their anchor block on chapter load. No CSP is set today so the external scripts load freely; IF a CSP is ever added it MUST allowlist sagecell.sagemath.org (script/connect/frame). Cells are editable (SageCell default) per author decision (Q3/Q11). Each cell is **independent** (`linked:false`, one `makeSagecell` call per cell); compute + memory are ephemeral and live entirely on the SageCell server | 2026-07-05 |
 | 70 | **Ephemeral redirects.** When the model judges a selection unusable (e.g. "worked example of the word 'the'") it prefixes its brief redirect with the token `[[EPHEMERAL]]` (CORE_SYSTEM_PROMPT). The backend then does NOT store it in cached_content (no content_id, keeping the review queue clean) though budget is still charged; the client strips the token, shows it as a self-dismissing one-time note (removed on the next outside click), and it never hydrates. Author's idea (Q3/Q8) | 2026-07-06 |
 | 73 | **GeoGebra joins the applet toolset.** The Applet creature now picks among three tools per selection: Sage (compute), Desmos ([[DESMOS]], graphing), or GeoGebra ([[GEOGEBRA]], interactive construction/geometry). `geogebra.js` mirrors desmos.js/sageCell.js (lazy-loads deployggb.js, mounts an editable applet via evalCommand, `<pre>` fallback). Built-in GeoGebra **elliptic-curve point-addition** demo at S5.SS1.p12 (chord-and-tangent; commands need a visual check). Verified live: a "drag two points on a curve" selection → GeoGebra (Q4) | 2026-07-06 |
 | 74 | **Eureka + add-to-textbook capture from conversations.** The one thing a chat/quiz persists (Decision 41): the Cat, on "capture this as a eureka", distills the insight and emits [[EUREKA]]; the Raven, on "add that to the textbook", emits [[TEXTBOOK_QUESTION]]. The backend stores each as an unreviewed cached_content row (creature_type eureka / suggested_question) anchored to the block; the client strips the tokens, notes the capture in the transcript, and (eureka) drops a red 💡 chip into the margin via an `alchemy:eureka` event. Chat panel carries a standing tip explaining it. Verified live: eureka stored (Q3/Q12) | 2026-07-06 |
 | 76 | **Delete-forever.** Every AI artifact box carries a red "delete" control (distinct from the non-destructive per-reader "hide"); `DELETE /api/content/{id}` purges the row for everyone. Enforced: the **creator** may delete their own, an **instructor** may delete anyone's (checked via `_admin.is_admin`); else 403. To make the admin session reach `/api`, the `admin_session` cookie path widened from `/admin` to `/`; `/api/whoami` now reports `is_admin`, and the reader shows "delete" when `own || isInstructor`. Content id stamped on the box at generation `done`/hydration; covers eureka chips. Verified: owner 200, non-owner 403, instructor-on-student 200 (Q3, author feedback) | 2026-07-06 |
-| 75 | **AI-written solutions for every question + Quick Check.** Solutions live in the LaTeX as `\newtheorem*{aisolution}{AI Generated Solution (needs review)}` blocks (so a direct LaTeX compile shows them); LaTeXML renders them to `<div class="ltx_theorem ltx_theorem_aisolution">`. The reader hides each behind a per-solution "Show solution" click. An admin **Settings** toggle governs availability: OFF (default) = the `/chapter/{n}` route strips the solution divs server-side entirely (a pure-Python balanced-div remover, no bs4); ON = served behind click-to-show. Infra built + tested (strip/serve verified). A background agent is writing the solutions into the .tex; needs a pipeline rebuild once done, then a manifest-snapshot re-accept (new blocks) | 2026-07-06 |
+| 75 | **AI-written solutions for every question + Quick Check.** Solutions live in the LaTeX as `\newtheorem*{aisolution}{AI Generated Solution (needs review)}` blocks (so a direct LaTeX compile shows them); LaTeXML renders them to `<div class="ltx_theorem ltx_theorem_aisolution">`. The reader hides each behind a per-solution "Show solution" click. ~~An admin **Settings** toggle governs availability: OFF (default) = the `/chapter/{n}` route strips the solution divs server-side entirely (a pure-Python balanced-div remover, no bs4); ON = served behind click-to-show.~~ **Superseded by Decision 77:** the single global on/off toggle was replaced by per-solution multi-level visibility (`/admin/solutions` tree). Infra built + tested (strip/serve verified). A background agent is writing the solutions into the .tex; needs a pipeline rebuild once done, then a manifest-snapshot re-accept (new blocks) | 2026-07-06 |
 | 72 | **Desmos applets alongside Sage.** The Applet creature now chooses its tool per selection: raw SageMath for computation, or a Desmos graph (response prefixed `[[DESMOS]]`, then one Desmos/LaTeX expression per line) for visual graphing/geometry/lattices. `desmos.js` mirrors `sageCell.js` (lazy-loads the Desmos API with the public demo key, mounts an editable `GraphingCalculator`, `<pre>` fallback). Built-in demos carry a `tool` field; added a built-in Desmos **lattice** demo (v₁=(17,5), v₂=(19,10)) at S7.SS2.p7. Ephemeral one-time notes gained explicit × and "ok!" dismiss controls (plus the existing outside-click). Other embeddable options considered for later: GeoGebra, JSXGraph, p5.js (Q4) | 2026-07-06 |
 | 71 | **Chapter figures are served from `build/`** via a `/x{name}` route (LaTeXML renames every figure to a bare `x3.jpg`/`x12.png`, referenced relatively; the SPA is at `/` so the browser requests `/x3.jpg`). Images are NOT copied into `frontend/dist`; before this every figure 404'd (author noticed the Bletchley photo missing — it was in-source all along). Base reading font scaled to ~120% (root font-size) to match the author's preferred zoom | 2026-07-06 |
-| -- | DEFERRED TODO (author feedback 2026-07-05): **AI-content type titles.** An expanded AI box's header just says "AI-generated · unreviewed" — add the creature type (Example / Intuition / Applet) so the reader/reviewer sees what kind of thing it is at a glance. (The chip already carries the type; the box header doesn't.) | 2026-07-05 |
+| -- | ~~DEFERRED TODO~~ **DONE** (author feedback 2026-07-05): **AI-content type titles.** An expanded AI box's header now shows the creature type (Example / Intuition / Applet ...) alongside "AI-generated · <status>" so the reader/reviewer sees what kind of thing it is at a glance (`frontend/src/lib/inSituResult.js`). | 2026-07-05 |
 | -- | DEFERRED bug (author feedback 2026-07-05): the **SageCell full-screen toggle** on an in-place applet misbehaves. Likely a CSS interaction with the reading layout (fixed/overflow/stacking) — investigate once reproducible; the share-link and in-place editing work well | 2026-07-05 |
 | -- | DEFERRED nicety (Decision 69 follow-up): **persist student edits to applet cells.** Today SageCell holds no durable state and we store none, so a student's tinkering resets on page reload. Save an edited cell's source to `localStorage` (keyed like the hidden-items set) and restore it on load, with a "reset to original" affordance. Consider the same for whether a built-in cell was run. Related idea, also deferred: a `linked:true` **grouped** built-in variant (`linkedGroup` field) for a section that wants notebook-style cells that build on each other | 2026-07-05 |
+| 77 | **Per-solution multi-level solution visibility (supersedes Decision 75).** The single global on/off Settings toggle is replaced by fine-grained control: `pipeline/solutions.py` stamps every `solution`/`aisolution` div with a stable `data-sol-key` (its content hash) and emits `build/solutions.json` (ordered solutions + section tree). The backend holds a `solution_overrides` table (`sol_key -> visible`) and a `solutions_default` setting (book-wide default, hidden by default); `/chapter/{n}` strips any solution not effectively visible from the served HTML entirely (`strip_hidden_solutions`, balanced-div remover). The instructor sets visibility at book / section / subsection / individual-item granularity on the **`/admin/solutions`** tree; `/admin/settings` is now a redirect to it. This is what `pipeline/solutions.py`'s "spec: multi-level solution visibility" comment refers to (Q12/Q6) | 2026-07-09 |
+| 78 | **Per-day budget cap removed; burst throttle + total budget instead.** The originally-planned per-student *daily* dollar cap (Q5 "max $1/day") and the `daily_limit_microdollars` column were **not built**. The runaway-usage backstop is now a **burst throttle** -- 40 requests / 60 s per invite code (a sliding window) -- combined with the hard **total** budget cap already enforced at generation time. Updates Q3 cost-control, Q5 budget enforcement, Q12 `invite_codes`, and Q14 (Q5/Q14) | 2026-07-09 |
+| 79 | **Flag flow redesign (adjusts Q6/Q12).** Flagging requires a signed-in invite code (anonymous readers can't flag). A flag no longer flips content back to review; it is written to `content_flags` with a **category** (`incorrect` / `inappropriate` / `text-error`), the filer's `created_by_code`, and a `resolved` bit, and surfaces in a separate instructor **`/admin/flags`** queue (resolve-only). The `cached_content.status = 'flagged'` value is retired -- no code path sets it. Both AI artifacts and base-textbook passages can be flagged (Q6/Q12) | 2026-07-09 |
+| 80 | **Creature roster reconciliation (resolves Decision 30 vs Q3/Q11).** Eight tool-creatures are implemented and wired to `/api/generate`: example, intuition, justify, counterexample, fun, applet, chat, quiz -- plus the result-only **eureka** and the conversation-capture **suggested_question** (Decision 74). **Summarize (spider) is Planned, not built**; **section-scoped filtering is Planned** (Decision 36); the "detail" creature stays dropped (Decision 30). The Q3/Q11 tables' Scope column is the design target; today every built creature appears on text selection (Q3/Q11) | 2026-07-09 |
+| 81 | **Tutoring rule: don't hand over answers to the book's own set questions.** `CORE_SYSTEM_PROMPT` instructs the model that, if a student asks for the solution or final answer to a specific textbook question, Concept Check, quiz, exercise, or review problem, it must NOT simply give it -- it offers instead to (a) work a closely analogous problem in full or (b) guide Socratically step by step; it may confirm/critique a proposed answer and give hints, but the book's own (instructor-gated, Decision 77) solutions remain the canonical answer key. This applies only to the book's set questions -- full worked examples of the *material* are given freely (extends Decision 55; Q3) | 2026-07-09 |
+| 82 | **Abuse backstops / input caps (author request).** Beyond the burst throttle (Decision 78): `/api/claim` is throttled per client IP (`CLAIM_RATE_MAX = 10` per window) against code brute-forcing; client-supplied text is capped -- selection 2000 chars, prompt 1000, per chat message 8000, and `MAX_CONVERSATION_MESSAGES = 40` resent-history turns (over which `/api/generate` returns `conversation_too_long`); flags use a fixed category set. These cap *rate* and *size*; total budget caps cost (Q5/Q3) | 2026-07-09 |
 
 ---
 

@@ -27,13 +27,22 @@ code: `DEV-TEST-1` ($5.00 budget, seeded on first startup).
 | `GET /` | Built frontend (`frontend/dist`), if present |
 | `GET /api/manifest` | Content manifest + `build_version` |
 | `GET /api/chapters` | Chapter number → HTML file map |
-| `GET /chapter/{n}` | Chapter reader HTML (1–9) |
+| `GET /chapter/{n}` | Chapter reader HTML (1–9); hidden solutions stripped server-side per the per-solution visibility settings (Decision 77) |
+| `GET /x{name}` | Chapter figures (LaTeXML's bare `x3.jpg`/`x12.png`), served from `build/` (Decision 71) |
 | `GET /book` | Single-file book |
-| `POST /api/claim` | Invite code → HttpOnly SameSite=Lax session cookie |
-| `GET /api/whoami` | Session check (reload survival) + remaining budget |
+| `POST /api/claim` | Invite code → HttpOnly SameSite=Lax session cookie (per-IP throttled, Decision 82) |
+| `GET /api/whoami` | Session check (reload survival) + remaining budget + `is_admin` |
 | `GET /api/content/{hash}` | Cached artifacts visible to the caller (approved ∪ own-unreviewed) |
-| `POST /api/generate` | SSE: `delta` events, then `done` (cost, remaining budget, usage) or `error` (`refresh_required`, `budget_exceeded`, `auth_required`, `unknown_block`) |
+| `GET /api/chapter-content/{n}` | All artifacts visible to the caller anchored anywhere in chapter `n` (one request per chapter view) |
+| `POST /api/generate` | SSE: `delta` events, then `done` (cost, remaining budget, usage, any eureka/question captures) or `error` (see codes below) |
+| `POST /api/flag` | Signed-in flag of an AI artifact or base-textbook passage (category + optional comment) → `/admin/flags` (Decision 79) |
+| `DELETE /api/content/{id}` | Delete-forever; creator (own) or instructor (anyone) only, else 403 (Decision 76) |
 | `GET /admin` | Instructor dashboard (see below) |
+
+`/api/generate` error codes: `auth_required`, `rate_limited` (burst throttle,
+Decision 82), `refresh_required` (stale tab, Decision 60), `budget_exceeded`,
+`unknown_block`, `invalid_scope`, `invalid_messages`, `conversation_too_long`,
+`upstream_error`.
 
 ## Instructor dashboard (`/admin`)
 
@@ -48,8 +57,9 @@ set, the password is seeded — stored as a stdlib `hashlib.scrypt` hash
 (memory-hard like argon2, zero extra dependencies). The env var is only read
 for that one-time seed; to change the password, delete the `admin` table row
 and restart with the new value. Login mints a separate HttpOnly SameSite=Lax
-`admin_session` cookie (path `/admin`), distinct from student `session`
-cookies. After 5 consecutive wrong passwords, login refuses attempts for 15
+`admin_session` cookie (path `/`, so the admin session also reaches `/api` for
+instructor-level deletes — widened from `/admin` in Decision 76), distinct from
+student `session` cookies. After 5 consecutive wrong passwords, login refuses attempts for 15
 minutes (counter and lock timestamp persist in the `admin` table across
 restarts).
 
@@ -74,13 +84,21 @@ restarts).
   sessions). Budgets shown in dollars, stored in microdollars.
 - `/admin/usage` — totals per ledger (student vs instructor), per creature
   type, per top-level chapter, plus the 50 most recent `usage_log` rows.
+- `/admin/flags` — student-reported problems (suspect base-textbook passages
+  and bad AI content), categorized (`incorrect` / `inappropriate` /
+  `text-error`) with optional comments; resolve-only (Decision 79).
+- `/admin/solutions` — per-solution visibility tree (book / section /
+  subsection / individual item), with bulk master actions and a book-wide
+  default (Decision 77). `/admin/settings` redirects here.
 
 ## Data
 
 SQLite at `backend/textbook.db` (git-ignored; override with `TEXTBOOK_DB`).
-Full Q12 schema: invite_codes / sessions / cached_content / content_flags /
-usage_log (student+instructor ledgers, microdollars) / content_manifest /
-admin. The manifest table resyncs from `build/manifest.json` at startup.
+Schema: invite_codes / sessions / cached_content / content_flags (categorized,
+Decision 79) / usage_log (student+instructor ledgers, microdollars) /
+content_manifest / admin / **settings** (key–value, e.g. `solutions_default`) /
+**solution_overrides** (per-solution visibility, Decision 77). The manifest
+table resyncs from `build/manifest.json` at startup.
 
 ## Notes
 

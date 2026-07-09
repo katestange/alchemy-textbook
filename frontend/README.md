@@ -2,9 +2,12 @@
 
 Plain **Svelte + Vite** SPA (no SvelteKit, no Node runtime in production --
 Decision 44) that hydrates an interaction layer over the pre-rendered
-LaTeXML chapter HTML (Decision 45). This slice wires up the **example** and
-**intuition** creatures end-to-end; chat/quiz are visible in the toolbar but
-disabled ("coming soon") per Decision 56's launch roster.
+LaTeXML chapter HTML (Decision 45).  All eight tool-creatures are now wired
+end-to-end: six **in-situ** creatures (example, intuition, justify,
+counterexample, fun, applet) stream into result boxes via `/api/generate`, and
+**chat** and **quiz** run as live conversation panels (`ChatPanel.svelte`,
+Decisions 65/74) — the earlier "coming soon" state is gone. Summarize and
+section-scoped selection remain unbuilt (Decisions 80/36).
 
 ## Scaffold
 
@@ -104,7 +107,9 @@ testable without a DOM/network:
   `removeResultItem` (used only for a budget-exceeded generation that never
   produced content) removes the pair entirely.
 
-All 67 tests pass as of this writing (`npx vitest run`).
+Run `npx vitest run` for the current suite (see `tests/` for the full set,
+which has since grown to cover the desmos/geogebra/sagecell applet helpers and
+the chat conversation-assembly logic).
 
 ## Manual smoke check (optional)
 
@@ -205,22 +210,16 @@ promotes them to real math segments on the next re-render.
    backend omits it for anonymous/non-owner rows rather than sending
    `false`, the current filter (`status === 'approved' || e.own`) still
    works correctly either way.
-3. **Budget display after generation.** `event: done` carries
-   `cost_microdollars` but not an updated `budget_remaining_microdollars`.
-   The frontend locally subtracts the cost from the last known budget
-   (`session.updateBudget`) as an approximation; if the backend later wants
-   the authoritative remaining balance reflected immediately (e.g. to catch
-   drift from concurrent multi-device usage on the same code), `done` would
-   need to carry it explicitly.
-4. **No `session`/`whoami` endpoint.** There's no documented way to ask "am
-   I still logged in?" on a fresh page load -- only `/api/claim` (POST) is
-   specified. This slice's `session` store therefore lives only in memory
-   for the current tab/reload cycle; a real reload always falls back to the
-   code-entry screen even though the HttpOnly cookie may still be valid
-   server-side. A cheap `GET /api/manifest`-succeeds-so-we're-fine check
-   isn't quite right either, since anonymous readers can also load the
-   manifest. Flagging this as a likely near-term follow-up rather than
-   solving it speculatively here.
+3. **Budget display after generation.** ~~`event: done` carries
+   `cost_microdollars` but not an updated `budget_remaining_microdollars`.~~
+   **Resolved:** the real backend's `done` event now carries the authoritative
+   `budget_remaining_microdollars` (as well as `cost_microdollars`), so the
+   client no longer has to approximate by subtracting locally.
+4. **No `session`/`whoami` endpoint.** ~~There's no documented way to ask "am
+   I still logged in?" on a fresh page load.~~ **Resolved:** `GET /api/whoami`
+   exists — it reports `{ ok, budget_remaining_microdollars, is_admin }` from
+   the HttpOnly session cookie, and `App.svelte` calls it on load so a reload
+   restores the session instead of bouncing to the code-entry screen.
 
 ## Collapsed-chip resting state, solution toggle, markdown, intuition (Decisions 61-64)
 
@@ -259,13 +258,16 @@ promotes them to real math segments on the next re-render.
 - **Intuition creature enabled.** `SelectionToolbar.svelte`'s "Int." chip is
   now enabled (gold/ochre tint, matching the firefly per Q11); its default
   prompt is "Explain the intuition behind this." (Q3), and it reuses the
-  same generate/hydrate/chip flow as example. Chat/Quiz remain disabled
-  ("coming soon").
+  same generate/hydrate/chip flow as example. (Justify, counterexample, fun,
+  and applet were subsequently enabled the same way; Chat and Quiz are now live
+  conversation panels, no longer "coming soon".)
 
 ## Known slice limitations (by design, per the brief)
 
-- Only **example** and **intuition** are wired to `/api/generate`; chat/quiz
-  render as disabled chips with a "coming soon" tooltip.
+- All eight tool-creatures are wired: six in-situ (example, intuition, justify,
+  counterexample, fun, applet) plus live chat and quiz conversation panels.
+  (This bullet previously said only example/intuition were wired — no longer
+  true.) Summarize is not built (Decision 80).
 - No refinement flow (clicking a settled result to re-open the prompt box)
   -- out of scope for this pass.
 - No creature *art* / animation -- quiet mode (typed icon chips, now with a
