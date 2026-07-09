@@ -19,6 +19,9 @@ analysis.math.example.edu ──►      "        ──►  127.0.0.1:8002  ana
 
 ## Onboarding a book (per book, ~an hour, done by one tech-comfortable person)
 
+0. **No `.tex` yet?** A professor starting from handwritten/scanned course
+   notes can transcribe them to portable LaTeX with the AI prompt in
+   `notes-to-latex.md` (repo root) — done in any chat tool, no setup.
 1. **Get the professor's book building.** Clone this repo (or fork it) into
    its own directory, drop their `.tex` + images into `textbook_source/`,
    edit **`book.toml`** (title, subject, voice, slug, source path, invite
