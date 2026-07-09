@@ -536,6 +536,8 @@
       session.reset();
     } else if (code === 'rate_limited') {
       showResultError(box, 'Whoa — that’s a lot of requests very fast. Give it a few seconds and try again.');
+    } else if (code === 'stream_interrupted') {
+      showResultError(box, 'The connection dropped mid-answer. Please try again.');
     } else {
       showResultError(box, 'Something went wrong generating this. Please try again.');
     }
@@ -639,13 +641,17 @@
       />
     {/if}
     {#if promptBox}
-      <PromptBox
-        top={promptBox.top}
-        left={promptBox.left}
-        initialPrompt={DEFAULT_PROMPTS[promptBox.creatureType] || ''}
-        onSubmit={submitPrompt}
-        onCancel={cancelPrompt}
-      />
+      <!-- Re-key so switching creature/anchor without unmounting rebuilds the
+           box (otherwise its one-time initialPrompt would stay stale). -->
+      {#key promptBox}
+        <PromptBox
+          top={promptBox.top}
+          left={promptBox.left}
+          initialPrompt={DEFAULT_PROMPTS[promptBox.creatureType] || ''}
+          onSubmit={submitPrompt}
+          onCancel={cancelPrompt}
+        />
+      {/key}
     {/if}
     {#if hiddenN > 0}
       <button class="show-hidden" type="button" on:click={showHidden}>

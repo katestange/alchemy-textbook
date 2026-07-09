@@ -225,7 +225,7 @@ def review_queue(request: Request):
         "       cm.section_id  AS anchor_section "
         "FROM cached_content cc "
         "LEFT JOIN content_manifest cm ON cm.content_hash = cc.content_hash "
-        "WHERE cc.status IN ('unreviewed', 'flagged') "
+        "WHERE cc.status = 'unreviewed' "
         "ORDER BY cc.created_at DESC, cc.id DESC")
     flags = {}
     for f in core.db_query(
@@ -476,6 +476,7 @@ async def orphan_reanchor(item_id: int, request: Request):
 def orphan_delete(item_id: int, request: Request):
     if not is_admin(request):
         return _login_redirect()
+    core.db_execute("DELETE FROM content_flags WHERE cached_content_id = ?", (item_id,))
     core.db_execute("DELETE FROM cached_content WHERE id = ?", (item_id,))
     return RedirectResponse("/admin/orphans", status_code=303)
 

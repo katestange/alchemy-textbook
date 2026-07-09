@@ -404,9 +404,10 @@ button {
    (::highlight below), which paints just the chosen range without touching the
    DOM. Fallback: the whole-block wash on .ai-anchor-highlight, used when the
    browser lacks the API or the exact text can't be located. */
+/* Only background-color / color / text-decoration are honored on a highlight
+   pseudo -- border-radius etc. are silently ignored, so don't set them. */
 ::highlight(ai-anchor) {
   background-color: color-mix(in srgb, var(--accent-gold) 22%, transparent);
-  border-radius: 4px;
 }
 .reading-pane .ai-anchor-highlight {
   background: color-mix(in srgb, var(--accent-gold) 15%, transparent);
@@ -473,10 +474,6 @@ button {
   color: var(--accent-teal);
 }
 
-.creature-chip:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
 
 .creature-chip:not(:disabled):hover,
 .creature-chip:not(:disabled):focus-visible {
@@ -654,6 +651,24 @@ button {
   background: var(--wash-gold);
   border-color: var(--accent-gold);
 }
+/* The newer creatures got chip colours but not the matching box wash -- add
+   them so justify/counterexample/fun/applet boxes read as the same family. */
+.ai-result[data-creature='justify'] {
+  background: var(--wash-teal);
+  border-color: var(--accent-teal);
+}
+.ai-result[data-creature='counterexample'] {
+  background: var(--wash-gold);
+  border-color: var(--accent-gold);
+}
+.ai-result[data-creature='fun'] {
+  background: var(--wash-red);
+  border-color: var(--accent-red);
+}
+.ai-result[data-creature='applet'] {
+  background: var(--wash-grey);
+  border-color: var(--accent-grey);
+}
 
 .ai-result .ai-result-head {
   display: flex;
@@ -778,6 +793,9 @@ button {
 }
 
 .solution-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
   background: none;
   border: 1px dashed var(--color-ink-soft);
   border-radius: 6px;
@@ -785,6 +803,19 @@ button {
   font-family: var(--font-serif);
   font-size: 0.85rem;
   padding: 0.15rem 0.6rem;
+}
+/* CSS-drawn caret (EB Garamond lacks ▸/▾ -- they tofu'd). */
+.solution-toggle-btn::after {
+  content: '';
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0.3em 0 0.3em 0.42em;
+  border-color: transparent transparent transparent currentColor;
+  transition: transform 0.15s ease;
+}
+.solution-toggle.revealed .solution-toggle-btn::after {
+  transform: rotate(90deg);
 }
 
 .solution-toggle-btn:hover,
@@ -925,8 +956,7 @@ button {
   letter-spacing: 0.03em;
 }
 .chat-panel-header-actions { display: flex; gap: 0.5rem; align-items: center; }
-.chat-panel-close,
-.new-conversation {
+.chat-panel-close {
   background: none;
   border: 1px solid var(--color-rule);
   border-radius: 4px;
@@ -936,7 +966,7 @@ button {
   font-size: 0.8rem;
   color: var(--color-ink-soft);
 }
-.chat-panel-close:hover, .new-conversation:hover { color: var(--color-ink); }
+.chat-panel-close:hover { color: var(--color-ink); }
 
 .context-selector {
   padding: 0.4rem 0.8rem;
@@ -1191,10 +1221,16 @@ button {
   letter-spacing: 0.03em;
   font-size: 0.9rem;
 }
+/* CSS-drawn caret (EB Garamond lacks the ▾ glyph -- it tofu'd). */
 .builtin-applet-caret::before {
-  content: '▾';
+  content: '';
   display: inline-block;
-  font-size: 0.8em;
+  width: 0;
+  height: 0;
+  vertical-align: middle;
+  border-style: solid;
+  border-width: 0.32em 0.28em 0 0.28em;
+  border-color: currentColor transparent transparent transparent;
   transition: transform 0.15s ease;
 }
 .builtin-applet.collapsed .builtin-applet-caret::before {

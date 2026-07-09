@@ -4,8 +4,7 @@
 <h1>Review queue</h1>
 <p class="hint">
   {{ items|length }} awaiting review
-  ({{ counts.get('unreviewed', 0) }} unreviewed, {{ counts.get('flagged', 0) }} flagged;
-  {{ counts.get('approved', 0) }} approved so far) &mdash;
+  ({{ counts.get('approved', 0) }} approved so far) &mdash;
   <kbd>j</kbd>/<kbd>k</kbd> move &middot; <kbd>a</kbd> approve &middot;
   <kbd>r</kbd> remove &middot; <kbd>e</kbd> edit &middot; <kbd>Esc</kbd> leave editor
 </p>

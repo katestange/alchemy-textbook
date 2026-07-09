@@ -171,7 +171,9 @@ export async function streamGenerate(
   const decoder = new TextDecoder();
   const parser = new SSEParser();
 
+  let sawTerminal = false;
   const dispatch = (evt) => {
+    if (evt.event === 'done' || evt.event === 'error') sawTerminal = true;
     let data;
     try {
       data = JSON.parse(evt.data);
@@ -181,14 +183,26 @@ export async function streamGenerate(
     onEvent(evt.event, data);
   };
 
-  for (;;) {
-    const { value, done } = await reader.read();
-    if (done) break;
-    for (const evt of parser.push(decoder.decode(value, { stream: true }))) {
+  // A mid-stream network failure rejects reader.read(); without this the whole
+  // streamGenerate promise would reject and the caller's `sending`/box state
+  // would hang forever (Send button stuck disabled, box stuck "streaming").
+  try {
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      for (const evt of parser.push(decoder.decode(value, { stream: true }))) {
+        dispatch(evt);
+      }
+    }
+    for (const evt of parser.flush()) {
       dispatch(evt);
     }
+  } catch (streamErr) {
+    if (!sawTerminal) onEvent('error', { code: 'stream_interrupted', message: String(streamErr) });
+    return;
   }
-  for (const evt of parser.flush()) {
-    dispatch(evt);
-  }
+  // Stream closed cleanly but the server never sent a `done`/`error` frame
+  // (e.g. the connection dropped between frames): synthesize an error so the
+  // caller always resolves its pending state.
+  if (!sawTerminal) onEvent('error', { code: 'stream_interrupted' });
 }

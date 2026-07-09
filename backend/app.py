@@ -24,7 +24,7 @@ from pathlib import Path
 from anthropic import AsyncAnthropic
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request, Response
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, StreamingResponse
+from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse
 
 # ---------------------------------------------------------------------------
 # Paths and configuration
@@ -65,12 +65,15 @@ MAX_OUTPUT_TOKENS_CONVERSATIONAL = 1100
 RATE_LIMIT_MAX = 40           # requests ...
 RATE_LIMIT_WINDOW = 60.0      # ... per this many seconds, per invite code
 _rate_hits: dict = defaultdict(deque)  # code -> deque[monotonic timestamps]
+# Invite-code entry is enumerable (short codes), so throttle claim attempts per
+# client IP too (Decision 57 / Q5): the code-entry endpoint must be rate-limited.
+CLAIM_RATE_MAX = 10           # code-entry attempts per IP per window
+_claim_hits: dict = defaultdict(deque)  # ip -> deque[monotonic timestamps]
 
 # Sanity caps on client-supplied text, so an oversized/abusive selection or
 # prompt can't inflate token cost or wedge the request.
 MAX_SELECTION_CHARS = 2000
 MAX_PROMPT_CHARS = 1000
-MAX_MESSAGES = 80             # chat history turns kept (client resends them)
 MAX_MESSAGE_CHARS = 8000      # per chat message
 MAX_FLAG_COMMENT_CHARS = 1000  # per flag note
 
@@ -78,18 +81,29 @@ MAX_FLAG_COMMENT_CHARS = 1000  # per flag note
 FLAG_CATEGORIES = {"incorrect", "inappropriate", "text-error"}
 
 
-def rate_limited(code: str) -> bool:
-    """True if `code` has exceeded RATE_LIMIT_MAX requests in the window."""
+def _sliding_window_hit(store: dict, key: str, max_hits: int) -> bool:
+    """Record a hit for `key`; return True if it now exceeds `max_hits` within
+    RATE_LIMIT_WINDOW seconds."""
     now = time.monotonic()
     with _db_lock:
-        hits = _rate_hits[code]
+        hits = store[key]
         cutoff = now - RATE_LIMIT_WINDOW
         while hits and hits[0] < cutoff:
             hits.popleft()
-        if len(hits) >= RATE_LIMIT_MAX:
+        if len(hits) >= max_hits:
             return True
         hits.append(now)
         return False
+
+
+def rate_limited(code: str) -> bool:
+    """True if `code` has exceeded RATE_LIMIT_MAX requests in the window."""
+    return _sliding_window_hit(_rate_hits, code, RATE_LIMIT_MAX)
+
+
+def claim_rate_limited(ip: str) -> bool:
+    """True if `ip` has exceeded CLAIM_RATE_MAX invite-code attempts in the window."""
+    return _sliding_window_hit(_claim_hits, ip or "?", CLAIM_RATE_MAX)
 
 # Creatures that hold a client-side conversation (Decision 66): history is
 # resent per turn, nothing is written to cached_content, no content_id.
@@ -148,6 +162,44 @@ def compute_ledgers(model: str, usage) -> tuple[int, int]:
     )
     instructor = cache_write * (CACHE_WRITE_MULT - CACHE_READ_MULT) * p["in"]
     return round(student), round(instructor)
+
+
+def record_billing(code: str, creature_type: str, section_id, model: str,
+                   final, streamed_text: str) -> dict:
+    """Charge both ledgers and the invite code's spend. Called from the SSE
+    generator's `finally`, so a client disconnect (which cancels the generator
+    at a yield, skipping the normal post-stream path) still bills the tokens
+    Anthropic already charged us for -- closing a free-generation hole and
+    keeping the ledgers honest. Returns {student_cost, ts}."""
+    ts = now_iso()
+    instructor_cost = 0
+    if final is not None:
+        student_cost, instructor_cost = compute_ledgers(model, final.usage)
+    elif streamed_text:
+        # Disconnected before the final usage arrived: charge an estimate for the
+        # output already produced (~4 chars/token, at the full output rate) so a
+        # dropped connection can't be used to generate for free.
+        est_out = max(1, (len(streamed_text) + 3) // 4)
+        student_cost = round(est_out * PRICES[model]["out"])
+    else:
+        return {"student_cost": 0, "ts": ts}  # nothing streamed, nothing billed
+
+    db_execute(
+        "INSERT INTO usage_log "
+        "(code, ledger, creature_type, cost_microdollars, section_id, created_at) "
+        "VALUES (?, 'student', ?, ?, ?, ?)",
+        (code, creature_type, student_cost, section_id, ts))
+    if instructor_cost > 0:
+        db_execute(
+            "INSERT INTO usage_log "
+            "(code, ledger, creature_type, cost_microdollars, section_id, created_at) "
+            "VALUES (NULL, 'instructor', ?, ?, ?, ?)",
+            (creature_type, instructor_cost, section_id, ts))
+    db_execute(
+        "UPDATE invite_codes SET spent_microdollars = spent_microdollars + ? "
+        "WHERE code = ?",
+        (student_cost, code))
+    return {"student_cost": student_cost, "ts": ts}
 
 
 # ---------------------------------------------------------------------------
@@ -384,13 +436,12 @@ BOOK_PREFIX_TEXT: str = ""      # all chapters in order (scope=book, Decision 51
 TOC_TEXT: str = ""
 SOLUTIONS: list = []            # ordered [{sol_key, section_id, chapter, name, type}]
 SOLUTION_SECTIONS: list = []    # section hierarchy [{id, level, title}]
-SOLUTION_META: dict = {}        # sol_key -> its entry (for name/section lookups)
 
 
 def load_build_artifacts() -> None:
     global MANIFEST, BUILD_VERSION, CHAPTERS, BLOCKS_BY_HASH
     global CHAPTER_PREFIX_TEXT, BOOK_PREFIX_TEXT, TOC_TEXT
-    global SOLUTIONS, SOLUTION_SECTIONS, SOLUTION_META
+    global SOLUTIONS, SOLUTION_SECTIONS
 
     raw = MANIFEST_PATH.read_bytes()
     BUILD_VERSION = hashlib.sha256(raw).hexdigest()[:12]
@@ -405,7 +456,6 @@ def load_build_artifacts() -> None:
         SOLUTION_SECTIONS = sol.get("sections", [])
     else:
         SOLUTIONS, SOLUTION_SECTIONS = [], []
-    SOLUTION_META = {s["sol_key"]: s for s in SOLUTIONS}
 
     BLOCKS_BY_HASH = {}
     chapter_blocks: dict[str, list] = {}
@@ -782,9 +832,19 @@ def api_manifest():
     # build_version served BOTH top-level and inside build{} — the two slice
     # agents were handed slightly different contracts and the mismatch cost a
     # real bug; belt and suspenders from here on.
+    #
+    # Redact each block's full text: it's the exact source (including every
+    # hidden solution) and the reader only needs xml_id / content_hash /
+    # section_id / block_type for anchoring. The full text stays in the
+    # in-memory MANIFEST for server-side re-anchoring only.
+    blocks = [
+        {k: v for k, v in b.items() if k not in ("text", "text_preview")}
+        for b in MANIFEST.get("blocks", [])
+    ]
     return {
         "build_version": BUILD_VERSION,
         **MANIFEST,
+        "blocks": blocks,
         "build": {**MANIFEST.get("build", {}), "build_version": BUILD_VERSION},
     }
 
@@ -811,7 +871,13 @@ def chapter(n: str):
 
 
 @app.get("/book")
-def book():
+def book(request: Request):
+    # The single-file build is NOT solution-stripped (only the split chapter
+    # pages are stamped/stripped), so it would expose every hidden solution.
+    # The reader never uses this route -- it navigates the split /chapter pages
+    # -- so gate it to the instructor.
+    if not _admin.is_admin(request):
+        raise HTTPException(status_code=404, detail="Not found")
     if not BOOK_HTML_PATH.exists():
         raise HTTPException(status_code=404, detail="book.html missing")
     return FileResponse(BOOK_HTML_PATH, media_type="text/html")
@@ -847,6 +913,8 @@ def chapter_graphic(name: str):
 
 @app.post("/api/claim")
 async def api_claim(request: Request, response: Response):
+    if claim_rate_limited(request.client.host if request.client else "?"):
+        raise HTTPException(status_code=429, detail="Too many attempts")
     body = await request.json()
     code = (body.get("code") or "").strip()
     rows = db_query(
@@ -1043,9 +1111,13 @@ async def api_generate(request: Request):
     if isinstance(body.get("prompt"), str):
         body["prompt"] = body["prompt"][:MAX_PROMPT_CHARS]
     if isinstance(body.get("messages"), list):
+        # Cap each message's length here; overall conversation length is bounded
+        # by the explicit MAX_CONVERSATION_MESSAGES check in event_stream (which
+        # returns a clear "start a new conversation" error rather than silently
+        # dropping turns).
         body["messages"] = [
             {**m, "content": str(m.get("content", ""))[:MAX_MESSAGE_CHARS]}
-            for m in body["messages"][-MAX_MESSAGES:]
+            for m in body["messages"]
             if isinstance(m, dict)
         ]
 
@@ -1152,7 +1224,11 @@ async def api_generate(request: Request):
             api_messages = [{"role": "user", "content": user_message}]
             max_tokens = MAX_OUTPUT_TOKENS
 
-        # f. Call Anthropic with streaming; forward text deltas.
+        # f. Call Anthropic with streaming; forward text deltas. Accumulate the
+        # streamed text so accounting can still charge for a partial response if
+        # the client disconnects mid-stream.
+        final = None
+        streamed: list[str] = []
         try:
             async with anthropic_client.messages.stream(
                 model=model,
@@ -1161,38 +1237,28 @@ async def api_generate(request: Request):
                 messages=api_messages,
             ) as stream:
                 async for text in stream.text_stream:
+                    streamed.append(text)
                     yield sse("delta", {"text": text})
                 final = await stream.get_final_message()
         except Exception:
             yield sse("error", {"code": "upstream_error"})
             return
+        finally:
+            # g. Two-ledger accounting (Decision 53), in `finally` so billing
+            # still happens if the client disconnected mid-stream (the generator
+            # is cancelled at the yield above, skipping everything after it).
+            billing = record_billing(
+                code, creature_type,
+                block["section_id"] if block else None,
+                model, final, "".join(streamed))
 
-        # g. Two-ledger accounting (Decision 53).
+        # Only reached on a clean finish -- a disconnect propagates GeneratorExit
+        # out of the finally and stops here (so nothing below double-bills).
         usage = final.usage
-        student_cost, instructor_cost = compute_ledgers(model, usage)
-        response_text = "".join(
-            b.text for b in final.content if b.type == "text"
-        )
-        ts = now_iso()
+        student_cost = billing["student_cost"]
+        ts = billing["ts"]
+        response_text = "".join(streamed)
 
-        db_execute(
-            "INSERT INTO usage_log "
-            "(code, ledger, creature_type, cost_microdollars, section_id, created_at) "
-            "VALUES (?, 'student', ?, ?, ?, ?)",
-            (code, creature_type, student_cost, block["section_id"], ts),
-        )
-        if (usage.cache_creation_input_tokens or 0) > 0:
-            db_execute(
-                "INSERT INTO usage_log "
-                "(code, ledger, creature_type, cost_microdollars, section_id, created_at) "
-                "VALUES (NULL, 'instructor', ?, ?, ?, ?)",
-                (creature_type, instructor_cost, block["section_id"], ts),
-            )
-        db_execute(
-            "UPDATE invite_codes SET spent_microdollars = spent_microdollars + ? "
-            "WHERE code = ?",
-            (student_cost, code),
-        )
         # Ephemeral redirects: when the model judges the selection unusable it
         # prefixes [[EPHEMERAL]] (see CORE_SYSTEM_PROMPT). Such throwaway
         # responses are shown once and never stored, so the instructor's review

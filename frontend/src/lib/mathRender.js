@@ -46,7 +46,7 @@ function renderSolutionSegment(seg, streaming) {
   const inner = renderPlainRun(seg.value);
   return (
     '<span class="solution-toggle">' +
-    '<button type="button" class="solution-toggle-btn" aria-expanded="false">Show solution &#9656;</button>' +
+    '<button type="button" class="solution-toggle-btn" aria-expanded="false">Show solution</button>' +
     `<span class="solution-content" hidden>${inner}</span>` +
     '</span>'
   );

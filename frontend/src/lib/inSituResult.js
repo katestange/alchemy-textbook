@@ -278,7 +278,12 @@ export function ensureResultBox(anchorEl, creatureType, key, status = 'unreviewe
   }
 
   const cluster = getOrCreateCluster(anchorEl, opts.injectAfter);
-  let item = cluster.querySelector(`[data-item-key="${itemKey}"]`);
+  // Look the item up document-wide, not just in this cluster: a fresh
+  // generation keys its cluster off the inject point (the <li>/heading) while
+  // hydration keys off the anchor block, so the same artifact could otherwise
+  // land in two clusters as duplicate chip+box pairs.
+  let item = document.querySelector(`.ai-cluster [data-item-key="${itemKey}"]`)
+    || cluster.querySelector(`[data-item-key="${itemKey}"]`);
   if (item) {
     const existing = item.querySelector('.ai-result');
     // A regeneration on the same block may discuss a different phrase --
@@ -555,7 +560,7 @@ function wireSolutionToggles(body) {
       const wrap = btn.closest('.solution-toggle');
       if (!wrap) return;
       const revealed = wrap.classList.toggle('revealed');
-      btn.innerHTML = revealed ? 'Hide solution &#9662;' : 'Show solution &#9656;';
+      btn.textContent = revealed ? 'Hide solution' : 'Show solution';
       btn.setAttribute('aria-expanded', String(revealed));
       const content = wrap.querySelector('.solution-content');
       if (content) content.hidden = !revealed;

@@ -91,6 +91,8 @@
         }
       }
     );
+    // Belt-and-suspenders: whatever happened, never leave the input disabled.
+    sending = false;
   }
 
   // Hide the capture-control tokens from the transcript; their effect (a
@@ -142,6 +144,8 @@
         "This conversation has grown long enough to bump into the model's limits — start a new conversation to keep going.";
     } else if (code === 'rate_limited') {
       panelError = 'Whoa — too many requests very fast. Give it a few seconds and try again.';
+    } else if (code === 'stream_interrupted') {
+      panelError = 'The connection dropped mid-answer. Please try again.';
     } else {
       panelError = 'Something went wrong. Please try again.';
     }
@@ -177,7 +181,7 @@
     const wrap = btn.closest('.solution-toggle');
     if (!wrap) return;
     const revealed = wrap.classList.toggle('revealed');
-    btn.innerHTML = revealed ? 'Hide solution &#9662;' : 'Show solution &#9656;';
+    btn.textContent = revealed ? 'Hide solution' : 'Show solution';
     btn.setAttribute('aria-expanded', String(revealed));
     const content = wrap.querySelector('.solution-content');
     if (content) content.hidden = !revealed;
