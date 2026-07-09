@@ -8,7 +8,11 @@ const DEFAULTS = {
   title: 'Interactive Textbook',
   slug: 'book',
   code_example: 'ABCD-1234-XY',
-  desmos_api_key: null
+  desmos_api_key: null,
+  // Decision 85: false = the instructor chose the classic colored chips
+  // (quiet mode) over illustrated creature art. The creature-art layer, when
+  // it lands, must check this flag and leave the chips alone when false.
+  creature_art: true
 };
 
 export const bookConfig = writable({ ...DEFAULTS });
@@ -28,5 +32,10 @@ export async function loadBookConfig() {
     window.__BOOK_CONFIG__ = cfg;
   }
   if (typeof document !== 'undefined' && cfg.title) document.title = cfg.title;
+  if (typeof document !== 'undefined') {
+    // Styling hook for the creature-art layer (Decision 85): CSS/components
+    // key off <html data-creature-art="on|off">.
+    document.documentElement.dataset.creatureArt = cfg.creature_art ? 'on' : 'off';
+  }
   return cfg;
 }

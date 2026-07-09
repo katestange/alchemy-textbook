@@ -1,0 +1,34 @@
+{% extends "admin/base.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<h1>Settings</h1>
+<p class="hint">Book-wide appearance choices (Decision 85). Solution
+visibility has its own page: <a href="/admin/solutions">Solutions</a>.</p>
+
+<section class="block">
+  <h2>Creature appearance</h2>
+  <p class="hint">How the AI study tools look to readers. <strong>Illustrated
+  creatures</strong> uses the hand-drawn grimoire creature art (once it is
+  installed &mdash; until then readers see the classic chips either way).
+  <strong>Classic chips</strong> keeps the plain colored ovals permanently,
+  for a quieter, more conventional look.</p>
+  <form method="post" action="/admin/settings/creature-art">
+    <label class="choice">
+      <input type="radio" name="creature_art" value="on"
+             {% if creature_art != 'off' %}checked{% endif %}>
+      Illustrated creatures (when art is installed)
+    </label>
+    <label class="choice">
+      <input type="radio" name="creature_art" value="off"
+             {% if creature_art == 'off' %}checked{% endif %}>
+      Classic colored chips (quiet mode)
+    </label>
+    <p><button class="primary">Save</button></p>
+  </form>
+</section>
+
+<style>
+  label.choice { display: block; margin: 0.4rem 0; }
+  label.choice input { margin-right: 0.5rem; }
+</style>
+{% endblock %}

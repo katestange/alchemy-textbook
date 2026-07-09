@@ -891,6 +891,10 @@ def api_book():
         "slug": BOOK_CFG["book"]["slug"],
         "code_example": f"{prefix}-7X4M-Q2",
         "desmos_api_key": BOOK_CFG["frontend"]["desmos_api_key"] or None,
+        # Decision 85: instructor's creature-appearance choice. False means
+        # the classic colored chips (quiet mode) even after creature art is
+        # installed; the art layer must check this and stand down.
+        "creature_art": get_setting("creature_art", "on") != "off",
     }
 
 

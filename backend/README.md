@@ -32,7 +32,7 @@ and serves it to the frontend at `/api/book`.
 | Route | What |
 |---|---|
 | `GET /` | Built frontend (`frontend/dist`), if present |
-| `GET /api/book` | Book identity from `book.toml`: title, slug, invite-code example, Desmos key |
+| `GET /api/book` | Book identity from `book.toml`: title, slug, invite-code example, Desmos key, plus the instructor's `creature_art` choice (Decision 85) |
 | `GET /api/manifest` | Content manifest + `build_version` |
 | `GET /api/chapters` | Chapter number → HTML file map |
 | `GET /chapter/{n}` | Chapter reader HTML (whatever `build/chapters.json` lists); hidden solutions stripped server-side per the per-solution visibility settings (Decision 77) |
@@ -103,7 +103,10 @@ restarts).
   `text-error`) with optional comments; resolve-only (Decision 79).
 - `/admin/solutions` — per-solution visibility tree (book / section /
   subsection / individual item), with bulk master actions and a book-wide
-  default (Decision 77). `/admin/settings` redirects here.
+  default (Decision 77).
+- `/admin/settings` — book-wide appearance choices (Decision 85): creature
+  style, illustrated creature art vs. the classic colored chips (quiet
+  mode). Served to the reader as `creature_art` in `GET /api/book`.
 
 ## Data
 

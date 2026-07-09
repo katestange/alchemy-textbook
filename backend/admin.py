@@ -657,15 +657,31 @@ def orphan_delete(item_id: int, request: Request):
 
 
 # ---------------------------------------------------------------------------
-# Settings -> superseded by the per-solution Solutions page; keep a redirect so
-# an old bookmark still lands somewhere sensible.
+# Settings (Decision 85). Resurrected as a real page (Decision 77 had turned
+# it into a redirect to /admin/solutions when the old global solutions toggle
+# went away): now holds book-wide appearance choices, starting with creature
+# style — illustrated creature art vs. the classic colored chips (quiet mode,
+# Decision 56), kept permanently for instructors who prefer the plain look.
 # ---------------------------------------------------------------------------
 
-@router.get("/settings")
+@router.get("/settings", response_class=HTMLResponse)
 def settings_page(request: Request):
     if not is_admin(request):
         return _login_redirect()
-    return RedirectResponse("/admin/solutions", status_code=303)
+    return _render(request, "admin/settings.html", {
+        "creature_art": core.get_setting("creature_art", "on"),
+        "active": "settings",
+    })
+
+
+@router.post("/settings/creature-art")
+async def settings_creature_art(request: Request):
+    if not is_admin(request):
+        return _login_redirect()
+    form = await request.form()
+    value = "off" if str(form.get("creature_art")) == "off" else "on"
+    core.set_setting("creature_art", value)
+    return RedirectResponse("/admin/settings", status_code=303)
 
 
 # ---------------------------------------------------------------------------
