@@ -43,13 +43,38 @@ Either way, the AI is held to the same rule: it may reformat what you
 wrote, but it may not add, fix, or omit any mathematics. Every uncertainty
 becomes an `\AI{...}` note for you to resolve.
 
+## What if my notes are huge?
+
+A whole semester of notes will not fit in one chat conversation. That's
+fine — the workflow is built for it:
+
+- **Prompt A: one chat per lecture.** A single conversation reliably
+  handles about one lecture (~15–25 pages, in 3–6 page batches) before
+  the AI's memory fills and transcription quality quietly degrades —
+  don't push past that. Starting fresh costs nothing: paste the prompt
+  again, and because later replies are body-only against the same fixed
+  header, output from many chats pastes into one document with no seams
+  (theorem numbers sort themselves out when you compile).
+- **Carry your corrections forward.** Things the AI learned mid-chat
+  ("my ρ always looks like a p") are forgotten in a new chat. Keep a
+  short personal *conventions* note — a few lines about your handwriting
+  quirks and notation — and paste it immediately after the prompt in
+  every new chat.
+- **Hundreds of pages? Use Prompt B.** The coding agent reads pages from
+  your folder batch by batch and keeps the transcript in a file, not in
+  the conversation, so a big set of notes just means more batches — not
+  lower quality. This is the main reason to prefer Prompt B for a full
+  course.
+
 ---
 
 # Prompt A — for a chat website
 
 **How to use it:**
 
-1. Start a fresh chat; paste all of Prompt A as your first message.
+1. Start a fresh chat; paste all of Prompt A as your first message (plus
+   your conventions note, if you've started one — see "What if my notes
+   are huge?"). Use one chat per lecture, not one for everything.
 2. Attach pages **a few at a time** (3–6 pages per message). Long batches
    degrade transcription fidelity.
 3. The first reply is a complete `.tex` file — save it as is. Later
