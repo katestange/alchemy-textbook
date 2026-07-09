@@ -1,0 +1,10 @@
+# Never bake secrets or machine-local state into the image.
+.env
+backend/textbook.db
+backend/.venv
+frontend/node_modules
+frontend/dist
+build/
+.git
+*.log
+The_Alchemy_of_Mathematical_Cryptography.zip

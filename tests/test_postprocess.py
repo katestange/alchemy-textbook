@@ -139,7 +139,11 @@ def test_real_manifest_matches_invariants():
     d = json.loads(manifest_path.read_text(encoding="utf-8"))
     blocks = d["blocks"]
 
-    assert len(blocks) == 817
+    # Invariants only — no magic block count, so this test holds for any
+    # adopted book (the per-book structural fingerprint lives in
+    # pipeline/manifest-snapshot.json, gated by check.sh).
+    assert blocks, "manifest has no blocks"
+    assert d["build"]["block_count"] == len(blocks)
     assert all(b["xml_id"] for b in blocks)
     for b in blocks:
         expected = hashlib.sha256(b["text"].encode("utf-8")).hexdigest()

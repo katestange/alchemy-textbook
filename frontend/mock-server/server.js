@@ -117,6 +117,15 @@ const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
 
   try {
+    if (req.method === 'GET' && url.pathname === '/api/book') {
+      return sendJSON(res, 200, {
+        title: 'Interactive Textbook (mock)',
+        slug: 'mock-book',
+        code_example: 'MOCK-7X4M-Q2',
+        desmos_api_key: null
+      });
+    }
+
     if (req.method === 'GET' && url.pathname === '/api/manifest') {
       return sendJSON(res, 200, await loadManifest());
     }

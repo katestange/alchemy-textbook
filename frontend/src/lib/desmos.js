@@ -8,8 +8,18 @@
 // window.Desmos.GraphingCalculator(elt) into a sized div; it is fully interactive by
 // default. Expressions are added one-per-call with calc.setExpression(...).
 
-const DESMOS_SRC =
-  'https://www.desmos.com/api/v1.11/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6';
+// The institution's own key comes from book.toml via /api/book (stashed on
+// window.__BOOK_CONFIG__ by bookConfig.js — this module stays import-free).
+// Fallback: Desmos's well-known public DEMO key, fine for development but
+// NOT licensed for production course use (free edu keys: desmos.com/apikey).
+const DESMOS_DEMO_KEY = 'dcb31709b452b1cf9dc26972add0fda6';
+
+function desmosSrc() {
+  const key =
+    (typeof window !== 'undefined' && window.__BOOK_CONFIG__?.desmos_api_key) ||
+    DESMOS_DEMO_KEY;
+  return `https://www.desmos.com/api/v1.11/calculator.js?apiKey=${encodeURIComponent(key)}`;
+}
 const LOAD_TIMEOUT_MS = 15000;
 
 // Module-level cache of the in-flight (or resolved) load Promise so the <script>
@@ -72,7 +82,7 @@ export function ensureDesmosLoaded() {
       resolve(window.Desmos);
     };
 
-    injectScript(DESMOS_SRC).then(succeed).catch(fail);
+    injectScript(desmosSrc()).then(succeed).catch(fail);
   });
 
   return loadPromise;

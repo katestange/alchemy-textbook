@@ -187,6 +187,7 @@ async def login_submit(request: Request):
     _admin_sessions[token] = _now() + datetime.timedelta(hours=ADMIN_SESSION_HOURS)
     resp = RedirectResponse("/admin/review", status_code=303)
     resp.set_cookie(ADMIN_COOKIE, token, httponly=True, samesite="lax",
+                    secure=core.COOKIE_SECURE,
                     max_age=ADMIN_SESSION_HOURS * 3600, path="/")
     return resp
 
@@ -284,7 +285,8 @@ async def review_edit(item_id: int, request: Request):
 def _new_code() -> str:
     def chunk(n):
         return "".join(secrets.choice(CODE_ALPHABET) for _ in range(n))
-    return f"CRYPTO-{chunk(4)}-{chunk(2)}"
+    prefix = core.BOOK_CFG["invites"]["code_prefix"]
+    return f"{prefix}-{chunk(4)}-{chunk(2)}"
 
 
 @router.get("/codes", response_class=HTMLResponse)

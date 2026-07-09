@@ -28,7 +28,10 @@ import re
 import sys
 from pathlib import Path
 
-SRC = Path("textbook_source/introduction-to-crypto.tex")
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+import bookconfig
+
+SRC = Path(bookconfig.load()["source"]["tex"])
 DST = Path("build/book-clean.tex")
 
 # Shims injected into the preamble, just before \begin{document}.

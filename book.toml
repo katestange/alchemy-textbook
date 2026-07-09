@@ -1,0 +1,63 @@
+# book.toml — per-book configuration for the interactive textbook.
+#
+# This is the ONE file a new adopter edits to point the system at their own
+# LaTeX textbook. Everything that identifies "which book this is" lives here;
+# deployment secrets (API key, admin password) live in .env instead.
+# After editing, run ./adopt-book.sh to rebuild and regenerate the pipeline
+# baselines for the new book.
+
+[book]
+# Short machine name for this book: used to namespace per-reader browser
+# storage so two books hosted on one domain don't share state.
+# Lowercase letters, digits, hyphens.
+slug = "alchemy-crypto"
+
+# Shown in the browser tab and on the reader's entry screen, and told to the
+# AI tutor ("You are a mathematics tutor embedded in <title>...").
+title = "The Alchemy of Mathematical Cryptography"
+
+# Completes the tutor's self-description: "...an interactive textbook on
+# <subject>". Keep it short, e.g. "real analysis" or "linear algebra".
+subject = "coding theory and cryptography"
+
+# One paragraph telling the AI how to match this book's writing voice.
+# Describe your book's actual habits; the tutor mimics them.
+voice = """
+Write in the voice of the textbook provided: match its tone, notation, and \
+explanatory habits -- the conversational asides, the "out loud, we say..." \
+readings, the concrete small-number examples before generality.\
+"""
+
+[source]
+# The main .tex file (repo-relative). Multi-file books (\input/\include) are
+# not yet supported — see ADAPTABILITY.md.
+tex = "textbook_source/introduction-to-crypto.tex"
+
+# Directory searched for \includegraphics files (repo-relative).
+images = "textbook_source"
+
+# LaTeXML split level: which sectioning unit becomes one reader page
+# ("chapter" in the UI). Only "section" (article-class top-level \section)
+# is validated today; "chapter" (book-class) is planned — see ADAPTABILITY.md.
+split_at = "section"
+
+[environments]
+# Your book's theorem-environment names, as declared with \newtheorem.
+# `solutions` are the click-to-reveal answers the instructor can hide per
+# item; `questions` are the environments a solution is named after
+# ("Concept Check 5.5"). A book with no such environments can use empty
+# lists — the solutions feature then simply stays dormant.
+solutions = ["solution", "aisolution"]
+questions = ["checkin", "quiz", "question", "example", "problem", "exercise"]
+
+[invites]
+# Prefix for generated student invite codes, e.g. CRYPTO-7X4M-Q2.
+# Pick something course-recognizable: "ALGEBRA", "MATH3140", ...
+code_prefix = "CRYPTO"
+
+[frontend]
+# Desmos API key for the graphing-calculator applets. Empty string = fall
+# back to Desmos's public DEMO key, which is fine for trying things out but
+# NOT licensed for production course use — request a (free for education)
+# key at https://www.desmos.com/apikey and put it here before a real class.
+desmos_api_key = ""

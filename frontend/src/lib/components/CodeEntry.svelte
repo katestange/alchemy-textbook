@@ -1,5 +1,6 @@
 <script>
   import { session } from '../stores/session.js';
+  import { bookConfig } from '../stores/bookConfig.js';
   import { claimCode } from '../api.js';
 
   let code = '';
@@ -24,12 +25,12 @@
 </script>
 
 <div class="code-entry">
-  <h1>The Alchemy of Mathematical Cryptography</h1>
+  <h1>{$bookConfig.title}</h1>
   <p>Enter your invite code to unlock AI-assisted study tools. You can also read the base textbook without a code.</p>
   <form on:submit|preventDefault={submit}>
     <input
       type="text"
-      placeholder="CRYPTO-7X4M-Q2"
+      placeholder={$bookConfig.code_example}
       bind:value={code}
       autocomplete="off"
       spellcheck="false"

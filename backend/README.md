@@ -18,16 +18,24 @@ backend/.venv/bin/uvicorn app:app --app-dir backend --port 8000
 
 Then browse **http://localhost:8000/** — if `frontend/dist/` exists (built via
 `cd frontend && npm run build`), the reader app is served there. Dev invite
-code: `DEV-TEST-1` ($5.00 budget, seeded on first startup).
+code: `DEV-TEST-1` ($5.00 budget) — seeded on first startup **only when
+`TEXTBOOK_SEED_DEV_CODE=1`** (never set in production; see `.env.example`
+for this and the other deployment env vars: `TEXTBOOK_HOST`, `TEXTBOOK_PORT`,
+`TEXTBOOK_COOKIE_SECURE`, `TEXTBOOK_BUILD_DIR`, `TEXTBOOK_DB`).
+
+Book identity (title, tutor subject/voice, invite-code prefix) comes from the
+repo's `book.toml` — the backend formats it into the system prompt at startup
+and serves it to the frontend at `/api/book`.
 
 ## Endpoints
 
 | Route | What |
 |---|---|
 | `GET /` | Built frontend (`frontend/dist`), if present |
+| `GET /api/book` | Book identity from `book.toml`: title, slug, invite-code example, Desmos key |
 | `GET /api/manifest` | Content manifest + `build_version` |
 | `GET /api/chapters` | Chapter number → HTML file map |
-| `GET /chapter/{n}` | Chapter reader HTML (1–9); hidden solutions stripped server-side per the per-solution visibility settings (Decision 77) |
+| `GET /chapter/{n}` | Chapter reader HTML (whatever `build/chapters.json` lists); hidden solutions stripped server-side per the per-solution visibility settings (Decision 77) |
 | `GET /x{name}` | Chapter figures (LaTeXML's bare `x3.jpg`/`x12.png`), served from `build/` (Decision 71) |
 | `GET /book` | Single-file book |
 | `POST /api/claim` | Invite code → HttpOnly SameSite=Lax session cookie (per-IP throttled, Decision 82) |

@@ -1,0 +1,46 @@
+# nginx front door for the textbook containers: TLS termination + one
+# subdomain per book. Include from /etc/nginx/sites-enabled/ (or conf.d/).
+#
+# ONE SUBDOMAIN PER BOOK — not one path per book. The reader is a SPA built
+# for the site root, and the backend serves everything same-origin from "/";
+# path-prefix hosting (dept.edu/crypto/) is NOT supported.
+#
+# Certificates: `certbot --nginx -d crypto.math.example.edu` (repeat per
+# subdomain) fills in the ssl_* lines for you.
+
+server {
+    listen 443 ssl;
+    server_name crypto.math.example.edu;
+
+    # ssl_certificate     /etc/letsencrypt/live/crypto.math.example.edu/fullchain.pem;
+    # ssl_certificate_key /etc/letsencrypt/live/crypto.math.example.edu/privkey.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:8001;      # matches the compose port
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        # SSE (/api/generate streams tokens): no buffering, long read timeout.
+        proxy_buffering off;
+        proxy_read_timeout 300s;
+        proxy_http_version 1.1;
+    }
+}
+
+# server {
+#     listen 443 ssl;
+#     server_name analysis.math.example.edu;
+#     location / {
+#         proxy_pass http://127.0.0.1:8002;
+#         ... same proxy settings as above ...
+#     }
+# }
+
+# Redirect all plain HTTP to HTTPS (cookies are Secure-flagged; nothing
+# useful is served over :80).
+server {
+    listen 80;
+    server_name crypto.math.example.edu;  # add each book's subdomain
+    return 301 https://$host$request_uri;
+}

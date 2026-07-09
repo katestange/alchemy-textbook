@@ -33,32 +33,51 @@ const GEOGEBRA_MARKER = '[[GEOGEBRA]]';
 // just doesn't see it. Persisted in localStorage keyed by item-key
 // (`creatureType:content_hash`) so it survives reloads. A change dispatches a
 // document event so the reading pane can update its "N hidden — show" control.
-const HIDDEN_KEY = 'alchemy:hidden-ai-items';
+// The key is namespaced by the book's slug (book.toml via /api/book, stashed
+// on window.__BOOK_CONFIG__) so two books hosted on one domain don't share
+// hidden-item state. Initialized lazily — first use happens well after the
+// config fetch — with a one-time migration from the old un-namespaced key.
+const HIDDEN_KEY_LEGACY = 'alchemy:hidden-ai-items';
 
-function loadHidden() {
-  try {
-    return new Set(JSON.parse(localStorage.getItem(HIDDEN_KEY) || '[]'));
-  } catch {
-    return new Set();
-  }
+function hiddenKey() {
+  const slug =
+    (typeof window !== 'undefined' && window.__BOOK_CONFIG__?.slug) || 'book';
+  return `alchemy:${slug}:hidden-ai-items`;
 }
-let hiddenSet = loadHidden();
+
+let hiddenSet = null;
+
+function getHidden() {
+  if (hiddenSet === null) {
+    try {
+      const legacy = localStorage.getItem(HIDDEN_KEY_LEGACY);
+      if (legacy !== null && localStorage.getItem(hiddenKey()) === null) {
+        localStorage.setItem(hiddenKey(), legacy);
+        localStorage.removeItem(HIDDEN_KEY_LEGACY);
+      }
+      hiddenSet = new Set(JSON.parse(localStorage.getItem(hiddenKey()) || '[]'));
+    } catch {
+      hiddenSet = new Set();
+    }
+  }
+  return hiddenSet;
+}
 
 function persistHidden() {
   try {
-    localStorage.setItem(HIDDEN_KEY, JSON.stringify([...hiddenSet]));
+    localStorage.setItem(hiddenKey(), JSON.stringify([...getHidden()]));
   } catch {
     /* private-mode / quota: hiding still works for this session */
   }
   try {
-    document.dispatchEvent(new CustomEvent('alchemy:hidden-changed', { detail: hiddenSet.size }));
+    document.dispatchEvent(new CustomEvent('alchemy:hidden-changed', { detail: getHidden().size }));
   } catch {
     /* no DOM (tests) */
   }
 }
 
 export function hiddenCount() {
-  return hiddenSet.size;
+  return getHidden().size;
 }
 
 export function unhideAll() {
@@ -271,9 +290,9 @@ export function ensureResultBox(anchorEl, creatureType, key, status = 'unreviewe
 
   // Hidden by this reader: skip silently during hydration (opts.skipIfHidden),
   // but a fresh, explicitly-requested generation un-hides and shows it again.
-  if (hiddenSet.has(itemKey)) {
+  if (getHidden().has(itemKey)) {
     if (opts.skipIfHidden) return null;
-    hiddenSet.delete(itemKey);
+    getHidden().delete(itemKey);
     persistHidden();
   }
 
@@ -385,7 +404,7 @@ export function ensureResultBox(anchorEl, creatureType, key, status = 'unreviewe
   hide.title = 'Hide this — remove it from the page (generating it again brings it back)';
   hide.setAttribute('aria-label', 'Hide this AI item');
   hide.addEventListener('click', () => {
-    hiddenSet.add(itemKey);
+    getHidden().add(itemKey);
     persistHidden();
     const cluster = item.closest('.ai-cluster');
     item.remove();

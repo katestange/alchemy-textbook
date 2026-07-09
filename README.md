@@ -24,6 +24,12 @@ tools (see spec §Q9). This repository is the reference implementation.
 ```
 spec.md                  Full design spec (Q1–Q14): pipeline, backend, frontend,
                          auth, caching, creatures, cost model, DB schema
+book.toml                Per-book config: title/voice for the AI, source .tex,
+                         environment names, invite prefix (edit to adopt a new book)
+adopt-book.sh            Guided onboarding for a NEW book: build + accept baselines
+ADAPTABILITY.md          Audit + phased plan for running other LaTeX textbooks
+deploy/                  Production hosting: Dockerfile, per-book compose, nginx TLS
+.env.example             Deployment secrets/env template (copy to .env)
 textbook_source/         Canonical source: the LaTeX book + its images
 pipeline/                Deterministic .tex -> web build
   preprocess.py            .tex  -> LaTeXML-safe copy (fixes/shims, logged)

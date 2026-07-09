@@ -15,6 +15,7 @@ import json
 import os
 import re
 import secrets
+import sys
 import time
 from collections import defaultdict, deque
 import sqlite3
@@ -31,7 +32,14 @@ from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse
 # ---------------------------------------------------------------------------
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-BUILD_DIR = REPO_ROOT / "build"
+
+# Per-book identity (title, subject, voice, invite prefix, ...): book.toml.
+sys.path.insert(0, str(REPO_ROOT))
+import bookconfig
+
+BOOK_CFG = bookconfig.load()
+
+BUILD_DIR = Path(os.environ.get("TEXTBOOK_BUILD_DIR", REPO_ROOT / "build"))
 MANIFEST_PATH = BUILD_DIR / "manifest.json"
 CHAPTERS_PATH = BUILD_DIR / "chapters.json"
 SOLUTIONS_PATH = BUILD_DIR / "solutions.json"
@@ -45,6 +53,11 @@ anthropic_client = AsyncAnthropic()  # reads ANTHROPIC_API_KEY from env
 
 SESSION_COOKIE = "session"
 SESSION_LIFETIME_DAYS = 180  # "end of semester" (Decision 58 drops sessions then)
+
+# Set TEXTBOOK_COOKIE_SECURE=1 whenever the app is served over HTTPS (i.e.
+# any real deployment behind TLS): marks session + admin cookies Secure so
+# they are never sent over plain HTTP. Off by default only for local dev.
+COOKIE_SECURE = os.environ.get("TEXTBOOK_COOKIE_SECURE", "") == "1"
 
 # v1 output cap: generous enough for one worked example, cheap enough to test.
 # Tune per creature once real usage is measured (Q14 action item). These
@@ -206,18 +219,19 @@ def record_billing(code: str, creature_type: str, section_id, model: str,
 # Prompts (v1 -- clearly marked for iteration; see spec Q3 and Decision 59)
 # ---------------------------------------------------------------------------
 
-# V1 PROMPT -- iterate after quality testing with real chapters.
-CORE_SYSTEM_PROMPT = """\
-You are a mathematics tutor embedded in "The Alchemy of Mathematical \
-Cryptography," an interactive textbook on coding theory and cryptography. \
+# V1 PROMPT -- iterate after quality testing with real chapters. The book's
+# identity (title, subject) and writing voice come from book.toml so the
+# same prompt serves any adopted textbook.
+CORE_SYSTEM_PROMPT = f"""\
+You are a mathematics tutor embedded in "{BOOK_CFG['book']['title']}," an \
+interactive textbook on {BOOK_CFG['book']['subject']}. \
 Students select passages of the book and summon you for help understanding \
 them. The full text of the chapter the student is reading, and the book's \
 table of contents, are provided below.
 
-Write in the voice of the textbook provided: match its tone, notation, and \
-explanatory habits -- the conversational asides, the "out loud, we say..." \
-readings, the concrete small-number examples before generality.
+{BOOK_CFG['book']['voice'].strip()}
 
+""" + """\
 Output format: render all mathematics as LaTeX between $...$ (inline) or \
 $$...$$ (display). Do not use any other math delimiters. Inside math, use \
 only core LaTeX math commands (amsmath level) -- no package-specific commands \
@@ -593,6 +607,10 @@ CREATE TABLE IF NOT EXISTS solution_overrides (
 );
 """
 
+# Dev invite code, seeded only when TEXTBOOK_SEED_DEV_CODE=1 (local dev /
+# tests). Production deployments must NOT set that env var: a well-known
+# live code with budget would ship enabled otherwise.
+SEED_DEV_CODE = os.environ.get("TEXTBOOK_SEED_DEV_CODE", "") == "1"
 DEV_CODE = "DEV-TEST-1"
 DEV_BUDGET_MICRODOLLARS = 5_000_000  # $5.00
 
@@ -637,9 +655,10 @@ def init_db() -> None:
                 for b in MANIFEST.get("blocks", [])
             ],
         )
-        # Seed a dev invite code if the table is empty.
+        # Seed a dev invite code if the table is empty (dev/test only; gated
+        # by TEXTBOOK_SEED_DEV_CODE so real deployments start with no codes).
         (n,) = _db.execute("SELECT COUNT(*) FROM invite_codes").fetchone()
-        if n == 0:
+        if n == 0 and SEED_DEV_CODE:
             _db.execute(
                 "INSERT INTO invite_codes "
                 "(code, budget_microdollars, spent_microdollars, created_at, revoked) "
@@ -827,6 +846,20 @@ def caller_code(request: Request) -> str | None:
 # --- content routes --------------------------------------------------------
 
 
+@app.get("/api/book")
+def api_book():
+    """Public book identity (from book.toml) so the frontend carries no
+    hardcoded branding: tab/entry-screen title, storage namespace, an
+    invite-code hint matching the configured prefix, and the Desmos key."""
+    prefix = BOOK_CFG["invites"]["code_prefix"]
+    return {
+        "title": BOOK_CFG["book"]["title"],
+        "slug": BOOK_CFG["book"]["slug"],
+        "code_example": f"{prefix}-7X4M-Q2",
+        "desmos_api_key": BOOK_CFG["frontend"]["desmos_api_key"] or None,
+    }
+
+
 @app.get("/api/manifest")
 def api_manifest():
     # build_version served BOTH top-level and inside build{} — the two slice
@@ -939,6 +972,7 @@ async def api_claim(request: Request, response: Response):
         token,
         httponly=True,
         samesite="lax",
+        secure=COOKIE_SECURE,
         max_age=SESSION_LIFETIME_DAYS * 24 * 3600,
     )
     return {
@@ -1359,4 +1393,10 @@ if _DIST.is_dir():
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    # Local default binds loopback only; a deployment sets TEXTBOOK_HOST
+    # (e.g. 0.0.0.0 inside a container) and TEXTBOOK_PORT explicitly.
+    uvicorn.run(
+        app,
+        host=os.environ.get("TEXTBOOK_HOST", "127.0.0.1"),
+        port=int(os.environ.get("TEXTBOOK_PORT", "8000")),
+    )

@@ -13,6 +13,18 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 mkdir -p build
 
+# Per-book configuration (book.toml): validated up front so a bad config
+# fails here with one clear message, not five minutes into latexml.
+python3 bookconfig.py >/dev/null
+IMAGES_PATH="$(python3 bookconfig.py source.images)"
+SPLIT_AT="$(python3 bookconfig.py source.split_at)"
+if [ "$SPLIT_AT" != "section" ]; then
+    echo "FATAL: book.toml [source] split_at='$SPLIT_AT' — only 'section'"
+    echo "  (article-class top-level \\section = chapter) is supported today."
+    echo "  book-class \\chapter splitting is planned: see ADAPTABILITY.md."
+    exit 1
+fi
+
 # LaTeXML behavior (splitting, fragment ids, exit codes) varies across
 # versions; this pipeline is verified against exactly this one.
 EXPECTED_LATEXML_VERSION="0.8.7"
@@ -29,8 +41,9 @@ python3 pipeline/preprocess.py
 
 echo
 echo "===== [2/5] latexml -> semantic XML ====="
-# --path=textbook_source lets latexml resolve \includegraphics files and
-# records that search path in book.xml, so latexmlpost can copy the images.
+# --path (book.toml [source] images) lets latexml resolve \includegraphics
+# files and records that search path in book.xml, so latexmlpost can copy
+# the images.
 #
 # Exit codes (verified empirically for 0.8.7): 0 on success *even when
 # Error:-level messages occur* (check.sh gates on those via the log);
@@ -38,7 +51,7 @@ echo "===== [2/5] latexml -> semantic XML ====="
 # exit is fatal here -- no need to tolerate a "nonzero on warnings" case.
 start=$SECONDS
 latexml_status=0
-timeout 600 latexml --dest=build/book.xml --path=textbook_source build/book-clean.tex \
+timeout 600 latexml --dest=build/book.xml --path="$IMAGES_PATH" build/book-clean.tex \
     > build/latexml.log 2>&1 || latexml_status=$?
 if [ "$latexml_status" -ne 0 ]; then
     [ "$latexml_status" -eq 124 ] && echo "FATAL: latexml timed out after 600s" \
@@ -75,7 +88,7 @@ echo "===== [5/6] latexmlpost --split -> chapter pages (spec Decision 50) ====="
 start=$SECONDS
 rm -rf build/html && mkdir -p build/html   # no stale chapter files
 timeout 600 latexmlpost --dest=build/html/book.html --format=html5 --pmml \
-    --split --splitat=section \
+    --split --splitat="$SPLIT_AT" \
     build/book.xml > build/latexmlpost-split.log 2>&1 \
     || { echo "FATAL: split latexmlpost failed — see build/latexmlpost-split.log"; exit 1; }
 echo "  split pass in $((SECONDS-start))s"

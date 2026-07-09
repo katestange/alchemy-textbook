@@ -1,0 +1,40 @@
+# Department-server template: ONE SERVICE PER BOOK, nginx in front.
+#
+# Each professor's book is its own checkout of this repo (with their own
+# book.toml + textbook_source/), its own image, its own SQLite volume, its
+# own .env (API key + admin password). Books never share state, budgets, or
+# admin logins — see deploy/README.md.
+#
+# Run from this file's directory:  docker compose up -d --build
+#
+# To add a book: copy the `crypto` service block, change the name, the
+# build context (that professor's checkout), the env_file, the volume, and
+# the localhost port; add a matching server block in nginx.
+
+services:
+  crypto:
+    build:
+      context: ..                    # this book's repo checkout
+      dockerfile: deploy/Dockerfile
+      # args: { WITH_TEX: "1" }      # if the book uses tikz/tcolorbox/...
+    env_file: ../.env                # ANTHROPIC_API_KEY + ADMIN_PASSWORD
+    volumes:
+      - crypto-data:/data            # SQLite: codes, sessions, AI cache
+    ports:
+      - "127.0.0.1:8001:8000"        # localhost-only; nginx is the front door
+    restart: unless-stopped
+
+  # analysis:
+  #   build:
+  #     context: /srv/textbooks/analysis-repo
+  #     dockerfile: deploy/Dockerfile
+  #   env_file: /srv/textbooks/analysis-repo/.env
+  #   volumes:
+  #     - analysis-data:/data
+  #   ports:
+  #     - "127.0.0.1:8002:8000"
+  #   restart: unless-stopped
+
+volumes:
+  crypto-data:
+  # analysis-data:

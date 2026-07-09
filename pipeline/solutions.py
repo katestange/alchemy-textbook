@@ -37,6 +37,9 @@ from pathlib import Path
 # an aisolution inside an example), which postprocess.py's walk does not emit.
 from postprocess import local, normalize, LTX, XMLID, HEADINGS, title_text, block_text
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+import bookconfig
+
 BUILD = Path("build")
 MANIFEST = BUILD / "manifest.json"
 BOOK_XML = BUILD / "book.xml"
@@ -44,10 +47,18 @@ CHAPTERS_JSON = BUILD / "chapters.json"
 HTML_DIR = BUILD / "html"
 OUT = BUILD / "solutions.json"
 
-SOLUTION_TYPES = {"solution", "aisolution"}
-# Theorem kinds a solution answers -- used to give each solution the display
-# name of the question it follows (Concept Check 5.5, Quiz 5.8, ...).
-QUESTION_TYPES = {"checkin", "quiz", "question", "example", "problem", "exercise"}
+# The book's own environment names (book.toml [environments]): which theorem
+# kinds are click-to-reveal solutions, and which kinds a solution answers --
+# the latter give each solution the display name of the question it follows
+# (Concept Check 5.5, Quiz 5.8, ...).
+_ENVS = bookconfig.load()["environments"]
+SOLUTION_TYPES = set(_ENVS["solutions"])
+QUESTION_TYPES = set(_ENVS["questions"])
+
+# Regex alternation matching any configured solution env's LaTeXML class,
+# e.g. ltx_theorem_solution / ltx_theorem_aisolution.
+SOLUTION_CLASS_ALT = "(?:" + "|".join(
+    re.escape(t) for t in sorted(SOLUTION_TYPES)) + ")" if SOLUTION_TYPES else None
 
 
 def theorem_type(elem) -> str:
@@ -155,14 +166,14 @@ def main() -> int:
         # Idempotent: clear any prior stamps first (a normal build starts from
         # freshly split HTML, but this makes re-runs/tests safe).
         text = re.sub(
-            r'(<div id="[^"]*" class="ltx_theorem ltx_theorem_(?:ai)?solution")'
+            rf'(<div id="[^"]*" class="ltx_theorem ltx_theorem_{SOLUTION_CLASS_ALT}")'
             r' data-sol-key="[0-9a-f]+" data-sol-section="[^"]*"',
             r'\1', text)
         for s in sols:
             xid = re.escape(s["xml_id"])
             # <div id="Thmaisolutionx22" class="ltx_theorem ltx_theorem_aisolution">
             pat = re.compile(
-                rf'(<div id="{xid}" class="ltx_theorem ltx_theorem_(?:ai)?solution")(>)')
+                rf'(<div id="{xid}" class="ltx_theorem ltx_theorem_{SOLUTION_CLASS_ALT}")(>)')
             new_text, n = pat.subn(
                 rf'\1 data-sol-key="{s["sol_key"]}" '
                 rf'data-sol-section="{s["section_id"]}"\2', text)

@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { whoami } from './lib/api.js';
   import { session } from './lib/stores/session.js';
+  import { loadBookConfig } from './lib/stores/bookConfig.js';
   import CodeEntry from './lib/components/CodeEntry.svelte';
   import ChapterPicker from './lib/components/ChapterPicker.svelte';
   import ReadingPane from './lib/components/ReadingPane.svelte';
@@ -14,6 +15,7 @@
   // If the HttpOnly session cookie is still valid (e.g. after a reload),
   // skip code entry and restore the live budget.
   onMount(async () => {
+    loadBookConfig(); // sets document.title + branding store; no need to await
     const me = await whoami();
     if (me.ok) session.setClaimed(me.budget_remaining_microdollars ?? null, me.is_admin);
   });
