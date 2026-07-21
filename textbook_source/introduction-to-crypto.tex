@@ -104,6 +104,14 @@
 % instead to give print a static fallback image (see Figure~\ref{fig:cipher-wheel}).
 \newcommand{\bespokedemo}[1]{\href{bespoke:#1}{\textsf{[\,interactive: #1\,]}}}
 
+% Web vs print content: \webonly{...} appears only in the online reader,
+% \printonly{...} only in the compiled PDF. The web pipeline flips \ifweb
+% (a shim injected by pipeline/preprocess.py); plain pdflatex leaves it false.
+% Robust so both are safe inside moving arguments like \caption.
+\newif\ifweb \webfalse
+\DeclareRobustCommand{\webonly}[1]{\ifweb#1\fi}
+\DeclareRobustCommand{\printonly}[1]{\ifweb\else#1\fi}
+
 
 
 \begin{document}
@@ -123,15 +131,6 @@ This is very much a work in progress and frequently in flux.  Corrections are mo
 \tableofcontents
 
 
-\section{Introduction \& Overview}
-
-Alchemy is an ancient mystical and proto-scientific practice aiming at transmuting elements and creating magical substances.  It was surrounded in secrecy, and protected by ciphered writing.  But it was part of the early development of chemistry.
-
-Cryptography is a bit like alchemy.  You study arcane knowledge and use it to mix up potions that do seemingly magical things.  Mathematics, like chemistry, is also a living breathing subject, driven by experiments and discoveries.  Our practices now may seem like alchemical mathematics to the cryptographers of the future.  
-
-The conceit in this text of framing cryptography as alchemy is also a nod to the ever-important principle that one should never take oneself too seriously.  I hope the student will find the mathematics enchanting, magical, and enjoyable.
-
-
 \section{Introduction}
 
 Alchemy is an ancient mystical and proto-scientific practice aiming at transmuting elements and creating magical substances.  It was surrounded in secrecy, and protected by ciphered writing.  But it was part of the early development of chemistry.
@@ -141,11 +140,13 @@ Cryptography is a bit like alchemy.  You study arcane knowledge and use it to mi
 The conceit in this text of framing cryptography as alchemy is also a nod to the ever-important principle that one should never take oneself too seriously.  I hope the student will find the mathematics enchanting, magical, and enjoyable.
 
 
-\section{Overview}
+\subsection{Overview}
 
-\textbf{Cryptography} is at its core, the study of transforming information (classically this information is text, nowadays it would usually be a bit string) into a another form, from which the original is recoverable only by certain allowed parties.  The topic has also expanded to include various other related abilities:  the ability to \textbf{verify} that a certain piece of information was produced only by a certain sender, for example.  All of these methods use similar mathematical techniques.
+\textbf{Cryptography} is at its core, the study of transforming information (classically this information is text, nowadays it would usually be a bit string) into another form, from which the original is recoverable only by certain allowed parties.  The topic has also expanded to include various other related abilities:  the ability to \textbf{verify} that a certain piece of information was produced only by a certain sender, for example.  All of these methods use similar mathematical techniques.
 
-The textbook will also touch on \textbf{coding theory} which transforms information for the purposes of making it resilient against corruption (lost bits, noisy transmissions), with no intent to obscure or hide it.  We use the word \textbf{encrypt} and \textbf{decrypt} for cryptography and \textbf{encode} and \textbf{decode} for coding theory.
+The textbook will also touch on \textbf{coding theory} which transforms information for the purposes of making it resilient against corruption (lost bits, noisy transmissions), with no intent to obscure or hide it.  We use the word \textbf{encrypt} and \textbf{decrypt} for cryptography and \textbf{encode} and \textbf{decode} for coding theory.  The mathematics underlying coding theory has some of the same personalities, but in new contexts.
+
+Now let's take a little tour of the subject.
 
 
 \subsection{Classical cryptography}
@@ -164,12 +165,11 @@ The simplest and most famous example is the Caesar cipher, attributed to Julis C
 
 \begin{figure}
 \begin{center}
-\href{bespoke:caesar-wheel}{\includegraphics[width=0.3\textwidth]{c-cipher.jpg}}
+\href{bespoke:caesar-wheel}{\includegraphics[width=0.5\textwidth]{caesar-wheel-demo.png}}
 \end{center}
 \caption{A Caesar cipher wheel, used for Caesar cipher encryption.
- With the setting shown here, assuming the outer wheel represents plaintext and inner wheel represents ciphertext, `CIPHER' would encrypt to `TZGYVI'.
- (In the online edition this figure is an interactive wheel: drag it to set the key and hover a letter to read off its pairing.)
-     Print image:  Subjectiveart, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0, via Wikimedia Commons}
+ With the key A~$\to$~R\printonly{ (shown here)}, assuming the outer wheel represents plaintext and inner wheel represents ciphertext, `CIPHER' would encrypt to `TZGYVI'.
+ \webonly{Hover a letter to read off its pairing.}\printonly{In the online edition, this figure is an interactive wheel.}}
 \label{fig:cipher-wheel}
 \end{figure}
 
