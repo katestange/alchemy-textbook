@@ -2,6 +2,7 @@
   import { createEventDispatcher, onMount } from 'svelte';
   import { manifestStore } from '../stores/manifestStore.js';
   import { fetchManifest, fetchChapters } from '../api.js';
+  import BookFrontMatter from './BookFrontMatter.svelte';
 
   const dispatch = createEventDispatcher();
 
@@ -24,20 +25,22 @@
 </script>
 
 <div class="page-shell">
-  <h1>Table of Contents</h1>
-  {#if loading}
-    <p>Loading…</p>
-  {:else if loadError}
-    <p class="error">{loadError}</p>
-  {:else}
-    <ul class="chapter-list">
-      {#each topLevelSections as section (section.id)}
-        <li>
-          <button class="chapter-card" on:click={() => dispatch('select', { chapter: section.id })}>
-            <span class="num">{section.id}</span>{section.title}
-          </button>
-        </li>
-      {/each}
-    </ul>
-  {/if}
+  <BookFrontMatter>
+    <h2 class="toc-heading">Table of Contents</h2>
+    {#if loading}
+      <p>Loading…</p>
+    {:else if loadError}
+      <p class="error">{loadError}</p>
+    {:else}
+      <ul class="chapter-list">
+        {#each topLevelSections as section (section.id)}
+          <li>
+            <button class="chapter-card" on:click={() => dispatch('select', { chapter: section.id })}>
+              <span class="num">{section.id}</span>{section.title}
+            </button>
+          </li>
+        {/each}
+      </ul>
+    {/if}
+  </BookFrontMatter>
 </div>

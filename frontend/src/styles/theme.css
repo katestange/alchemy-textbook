@@ -135,13 +135,74 @@ button {
   text-decoration: underline;
 }
 
+/* ---- Book front matter (shared by entry screen + table of contents) ---- */
+
+.masthead {
+  text-align: center;
+  margin: 1rem 0 2.25rem;
+}
+
+.masthead h1 {
+  font-size: 2rem;
+  margin: 0 0 0.4rem;
+}
+
+.masthead .byline {
+  font-size: 1.15rem;
+  color: var(--color-ink-soft);
+  margin: 0.2rem 0;
+}
+
+.masthead .tagline {
+  font-style: italic;
+  color: var(--color-ink-soft);
+  margin: 0.2rem 0 0;
+}
+
+.book-intro p {
+  margin: 0 0 1rem;
+}
+
+.colophon {
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--color-rule);
+}
+
+.colophon h2 {
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem;
+}
+
+.colophon p {
+  font-size: 0.95rem;
+  color: var(--color-ink-soft);
+  margin: 0;
+}
+
+.toc-heading {
+  margin: 2rem 0 0.5rem;
+  font-size: 1.3rem;
+}
+
 /* ---- Code entry ---- */
 
+/* An embedded, focused card between the intro prose and the colophon (rather
+   than a bare full-page box) now that it lives inside the front matter. */
 .code-entry {
-  max-width: 26rem;
-  margin: 4rem auto;
-  padding: 0 1.25rem;
+  max-width: 30rem;
+  margin: 2.5rem auto;
+  padding: 1.5rem 1.75rem;
   text-align: center;
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-rule);
+  border-radius: 10px;
+}
+
+.code-entry .entry-lead {
+  margin-top: 0;
+  font-size: 0.95rem;
+  color: var(--color-ink-soft);
 }
 
 .code-entry input[type='text'] {
