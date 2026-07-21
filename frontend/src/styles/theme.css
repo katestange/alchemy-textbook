@@ -1265,6 +1265,30 @@ button {
   overflow-x: auto;
 }
 
+/* ---- Bespoke demo tools: shared body layout (used inside DemoShell) ---- */
+
+/* Left column of a tool: the visual + its controls. */
+.demo-controls { flex: 0 0 300px; margin: 0 auto; }
+.demo-slider { display: flex; align-items: center; gap: 0.6rem; justify-content: center;
+               font-size: 0.9rem; color: var(--color-ink-soft); margin-top: 0.4rem; }
+.demo-slider input { accent-color: var(--accent-teal); }
+.demo-slider b { color: var(--color-ink); }
+
+/* Right column: the paired text boxes. */
+.demo-io { flex: 1 1 260px; display: flex; flex-direction: column; gap: 0.5rem; min-width: 0; }
+.demo-io label, .demo-field { display: flex; flex-direction: column; gap: 0.25rem;
+  font-size: 0.85rem; color: var(--color-ink-soft); }
+.demo-io textarea, .demo-io input[type='text'] {
+  font-family: 'Iowan Old Style', Palatino, Georgia, serif;
+  font-size: 1rem; letter-spacing: 0.03em; line-height: 1.5;
+  padding: 0.5rem 0.6rem; border-radius: 6px; resize: vertical;
+  border: 1px solid var(--color-rule);
+  background: var(--color-bg); color: var(--color-ink);
+}
+.io-arrow { text-align: center; color: var(--color-ink-soft); }
+.demo-note { font-size: 0.8rem; color: var(--color-ink-soft); font-style: italic; margin: 0; }
+.demo-error { font-size: 0.85rem; color: var(--accent-red); margin: 0; }
+
 /* Figure / table captions: set them apart from body text — a smaller, muted,
    centred serif with the "Figure N." label in small-caps accent. */
 .reading-pane .ltx_figure .ltx_caption,
