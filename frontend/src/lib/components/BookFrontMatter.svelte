@@ -54,7 +54,7 @@
 <slot />
 
 <section class="colophon">
-  <h2>About the software</h2>
+  <h2>Colophon</h2>
   <p>
     The web display and AI enhancement overlay is vibe-coded with Claude and is
     MIT licensed at
