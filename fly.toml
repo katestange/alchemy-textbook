@@ -1,0 +1,43 @@
+# Fly.io deployment for one book. See deploy/FLY.md for the full runbook.
+# One always-on machine + one volume = the single-worker / single-SQLite model
+# this app is built for. Do NOT scale machines/workers or enable auto-stop:
+# admin sessions + rate-limit windows are in-process and SSE needs a warm proc.
+
+app = "alchemy-textbook"          # globally-unique; change here if taken
+primary_region = "dfw"            # Dallas — nearest Fly region to CU Boulder (no Denver region)
+
+[build]
+  dockerfile = "deploy/Dockerfile"
+  [build.args]
+    WITH_TEX = "1"                # book uses tikz/tcolorbox → LaTeXML needs TeX
+
+# Runtime env only. Secrets (ANTHROPIC_API_KEY, ADMIN_PASSWORD) are set with
+# `fly secrets set`, never here. Host/port/db/cookie already baked by the
+# Dockerfile; repeated here only for clarity/overridability.
+[env]
+  TEXTBOOK_HOST = "0.0.0.0"
+  TEXTBOOK_PORT = "8000"
+  TEXTBOOK_DB = "/data/textbook.db"
+  TEXTBOOK_COOKIE_SECURE = "1"
+
+[mounts]
+  source = "textbook_data"        # `fly volumes create textbook_data ...`
+  destination = "/data"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = false      # keep it warm (SSE + in-proc sessions)
+  auto_start_machines = false
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    method = "get"
+    path = "/api/book"            # public, read-only, returns 200 JSON
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "60s"          # first boot; no heavy warmup though
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"                # uvicorn runtime is light (LaTeXML is build-time)
