@@ -1,8 +1,11 @@
 <script>
   // Interactive Caesar cipher wheel. Outer ring = plaintext A–Z (fixed);
-  // inner ring = ciphertext A–Z, rotated by `key`. Drag the wheel (or use the
-  // nudge buttons) to set the key; hover a spoke to read off a letter pairing.
-  // Muted palette via the reader's theme CSS variables.
+  // inner ring = ciphertext A–Z, rotated by `key`. Drag horizontally —
+  // anywhere, the drag follows the pointer across the whole page — to set the
+  // key (dragging right turns the inner ring clockwise); hover a spoke to
+  // read off a letter pairing. Muted palette via the reader's theme vars.
+  import { onDestroy } from 'svelte';
+
   export let key = 3;          // shift 0..25, bindable
   export let size = 340;
   export let interactive = true;
@@ -25,26 +28,44 @@
   }
   $: innerRot = -key * step;    // aligns ciphertext (i+key) under plaintext i
   $: cipherOf = (i) => (i + key) % N;
+  const modN = (k) => ((k % N) + N) % N;
 
-  // ---- drag to rotate ----
-  let dragging = false, startAngle = 0, startKey = 0;
-  function angleAt(ev) {
-    const r = svgEl.getBoundingClientRect();
-    return Math.atan2(ev.clientY - (r.top + r.height / 2),
-                      ev.clientX - (r.left + r.width / 2)) * 180 / Math.PI;
+  // ---- hover: derive the letter from the pointer's angle on EVERY move, so
+  // the highlight tracks the mouse instead of sticking at the last hit ----
+  function updateHover(ev) {
+    const rect = svgEl.getBoundingClientRect();
+    const scale = size / rect.width;
+    const dx = (ev.clientX - rect.left) * scale - cx;
+    const dy = (ev.clientY - rect.top) * scale - cy;
+    const r = Math.hypot(dx, dy);
+    if (r < ringIn || r > size / 2) { hovered = null; return; }  // centre / outside
+    const ang = Math.atan2(dy, dx) * 180 / Math.PI;              // -180..180, 0 = 3 o'clock
+    hovered = modN(Math.round((ang + 90) / step));
   }
+
+  // ---- drag: horizontal, page-wide. Listeners go on window for the duration
+  // of the drag so it keeps working when the pointer leaves the wheel.
+  // Dragging right turns the inner ring clockwise (key decreases). ----
+  let dragging = false, startX = 0, startKey = 0;
+  $: pxPerStep = Math.max(14, size * 0.05);
+
   function down(ev) {
     if (!interactive) return;
-    dragging = true; startAngle = angleAt(ev); startKey = key;
-    svgEl.setPointerCapture?.(ev.pointerId);
+    dragging = true; startX = ev.clientX; startKey = key; hovered = null;
+    window.addEventListener('pointermove', dragMove);
+    window.addEventListener('pointerup', dragEnd);
   }
-  function move(ev) {
-    if (!dragging) return;
-    const delta = angleAt(ev) - startAngle;
-    key = ((startKey + Math.round(delta / step)) % N + N) % N;
+  function dragMove(ev) {
+    key = modN(startKey - Math.round((ev.clientX - startX) / pxPerStep));
   }
-  function up() { dragging = false; }
-  function nudge(d) { key = ((key + d) % N + N) % N; }
+  function dragEnd() {
+    dragging = false;
+    window.removeEventListener('pointermove', dragMove);
+    window.removeEventListener('pointerup', dragEnd);
+  }
+  onDestroy(dragEnd);
+
+  function nudge(d) { key = modN(key + d); }
 </script>
 
 <div class="wheel" style="--wheel:{size}px">
@@ -55,12 +76,10 @@
     aria-label="Caesar cipher wheel, key {key}"
     class:interactive
     on:pointerdown={down}
-    on:pointermove={move}
-    on:pointerup={up}
-    on:pointerleave={() => { up(); hovered = null; }}
+    on:pointermove={(ev) => { if (!dragging) updateHover(ev); }}
+    on:pointerleave={() => { if (!dragging) hovered = null; }}
   >
-    <!-- transparent backdrop so a drag registers anywhere on the wheel, not
-         only when the pointer happens to be over a letter or ring stroke -->
+    <!-- transparent backdrop so pointer events register anywhere on the wheel -->
     <circle class="backdrop" cx={cx} cy={cy} r={size / 2} />
 
     <!-- rings -->
@@ -72,11 +91,7 @@
     <g>
       {#each LETTERS as L, i}
         {@const p = pos(i, rOuter)}
-        <g class="spoke" class:hot={hovered === i}
-           on:mouseenter={() => (hovered = i)}>
-          <circle class="hit" cx={p.x} cy={p.y} r={size * 0.05} />
-          <text class="plain" x={p.x} y={p.y}>{L}</text>
-        </g>
+        <text class="plain" class:hot={hovered === i} x={p.x} y={p.y}>{L}</text>
       {/each}
     </g>
 
@@ -92,20 +107,25 @@
 
     <!-- fixed top marker -->
     <path class="marker" d="M{cx-7} {cy-ringOut-6} L{cx+7} {cy-ringOut-6} L{cx} {cy-ringOut+6} Z" />
+
+    <!-- the one instruction lives in the wheel's hub -->
+    {#if interactive}
+      <text class="hub" x={cx} y={cy - size * 0.028}>drag to</text>
+      <text class="hub" x={cx} y={cy + size * 0.028}>change key</text>
+    {/if}
   </svg>
 
+  <!-- pairing readout: blank unless hovering (the key lives below, between − and +) -->
   <div class="readout" aria-live="polite">
     {#if hovered !== null}
       plaintext <b>{LETTERS[hovered]}</b> = ciphertext <b>{LETTERS[cipherOf(hovered)]}</b>
-    {:else}
-      key = <b>{key}</b> &nbsp;(A → {LETTERS[key]}){#if interactive} · drag the wheel to change{/if}
     {/if}
   </div>
 
   {#if interactive}
     <div class="nudge">
       <button type="button" on:click={() => nudge(-1)} aria-label="decrease key">−</button>
-      <span>key {key}</span>
+      <span>key <b>{key}</b></span>
       <button type="button" on:click={() => nudge(1)} aria-label="increase key">+</button>
     </div>
   {/if}
@@ -126,23 +146,26 @@
   .ring-fill { fill: var(--color-bg, #f4ecd8); opacity: 0.55; }
 
   text { font-size: calc(var(--wheel) * 0.052); text-anchor: middle;
-         dominant-baseline: central; }
+         dominant-baseline: central; pointer-events: none; }
   .plain  { fill: var(--color-ink, #2b2117); }
   .cipher { fill: var(--accent-teal, #2b6b66); }
-  .hit    { fill: transparent; }
-
-  .spoke { cursor: pointer; }
-  .spoke.hot .plain { fill: var(--accent-red, #a23c3c); font-weight: 600; }
-  .cipher.hot { fill: var(--accent-red, #a23c3c); font-weight: 600; }
+  .plain.hot, .cipher.hot { fill: var(--accent-red, #a23c3c); font-weight: 600; }
 
   .marker { fill: var(--color-ink-soft, #55493a); }
+
+  .hub {
+    font-size: calc(var(--wheel) * 0.038);
+    font-variant-caps: small-caps; letter-spacing: 0.05em;
+    fill: var(--color-ink-soft, #55493a); opacity: 0.75;
+  }
 
   .readout { font-size: 0.95rem; color: var(--color-ink-soft, #55493a);
              text-align: center; min-height: 1.4em; }
   .readout b { color: var(--color-ink, #2b2117); }
 
   .nudge { display: flex; align-items: center; gap: 0.75rem;
-           font-size: 0.85rem; color: var(--color-ink-soft, #55493a); }
+           font-size: 0.9rem; color: var(--color-ink-soft, #55493a); }
+  .nudge b { color: var(--color-ink, #2b2117); }
   .nudge button {
     width: 1.9rem; height: 1.9rem; border-radius: 50%;
     border: 1px solid var(--color-rule, #d9c9a3);

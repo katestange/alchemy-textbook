@@ -10,6 +10,6 @@ import CaesarWheel from './demos/CaesarWheel.svelte';
 import CaesarTool from './demos/CaesarTool.svelte';
 
 export const bespokeDemos = {
-  'caesar-wheel': (host) => new CaesarWheel({ target: host, props: { size: 300, key: 17 } }),
+  'caesar-wheel': (host) => new CaesarWheel({ target: host, props: { size: 380, key: 17 } }),
   'caesar-tool': (host) => new CaesarTool({ target: host, props: { open: false } })
 };

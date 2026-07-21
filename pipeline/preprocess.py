@@ -40,6 +40,10 @@ PREAMBLE_SHIMS = r"""
 \providecommand{\tcbhighmath}[1]{\boxed{#1}}   % tcolorbox: only \card uses this
 \providecommand{\NiceMatrixOptions}[1]{}        % nicematrix: stub
 \providecommand{\Block}[3][]{#3}                 % nicematrix: \Block[opts]{a}{content}
+%% Web edition switch: if the book's preamble defines \newif\ifweb (with
+%% \webonly / \printonly helpers), flip it true for this (web) build. A book
+%% without the macro is unaffected. The print/PDF compile never sees this.
+\ifdefined\webtrue\webtrue\fi
 %% ------------------------------------------------------------
 """
 
