@@ -1265,6 +1265,25 @@ button {
   overflow-x: auto;
 }
 
+/* Figure / table captions: set them apart from body text — a smaller, muted,
+   centred serif with the "Figure N." label in small-caps accent. */
+.reading-pane .ltx_figure .ltx_caption,
+.reading-pane .ltx_table .ltx_caption,
+.reading-pane figcaption.ltx_caption {
+  text-align: center;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--color-ink-soft);
+  max-width: 42rem;
+  margin: 0.9rem auto 0;
+}
+.reading-pane .ltx_caption .ltx_tag {
+  font-variant-caps: small-caps;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  color: var(--accent-gold);
+}
+
 /* A figure whose static image was replaced by an applet: give it the full
    column width (it was sized to the small centered image). */
 .reading-pane .ltx_figure.applet-figure {
