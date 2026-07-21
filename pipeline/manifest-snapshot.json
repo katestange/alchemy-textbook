@@ -1,10 +1,10 @@
 {
- "total_blocks": 920,
- "total_sections": 154,
+ "total_blocks": 932,
+ "total_sections": 155,
  "duplicate_hash_groups": 5,
  "chapters": {
   "1": {
-   "paragraph": 74,
+   "paragraph": 86,
    "proof": 1,
    "theorem": 1
   },

@@ -161,7 +161,7 @@ The use of cryptography is scattered throughout history.  We know of examples fr
 
 Most abundant in history are examples of \textbf{substitution ciphers}.  These are ciphers in which each letter of the alphabet is replaced with another letter, or a novel symbol.  If this is done in a fixed manner (so that the substitution rule does not change at different positions of the message), this is called a \textbf{monoalphabetic substitution cipher}.  For any encryption method, the original message is called the \textbf{plaintext} and the resulting encrypted message is called the \textbf{ciphertext}.  Thus a substitution cipher is one which replaces each character of the plaintext to obtain the ciphertext.  The first published treatise on substitution ciphers may have been written by Al-Qalqashandi in Egypt in the 1300's (see Kahn's book above).
 
-The simplest and most famous example is the Caesar cipher, attributed to Julis Caesar.  In this system, the alphabet is shifted some number of positions in one direction.  For example, with a shift of one position, `A' becomes `B,' `B' becomes `C' and so on.  For demonstration, this is typically implemented as a double wheel, where one alphabet is rotated relative to the other.  An example is given in Figure~\ref{fig:cipher-wheel}.
+The simplest and most famous example is the Caesar cipher, attributed to Julius Caesar.  In this system, the alphabet is shifted some number of positions in one direction.  For example, with a shift of one position, `A' becomes `B,' `B' becomes `C' and so on.  For demonstration, this is typically implemented as a double wheel, where one alphabet is rotated relative to the other.  An example is given in Figure~\ref{fig:cipher-wheel}.
 
 \begin{figure}
 \begin{center}
@@ -177,10 +177,10 @@ The simplest and most famous example is the Caesar cipher, attributed to Julis C
 
 
 
-In general, one may use any permutation of the alphabet, not just a cipherwheel rotation.  Or one may use unusual symbols to replace letters, such as the `dancing men' in the eponymous Sherlock Holmes story (\emph{The Adventure of the Dancing Men}, Sir Arthur Conan Doyle).  An interesting example is that of a \textbf{Polybius square} (used for signalling long distances in ancient Greece).  The letters of the alphabet are arranged into a grid (the `Polybius square'), and each letter of the plaintext is then replaced by the coordinates it occupies in the grid (See Figure~\ref{fig:polybius-example}).
+In general, one may use any permutation of the alphabet, not just a cipherwheel rotation.  Or one may use unusual symbols to replace letters, such as the `dancing men' in the eponymous Sherlock Holmes story (\emph{The Adventure of the Dancing Men}, Sir Arthur Conan Doyle).  An interesting example is that of a \textbf{Polybius square}, used for signalling long distances in ancient Greece.  The letters of the alphabet are arranged into a grid (the `Polybius square'), and each letter of the plaintext is then replaced by the coordinates it occupies in the grid (See Figure~\ref{fig:polybius-example}).
 
 \begin{figure}
-$$
+\printonly{$$
 \begin{array}{c|ccccc}
   & 1 & 2 & 3 & 4 & 5 \\
 \hline
@@ -190,10 +190,13 @@ $$
 4 & Q & R & S & T & U \\
 5 & V & W & X & Y & Z \\
 \end{array}
-$$
-\caption{Example of a Polybius square.  For example, the letter $B$ is encrypted as $(1,2)$.}
+$$}%
+\webonly{\begin{center}\bespokedemo{polybius-demo}\end{center}}
+\caption{Example of a Polybius square.  For example, the letter $B$ is encrypted as $(1,2)$.\webonly{  Hover a letter to read off its coordinates.}}
 \label{fig:polybius-example}
 \end{figure}
+
+\webonly{\bespokedemo{polybius-tool}}
 
 In each case, the cipher is encrypted and decrypted with knowledge of a \textbf{secret key}.  The key to the Caesar cipher is the number of positions to shift.  The key to a general monoalphabetic substitution cipher is the list of substitutions for each letter.
 
@@ -202,14 +205,49 @@ In each case, the cipher is encrypted and decrypted with knowledge of a \textbf{
 Another approach to cryptography is not to change the letters of the plaintext at all, but to simply reorder them to obtain the ciphertext.  For example, one might write a message left to right in successive rows to form a square, and then read it off in successive columns to obtain the ciphertext (Figure~\ref{fig:transposition-example}).  A famous example of this type of cipher is known as a \textbf{scytale}.  This is a physical encryption device:  the message is written on a belt and wrapped around a cylinder; then the ciphertext is read up and down the cylinder in rows.  This device was rumoured to have been used by the ancient Greeks.
 
 \begin{figure}
-\caption{Example of a transposition cipher}
+\begin{center}
+\printonly{%
+ \begin{tabular}{cccc}
+   A & T & T & A \\
+   C & K & A & T \\
+   D & A & W & N \\
+ \end{tabular}
+ \vspace{1em}
+
+ Plaintext:  ATTACK AT DAWN \\
+ Ciphertext (read down the columns):  ACDTKATAWATN
+}%
+\webonly{\bespokedemo{transposition-demo}}
+\end{center}
+\caption{Example of a transposition cipher:  the plaintext is written in rows of four and the ciphertext is read off down the columns.\webonly{  Hover any letter to trace it through the grid.}}
 \label{fig:transposition-example}
 \end{figure}
 
+\webonly{\bespokedemo{transposition-tool}}
+
 \begin{figure}
-\caption{Example of a scytale}
+\begin{center}
+\printonly{%
+ The strip, written along its length:  ATTACKATDAWN \\
+ \vspace{1em}
+ Wound three times around the rod: \\
+ \vspace{0.5em}
+ \begin{tabular}{cccc}
+   A & A & A & A \\
+   T & C & T & W \\
+   T & K & D & N \\
+ \end{tabular}
+ \vspace{1em}
+
+ Ciphertext (read along the rod):  AAAATCTWTKDN
+}%
+\webonly{\bespokedemo{scytale-demo}}
+\end{center}
+\caption{Example of a scytale:  successive letters of the strip descend the rod, so reading along the rod scrambles them.\webonly{  Hover a letter to follow it, and change the number of wraps.}}
 \label{fig:scytale-example}
 \end{figure}
+
+\webonly{\bespokedemo{scytale-tool}}
 
 Any cipher in which the letters of the message are simply rearranged is called a \textbf{transposition cipher}.  The key to a transposition cipher is also a permutation, but this time on the letters of the plaintext, not the letters of the alphabet.
 
@@ -218,31 +256,50 @@ Any cipher in which the letters of the message are simply rearranged is called a
 
 The Vigen\`ere cipher deserves special attention, as it represents a conceptual advance from most other classical cryptograph of the past several millennia.  It was gradually developed in the 1400s and 1500s by a number of people, none of which was Vigen\`ere (as is the case for many named mathematical ideas).  The key insight is that a Caesar cipher would be much more secure if a \emph{different} key were used for each letter of the plaintext.  
 
-It is useful to have on hand a Vigen\`ere square, seen in Figure~\ref{fig:vig-square}.  This shows the alphabet in each of its 26 possible shifted forms.  To begin, we choose a key word.  We could choose, for example, the word `POLLEN.'  Each letter of the key is interpreted as a shift.  The letter `P,' being the 16th letter of the alphabet, represents a shift of 16 positions.  Writing the keyword, repeatedly, above the plaintext, we encrypt each letter of the plaintext with the corresponding shift.  See Figure~\ref{fig:vig-example}
+It is useful to have on hand a Vigen\`ere square, seen in Figure~\ref{fig:vig-square-intro}.  This shows the alphabet in each of its 26 possible shifted forms.  To begin, we choose a key word.  We could choose, for example, the word `POLLEN.'  Each letter of the key is interpreted as a shift:  numbering the letters A $= 0$ through Z $= 25$, the letter `P' represents a shift of $15$ positions.  Writing the keyword, repeatedly, above the plaintext, we encrypt each letter of the plaintext with the corresponding shift.  See Figure~\ref{fig:vig-example}
 
 \begin{figure}
-\caption{Vigen\`ere square}
-\label{fig:vig-square}
-\KS{AI: this figure is EMPTY (no content) and its label \texttt{fig:vig-square} is DUPLICATED -- the same label is on the real addition-table figure later (the one that renders as Figure~13). Two figures sharing a label makes the reference ambiguous. Likely fix: delete this empty placeholder and let the reference point to the real Figure~13.}
+\begin{center}
+\printonly{%
+\small
+\setlength{\tabcolsep}{2.2pt}
+\begin{tabular}{c|cccccccccccccccccccccccccc}
+  & A & B & C & D & E & F & G & H & I & J & K & L & M & N & O & P & Q & R & S & T & U & V & W & X & Y & Z \\
+\hline
+E & E & F & G & H & I & J & K & L & M & N & O & P & Q & R & S & T & U & V & W & X & Y & Z & A & B & C & D \\
+L & L & M & N & O & P & Q & R & S & T & U & V & W & X & Y & Z & A & B & C & D & E & F & G & H & I & J & K \\
+N & N & O & P & Q & R & S & T & U & V & W & X & Y & Z & A & B & C & D & E & F & G & H & I & J & K & L & M \\
+O & O & P & Q & R & S & T & U & V & W & X & Y & Z & A & B & C & D & E & F & G & H & I & J & K & L & M & N \\
+P & P & Q & R & S & T & U & V & W & X & Y & Z & A & B & C & D & E & F & G & H & I & J & K & L & M & N & O \\
+\end{tabular}
+}%
+\webonly{\bespokedemo{vigenere-square}}
+\end{center}
+\caption{The Vigen\`ere square:  row = key letter, column = plaintext letter, entry = ciphertext letter.\printonly{  Shown here are the rows for the key letters of `POLLEN'; the full square appears in Figure~\ref{fig:vig-square}.}\webonly{  Hover an entry to read off a pairing.}}
+\label{fig:vig-square-intro}
 \end{figure}
 
 \begin{figure}
-  \begin{tabular}{c|ccccccccccccccc}
-       KEY & 1 & 3 & 2 & 4 & 1 & 3 & 2 & 4 & 1 & 3 & 2 & 4  \\
+\begin{center}
+  \begin{tabular}{c|cccccccccccc}
+       KEY & P & O & L & L & E & N & P & O & L & L & E & N \\
        \hline
        PLAINTEXT & A & T & T & A & C & K & A & T & D & A & W & N \\
        \hline
-       CIPHERTEXT & B & W & V & E & D & N & C & X & E & D & Y & R \\ 
+       CIPHERTEXT & P & H & E & L & G & X & P & H & O & L & A & A \\
      \end{tabular}
-     \caption{Example of the Vigen\`ere cipher \KS{still to be updated}}
+\end{center}
+     \caption{Example of the Vigen\`ere cipher with keyword `POLLEN'.}
 \label{fig:vig-example}
 \end{figure}
+
+\webonly{\bespokedemo{vigenere-tool}}
 
 The cryptanalysis of the Vigen\`ere cipher, described as `impossible of translation' as recently as a 1907 \KS{1917?} Scientific American article, is clever, but encryption can be done by hand.  It is even said that Casanova used his masterful cryptanalysis of a lady's secret message to woo her (see \emph{Secret History}).
 
 \subsubsection{The one-time pad}
 
-If one takes the Vigen\`ere cipher to its extreme and uses a keyword whose length matches that of the ciphertext, and which is generated randomly (it is not, for example, an english word), then we obtain something called a \textbf{one-time pad}.  This has the gratifying property of being \emph{truly} secure, in the following sense:  any ciphertext can be made to match with any plaintext by a judicious choice of key.  In other words, if we were to try all keys exhaustively, we would encounter every possible plaintext.  There would be no way to know which was the correct one.
+If one takes the Vigen\`ere cipher to its extreme and uses a keyword whose length matches that of the ciphertext, and which is generated randomly (it is not, for example, an english word), then we obtain something called a \textbf{one-time pad}.  This has the gratifying property of being \emph{truly} secure, in the following sense:  \emph{any} ciphertext can be made to match with \emph{any} plaintext by a judicious choice of key.  In other words, if we were to try all keys exhaustively, we would encounter every possible plaintext.  There would be no way to know which was the correct one.
 
 This may be a good moment for some mathematical formalism.  Let us suppose we are working with \textbf{binary bitstrings}, i.e. strings of 1s and 0s.  There's a useful binary operation called \textbf{XOR}, denoted by $\oplus$ and it is defined as follows:  $0 \oplus 0 = 1 \oplus 1 = 0$, $0 \oplus 1 = 1 \oplus 0 = 1$.  With this language, we can define the one-time pad (on binary bitstrings) as follows:  XOR the key with the plaintext, character by character.  See Figure~\ref{fig:onetime-example} for a real-life example from the 1940's.
 
@@ -253,6 +310,8 @@ This may be a good moment for some mathematical formalism.  Let us suppose we ar
 \caption{Example of a One-Time Pad, used by the Special Operations Executive, which conducted espionage for the British in German-occupied Europe during World War II.  Image by author, Washington Spy Museum.}
 \label{fig:onetime-example}
 \end{figure}
+
+\webonly{\bespokedemo{otp-tool}}
 
 \begin{theorem}
 	Given any ciphertext and plaintext (both binary bitstrings), there is a one-time pad key which encrypts the ciphertext to the plaintext.
@@ -265,12 +324,13 @@ This may be a good moment for some mathematical formalism.  Let us suppose we ar
 
 \subsubsection{Other old ciphers}
 
-Most ciphers up until world war two were at most combinations of substitution and transposition.  Indeed, in world war one, the ADFGVX cipher was the culmination of cryptography used for the First World War.  It works by first applying a Polybius square in which each letter is replaced with a pair of letters.  Then, the resulting sequence of letters is subject to a simple transposition cipher, which breaks apart the pairs.  This property makes it in part a \textbf{polygraphic substitution cipher}, meaning it replaces characters in groups.  A tutorial on this cipher is available in my video library.  See Figure~\ref{fig:adfgvx-example}.
+Most ciphers up until world war two were at most combinations of substitution and transposition.  Indeed, the ADFGVX cipher was the culmination of cryptography used for the First World War.  It works by first applying a Polybius square in which each letter is replaced with a pair of letters.  Then, the resulting sequence of letters is subject to a simple transposition cipher, which breaks apart the pairs.  This property makes it in part a \textbf{polygraphic substitution cipher}, meaning it replaces characters in groups.  
+A tutorial on this cipher is available in my video library.  See Figure~\ref{fig:adfgvx-example}.
 
 \begin{figure}
 
 \begin{center}
-
+\printonly{%
     \begin{minipage}[t]{.6\textwidth}
         \centering
  \begin{tabular}{c|cccccc}
@@ -311,11 +371,14 @@ Most ciphers up until world war two were at most combinations of substitution an
 
      Ciphertext:  GGDGGAXDDXDFDXADFFGGAGXD\\
      \vspace{1em}
-
+}%
+\webonly{\bespokedemo{adfgvx-demo}}
    \end{center}
-\caption{Example of the ADFGVX cipher}
+\caption{Example of the ADFGVX cipher\webonly{.  Hover a plaintext or ciphertext letter to trace it through both stages}}
 \label{fig:adfgvx-example}
 \end{figure}
+
+\webonly{\bespokedemo{adfgvx-tool}}
 
 Another famous polygraphic cipher is matrix encryption, which is often called a Hill cipher, but sometimes credited to both Levine and Hill during the first half of the twentieth century.  In this system, letters are replaced with their positions in the alphabet (so `A' becomes `1' etc.), and then groups of letters are considered vectors.  Matrices then act on the vectors.  We will see this in Section~\ref{sec:hill}.
 
@@ -344,6 +407,7 @@ For example, in the Caesar cipher, the keyspace consists of the $26$ possible al
 
 \begin{figure}
 	\begin{center}
+\printonly{%
 	 \begin{minipage}{0.45\textwidth}
 		 \begin{center}
      \begin{tabular}{c|c}
@@ -386,10 +450,14 @@ For example, in the Caesar cipher, the keyspace consists of the $26$ possible al
       \end{tabular}
 \end{center}
       \end{minipage}
+}%
+\webonly{\bespokedemo{caesar-crack-demo}}
 \end{center}
-\caption{An exhaustive search through the keyspace of a Caesar cipher}
+\caption{An exhaustive search through the keyspace of a Caesar cipher\webonly{.  Hover the rows --- exactly one shift reads as English}}
 \label{fig:caesar-exhaustive}
 \end{figure}
+
+\webonly{\bespokedemo{caesar-crack-tool}}
 
 Therefore, the security of a symmetric key cryptosystem is bounded in terms of its keyspace:  a small keyspace necessarily means a weak system.  But a big keyspace does not guarantee a strong system.  Even with a very large keyspace, a clever \textbf{cryptanalyst} (one who attempts to break a cryptosystem) may have a more efficient algorithm than an exhaustive search.  An example of this is the alphabetic cipher mentioned in Section \KS{GIVE SEC}.  For english, the keyspace consists of all possible permutations of 26 roman letters.  That's a space of size $26!$ ($26$ factorial).  That means there are more than $400,000,000,000,000,000,000,000,000$ possible keys.  Trying one per nanosecond (a nanosecond may by time for a couple of instructions on a modern laptop) that will take over $12,000,000$ millennia.
 
@@ -439,12 +507,8 @@ Here's a sort of failed first attempt at a key exchange:
 \begin{enumerate}
 	\item Alice chooses a private key $a$ (an integer)
 	\item Bob chooses a private key $b$ (an integer)
-% AI-FLAGGED ORIGINAL:
-%	\item Alice makes a public key $2a$ and sends it to Bob.
-%	\item Bob makes a public key $2b$ and sends it to Alice.
 	\item Alice makes a public key $5a$ and sends it to Bob.
 	\item Bob makes a public key $5b$ and sends it to Alice.
-\KS{Fixed by AI: the rest of this example (steps below and the Eve/division-by-$5$ discussion) uses public keys $5a$ and $5b$; the multiplier here should be $5$, not $2$, for internal consistency.}
 	\item Alice can compute (Alice's private key)x(Bob's public key) $= a(5b) = 5ab$.
 	\item Bob can compute (Bob's private key)x(Alice's public key) $= b(5a) = 5ab$.
 \end{enumerate}
@@ -555,6 +619,7 @@ There are terms for the security of a cryptosystem against an adversary with oth
 
 \begin{figure}
 	\begin{center}
+\printonly{%
 \small
 \setlength{\tabcolsep}{2pt}
 \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
@@ -564,10 +629,14 @@ There are terms for the security of a cryptosystem against an adversary with oth
   $8.2$ & $1.5$ & $2.8$ & $4.3 $ & $12.7 $ & $2.2 $ & $2.0 $ & $6.1 $ & $7.0 $ & $0.2 $ & $0.8$ & $4.0$ & $2.4 $ &  $6.7 $ &  $7.5 $&  $1.9 $ &  $0.1 $ &  $6.0 $ &  $6.3 $ &  $9.1 $ &  $ 2.8  $ & $ 1.0 $ & $ 2.3  $ &  $0.1  $ &  $2.0 $ &  $0.1  $ \\
 \hline
 \end{tabular}
+}%
+\webonly{\bespokedemo{frequency-demo}}
 \end{center}
-\caption{Standard english letter frequencies in percentage.}
+\caption{Standard english letter frequencies in percentage.\webonly{  Hover a bar for the value.}}
 \label{fig:frequencies}
 \end{figure}
+
+\webonly{\bespokedemo{frequency-tool}}
 
 
 
