@@ -52,7 +52,10 @@
   <div class="top-bar">
     <button class="link-btn" type="button" on:click={backToChapters}>Table of contents</button>
     {#if $session.anonymous}
-      <span>Reading anonymously</span>
+      <span class="mode-tag">
+        Static mode ·
+        <button class="link-btn" type="button" on:click={() => session.reset()}>Have an invite code?</button>
+      </span>
     {:else if $session.budgetRemainingMicrodollars != null}
       <span>Budget remaining: {formatBudget($session.budgetRemainingMicrodollars)}</span>
     {/if}
