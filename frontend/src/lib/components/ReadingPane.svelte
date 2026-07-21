@@ -26,6 +26,7 @@
   import FlagDialog from './FlagDialog.svelte';
   import { chatStore } from '../stores/chatStore.js';
   import { builtinApplets } from '../builtinApplets.js';
+  import { bespokeDemos } from '../bespokeDemos.js';
   import { mountEditableCell } from '../sageCell.js';
   import { mountDesmosCalculator } from '../desmos.js';
   import { mountGeoGebra } from '../geogebra.js';
@@ -87,6 +88,7 @@
     wireWideMath();
     hydrateChapterContent(n);
     injectBuiltinApplets();
+    injectBespokeDemos();
     if (scrollTo) {
       const el = document.getElementById(scrollTo);
       if (el) el.scrollIntoView({ block: 'start' });
@@ -306,6 +308,30 @@
         mountEditableCell(host, app.code);
       }
     }
+  }
+
+  // Mount hand-built interactive demos authored in the LaTeX via
+  // \bespokedemo{name} (which LaTeXML renders as <a href="bespoke:name">). Each
+  // such anchor is replaced in place by its registered component; when the
+  // anchor is a figure's image, the demo takes the image's spot and the caption
+  // stays. Unknown names leave a visible note instead of failing silently.
+  function injectBespokeDemos() {
+    containerEl.querySelectorAll('a[href^="bespoke:"]').forEach((a) => {
+      const name = (a.getAttribute('href') || '').slice('bespoke:'.length);
+      const host = document.createElement('div');
+      host.className = 'bespoke-demo';
+      host.dataset.demo = name;
+      const fig = a.closest('figure');
+      if (fig) fig.classList.add('applet-figure'); // widen figure to the column
+      a.replaceWith(host);
+      const mount = bespokeDemos[name];
+      if (mount) {
+        try { mount(host); }
+        catch (err) { host.textContent = `Could not load demo “${name}”.`; }
+      } else {
+        host.textContent = `[unknown demo: ${name}]`;
+      }
+    });
   }
 
   // Reserve an applet's eventual height with a "Loading…" placeholder so the

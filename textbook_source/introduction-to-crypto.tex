@@ -98,6 +98,12 @@
 \newcommand{\CC}{\mathbb{C}}
 \newcommand{\PP}{\mathbb{P}}
 
+% Bespoke interactive demos: the web reader replaces \bespokedemo{name} with a
+% registered JS component (see frontend/src/lib/bespokeDemos.js); in print it
+% degrades to a labelled link. Wrap an \includegraphics in \href{bespoke:name}
+% instead to give print a static fallback image (see Figure~\ref{fig:cipher-wheel}).
+\newcommand{\bespokedemo}[1]{\href{bespoke:#1}{\textsf{[\,interactive: #1\,]}}}
+
 
 
 \begin{document}
@@ -126,6 +132,22 @@ Cryptography is a bit like alchemy.  You study arcane knowledge and use it to mi
 The conceit in this text of framing cryptography as alchemy is also a nod to the ever-important principle that one should never take oneself too seriously.  I hope the student will find the mathematics enchanting, magical, and enjoyable.
 
 
+\section{Introduction}
+
+Alchemy is an ancient mystical and proto-scientific practice aiming at transmuting elements and creating magical substances.  It was surrounded in secrecy, and protected by ciphered writing.  But it was part of the early development of chemistry.
+
+Cryptography is a bit like alchemy.  You study arcane knowledge and use it to mix up potions that do seemingly magical things.  Mathematics, like chemistry, is also a living breathing subject, driven by experiments and discoveries.  Our practices now may seem like alchemical mathematics to the cryptographers of the future.  
+
+The conceit in this text of framing cryptography as alchemy is also a nod to the ever-important principle that one should never take oneself too seriously.  I hope the student will find the mathematics enchanting, magical, and enjoyable.
+
+
+\section{Overview}
+
+\textbf{Cryptography} is at its core, the study of transforming information (classically this information is text, nowadays it would usually be a bit string) into a another form, from which the original is recoverable only by certain allowed parties.  The topic has also expanded to include various other related abilities:  the ability to \textbf{verify} that a certain piece of information was produced only by a certain sender, for example.  All of these methods use similar mathematical techniques.
+
+The textbook will also touch on \textbf{coding theory} which transforms information for the purposes of making it resilient against corruption (lost bits, noisy transmissions), with no intent to obscure or hide it.  We use the word \textbf{encrypt} and \textbf{decrypt} for cryptography and \textbf{encode} and \textbf{decode} for coding theory.
+
+
 \subsection{Classical cryptography}
 
 The use of cryptography is scattered throughout history.  We know of examples from ancient Greeks, Romans, Vikings, and Islam, and cryptography even appears in the Hebrew bible in the form of the Atbash cipher.  Instead of undertaking anything chronological, I will briefly touch on the main mathematical ideas that surfaced before modern times.  The word \textbf{cipher} is typically used to describe an encryption system that works letter-by-letter, bit-by-bit, or perhaps block-by-block, by substitution (replacing the letter, bit or block with something new) or transposition (reordering the letters, bits or blocks).  In modern times, these types of ciphers live mainly in escape rooms and mystery hunts.  For the history of cryptography, some places to turn include:
@@ -142,13 +164,16 @@ The simplest and most famous example is the Caesar cipher, attributed to Julis C
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.3\textwidth]{c-cipher.jpg}
+\href{bespoke:caesar-wheel}{\includegraphics[width=0.3\textwidth]{c-cipher.jpg}}
 \end{center}
-\caption{Image of a Cipherwheel, used for Caesar cipher encryption. 
+\caption{A Caesar cipher wheel, used for Caesar cipher encryption.
  With the setting shown here, assuming the outer wheel represents plaintext and inner wheel represents ciphertext, `CIPHER' would encrypt to `TZGYVI'.
-     Image:  Subjectiveart, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0, via Wikimedia Commons}
+ (In the online edition this figure is an interactive wheel: drag it to set the key and hover a letter to read off its pairing.)
+     Print image:  Subjectiveart, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0, via Wikimedia Commons}
 \label{fig:cipher-wheel}
 \end{figure}
+
+\bespokedemo{caesar-tool}
 
 
 
