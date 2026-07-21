@@ -119,11 +119,16 @@ This is very much a work in progress and frequently in flux.  Corrections are mo
 
 \section{Introduction \& Overview}
 
-\KS{Some intro to be written.}
+Alchemy is an ancient mystical and proto-scientific practice aiming at transmuting elements and creating magical substances.  It was surrounded in secrecy, and protected by ciphered writing.  But it was part of the early development of chemistry.
+
+Cryptography is a bit like alchemy.  You study arcane knowledge and use it to mix up potions that do seemingly magical things.  Mathematics, like chemistry, is also a living breathing subject, driven by experiments and discoveries.  Our practices now may seem like alchemical mathematics to the cryptographers of the future.  
+
+The conceit in this text of framing cryptography as alchemy is also a nod to the ever-important principle that one should never take oneself too seriously.  I hope the student will find the mathematics enchanting, magical, and enjoyable.
+
 
 \subsection{Classical cryptography}
 
-The use of cryptography is scattered throughout history.  We know of examples from ancient Greeks, Romans, Vikings, and Islam, and cryptography even appears in the Hebrew bible in the form of the Atbash cipher.  Instead of undertaking anything chronological, I will briefly touch on the main mathematical ideas that surfaced before modern times.  The word \textbf{cipher} is typically used to describe an encryption system that works letter-by-letter, bit-by-bit, or perhaps block-by-block, by substitution (replacing the letter, bit or block with something new) or transposition (reordering the letters, bits or blocks).  We will only encounter this type of encryption in the historical section.  For the history of cryptography, see the books:
+The use of cryptography is scattered throughout history.  We know of examples from ancient Greeks, Romans, Vikings, and Islam, and cryptography even appears in the Hebrew bible in the form of the Atbash cipher.  Instead of undertaking anything chronological, I will briefly touch on the main mathematical ideas that surfaced before modern times.  The word \textbf{cipher} is typically used to describe an encryption system that works letter-by-letter, bit-by-bit, or perhaps block-by-block, by substitution (replacing the letter, bit or block with something new) or transposition (reordering the letters, bits or blocks).  In modern times, these types of ciphers live mainly in escape rooms and mystery hunts.  For the history of cryptography, some places to turn include:
 \begin{enumerate}
 	\item \emph{Secret History:  The Story of Cryptology} by Craig P. Bauer
 	\item \emph{The Codebreakers:  The Comprehensive History of Secret Communication from Ancient Times to the Internet} by David Kahn.
@@ -218,7 +223,7 @@ This may be a good moment for some mathematical formalism.  Let us suppose we ar
 
 \begin{figure}
 \begin{center}
-    \includegraphics[width=0.6\textwidth]{one-time.jpg}
+    \includegraphics[width=0.95\textwidth]{one-time-pad.jpg}
 \end{center}
 \caption{Example of a One-Time Pad, used by the Special Operations Executive, which conducted espionage for the British in German-occupied Europe during World War II.  Image by author, Washington Spy Museum.}
 \label{fig:onetime-example}
@@ -241,7 +246,7 @@ Most ciphers up until world war two were at most combinations of substitution an
 
 \begin{center}
 
-    \begin{minipage}{.6\textwidth}
+    \begin{minipage}[t]{.6\textwidth}
         \centering
  \begin{tabular}{c|cccccc}
        & A & D & F & G & V & X \\
@@ -255,9 +260,8 @@ Most ciphers up until world war two were at most combinations of substitution an
      \end{tabular}
 
     \end{minipage}%
-    \begin{minipage}{.4\textwidth}
+    \begin{minipage}[t]{.4\textwidth}
         \centering
-    
      \begin{tabular}{cccc}
        3 & 4 & 2 & 1 \\
        \hline
