@@ -185,38 +185,6 @@ button {
   font-size: 1.3rem;
 }
 
-/* ---- Code entry ---- */
-
-/* An embedded, focused card between the intro prose and the colophon (rather
-   than a bare full-page box) now that it lives inside the front matter. */
-.code-entry {
-  max-width: 30rem;
-  margin: 2.5rem auto;
-  padding: 1.5rem 1.75rem;
-  text-align: center;
-  background: var(--color-bg-raised);
-  border: 1px solid var(--color-rule);
-  border-radius: 10px;
-}
-
-.code-entry .entry-lead {
-  margin-top: 0;
-  font-size: 0.95rem;
-  color: var(--color-ink-soft);
-}
-
-.code-entry input[type='text'] {
-  font-family: var(--font-serif);
-  font-size: 1.1rem;
-  padding: 0.5rem 0.75rem;
-  width: 100%;
-  border: 1px solid var(--color-rule);
-  border-radius: 6px;
-  background: var(--color-bg-raised);
-  color: var(--color-ink);
-}
-
-.code-entry button,
 .chapter-card,
 .creature-chip,
 .result-box .actions button,
@@ -224,24 +192,78 @@ button {
   border-radius: 8px;
 }
 
-.code-entry button {
-  margin-top: 0.75rem;
-  padding: 0.5rem 1.25rem;
-  border: 1px solid var(--color-ink-soft);
+/* ---- Mode choice (entry screen): two big Live / Static boxes ---- */
+
+.mode-choice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin: 2.5rem 0;
+}
+
+.mode-box {
+  flex: 1 1 18rem;
+  display: flex;
+  flex-direction: column;
+  padding: 1.75rem;
+  text-align: center;
   background: var(--color-bg-raised);
+  border: 1px solid var(--color-rule);
+  border-radius: 12px;
+}
+
+.mode-box h3 {
+  font-size: 1.35rem;
+  margin: 0 0 0.5rem;
+}
+
+.mode-box p {
+  color: var(--color-ink-soft);
+  margin: 0 0 1.25rem;
+}
+
+/* Push each box's control (form or button) to the bottom so the two boxes'
+   inputs line up even though their sentences differ in length. */
+.mode-box form,
+.mode-box > button {
+  margin-top: auto;
+}
+
+.mode-box form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.mode-box input[type='text'] {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+  border: 1px solid var(--color-rule);
+  border-radius: 6px;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  text-align: center;
+}
+
+.mode-box button {
+  align-self: center;
+  padding: 0.5rem 1.5rem;
+  border: 1px solid var(--color-ink-soft);
+  border-radius: 8px;
+  background: var(--color-bg);
   color: var(--color-ink);
   font-size: 1rem;
 }
 
-.code-entry .hint {
-  font-size: 0.85rem;
-  color: var(--color-ink-soft);
-  margin-top: 1rem;
+.mode-box button:hover:not(:disabled) {
+  border-color: var(--accent-teal);
 }
 
-.code-entry .error {
+.mode-box .error {
   color: var(--accent-red);
-  margin-top: 0.75rem;
+  margin: 0.75rem 0 0;
 }
 
 /* ---- Chapter picker ---- */

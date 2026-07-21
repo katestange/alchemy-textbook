@@ -27,26 +27,30 @@
 
 <div class="page-shell">
   <BookFrontMatter>
-    <div class="code-entry">
-      <p class="entry-lead">Enter your invite code to unlock AI-assisted study tools (live mode). You can also read the base textbook without a code.</p>
-      <form on:submit|preventDefault={submit}>
-        <input
-          type="text"
-          placeholder={$bookConfig.code_example}
-          bind:value={code}
-          autocomplete="off"
-          spellcheck="false"
-        />
-        <button type="submit" disabled={submitting}>{submitting ? 'Checking…' : 'Enter'}</button>
-      </form>
-      {#if error}
-        <p class="error">{error}</p>
-      {/if}
-      <p class="hint">
-        No code? <button class="link-btn" type="button" on:click={() => session.continueAnonymous()}>
-          Continue as an anonymous reader
-        </button> (base textbook only — no AI generation).
-      </p>
+    <div class="mode-choice">
+      <div class="mode-box">
+        <h3>Live mode</h3>
+        <p>Enter your invite code to use AI overlay.</p>
+        <form on:submit|preventDefault={submit}>
+          <input
+            type="text"
+            placeholder={$bookConfig.code_example}
+            bind:value={code}
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <button type="submit" disabled={submitting}>{submitting ? 'Checking…' : 'Enter'}</button>
+        </form>
+        {#if error}
+          <p class="error">{error}</p>
+        {/if}
+      </div>
+
+      <div class="mode-box">
+        <h3>Static mode</h3>
+        <p>View the existing text &amp; AI add-ons</p>
+        <button type="button" on:click={() => session.continueAnonymous()}>Enter</button>
+      </div>
     </div>
   </BookFrontMatter>
 </div>
