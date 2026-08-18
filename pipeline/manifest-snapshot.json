@@ -1,11 +1,13 @@
 {
- "total_blocks": 932,
+ "total_blocks": 972,
  "total_sections": 155,
- "duplicate_hash_groups": 5,
+ "duplicate_hash_groups": 4,
  "chapters": {
   "1": {
-   "paragraph": 86,
+   "checkin": 1,
+   "paragraph": 124,
    "proof": 1,
+   "quiz": 1,
    "theorem": 1
   },
   "2": {
