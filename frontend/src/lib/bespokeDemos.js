@@ -24,6 +24,8 @@ import CaesarCrackTool from './demos/CaesarCrackTool.svelte';
 import FrequencyDemo from './demos/FrequencyDemo.svelte';
 import FrequencyTool from './demos/FrequencyTool.svelte';
 import OtpTool from './demos/OtpTool.svelte';
+import CryptogramTool from './demos/CryptogramTool.svelte';
+import EnigmaTool from './demos/EnigmaTool.svelte';
 
 const make = (Component, props = {}) => (host) => new Component({ target: host, props });
 
@@ -44,5 +46,7 @@ export const bespokeDemos = {
   'caesar-crack-tool': make(CaesarCrackTool),
   'frequency-demo': make(FrequencyDemo),
   'frequency-tool': make(FrequencyTool),
-  'otp-tool': make(OtpTool)
+  'otp-tool': make(OtpTool),
+  'cryptogram-tool': make(CryptogramTool),
+  'enigma-tool': make(EnigmaTool)
 };
