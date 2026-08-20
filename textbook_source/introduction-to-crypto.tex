@@ -163,6 +163,7 @@ The use of cryptography is scattered throughout history.  We know of examples fr
 \end{enumerate}
 
 \subsubsection{Substitution ciphers}
+\label{sec:substitution}
 
 Most abundant in history are examples of \textbf{substitution ciphers}.  These are ciphers in which each letter of the alphabet is replaced with another letter, or a novel symbol.  If this is done in a fixed manner (so that the substitution rule does not change at different positions of the message), this is called a \textbf{monoalphabetic substitution cipher}.  For any encryption method, the original message is called the \textbf{plaintext} and the resulting encrypted message is called the \textbf{ciphertext}.  Thus a substitution cipher is one which replaces each character of the plaintext to obtain the ciphertext.  The first published treatise on substitution ciphers may have been written by Al-Qalqashandi in Egypt in the 1300's (see Kahn's book above).
 
@@ -182,7 +183,7 @@ The simplest and most famous example is the Caesar cipher, attributed to Julius 
 
 
 
-In general, one may use any **permutation** (reordering) of the alphabet, not just a cipherwheel rotation.  It is useful to have a mathematical language for permutations, so will pause to describe the usual one.  One way to give a permutation of the alphabet is just as a function, like this:
+In general, one may use any \textbf{permutation} (reordering) of the alphabet, not just a cipherwheel rotation.  It is useful to have a mathematical language for permutations, so we will pause to describe the usual one.  One way to give a permutation of the alphabet is just as a function, like this:
 
 \begin{center}
 \small
@@ -193,12 +194,6 @@ In general, one may use any **permutation** (reordering) of the alphabet, not ju
   output & M & L & R & B & S & U & A & Q & N & K & J & I & E & D & C & T & F & Y & G & O & H & W & Z & X & P & V \\
 \end{tabular}
 \end{center}
-\todo{AI: table added (and the same permutation drives the arrow diagram and cycle
-structure below -- I generated all three from one script so they provably agree).
-Note: the earlier ``**permutation**'' and ``**cycles**'' use markdown asterisks,
-which LaTeX will print literally; they likely want \textbackslash textbf. Also
-spotted nearby: ``so will pause'' (missing ``we''), ``permtuations''. I did not
-touch your text.}
 
 A more vivid way to show a permutation is to draw an arrow diagram, where each letter has an arrow to the letter it should be replaced with:
 
@@ -258,22 +253,16 @@ A more vivid way to show a permutation is to draw an arrow diagram, where each l
   \path (X) edge[loop right] (X);
 \end{tikzpicture}
 \end{center}
-\todo{AI: arrow diagram added, same permutation as the table. I included a fixed
-point (X, drawn with a little self-loop) so the convention for one-element
-cycles is visible.}
 
-Observe that a permutation can't take two letters to the same letter, so the arrow diagram consists of a bunch of **cycles** or closed loops of letters.  A compact way to write down a permutation is to collect the cycles and list them.  We put brackets around each group to separate them, and write the letters in order, understanding that the final letter in the group has an arrow to the first one.  For example, the diagram above becomes:
+Observe that a permutation can't take two letters to the same letter, so the arrow diagram consists of a bunch of \textbf{cycles} or closed loops of letters.  A compact way to write down a permutation is to collect the cycles and list them.  We put brackets around each group to separate them, and write the letters in order, understanding that the final letter in the group has an arrow to the first one.  For example, the diagram above becomes:
 
 \[
 (\mathrm{C\,R\,Y\,P\,T\,O})\;(\mathrm{G\,A\,M\,E\,S})\;(\mathrm{B\,L\,I\,N\,D})\;(\mathrm{F\,U\,H\,Q})\;(\mathrm{V\,W\,Z})\;(\mathrm{J\,K})\;(\mathrm{X})
 \]
-\todo{AI: cycle structure added, matching the table and diagram above. If you'd
-rather not have a fixed point in the example, say so and I'll regenerate all
-three pieces together.}
 
-There are 26! (twenty-six factorial) ways to reorder the roman alphabet, hence 26! possible permtuations of the alphabet.
+There are 26! (twenty-six factorial) ways to reorder the roman alphabet, hence 26! possible permutations of the alphabet.
 
-Instead of a transposition cipher that replaces one letter of the alphabet with another, one may use unusual symbols to replace letters, such as the `dancing men' in the eponymous Sherlock Holmes story (\emph{The Adventure of the Dancing Men}, Sir Arthur Conan Doyle).  An interesting example is that of a \textbf{Polybius square}, used for signalling long distances in ancient Greece.  The letters of the alphabet are arranged into a grid (the `Polybius square'), and each letter of the plaintext is then replaced by the coordinates it occupies in the grid (See Figure~\ref{fig:polybius-example}).
+Instead of a substitution cipher that replaces one letter of the alphabet with another, one may use unusual symbols to replace letters, such as the `dancing men' in the eponymous Sherlock Holmes story (\emph{The Adventure of the Dancing Men}, Sir Arthur Conan Doyle).  An interesting example is that of a \textbf{Polybius square}, used for signalling long distances in ancient Greece.  The letters of the alphabet are arranged into a grid (the `Polybius square'), and each letter of the plaintext is then replaced by the coordinates it occupies in the grid (See Figure~\ref{fig:polybius-example}).
 
 \begin{figure}
 \printonly{$$
@@ -298,13 +287,7 @@ In each case, the cipher is encrypted and decrypted with knowledge of a \textbf{
 
 \subsubsection{Transposition ciphers}
 
-Another approach to cryptography is not to change the letters of the plaintext at all, but to simply reorder them to obtain the ciphertext.  For example, one might write a message left to right in successive rows to form a square, and then read it off in successive columns to obtain the ciphertext (Figure~\ref{fig:transposition-example}).  This is called \textbf{simple columnar transposition}.  This can be implemented by a physical device called a \textbf{skytale} (a stick or staff).  The message is written on a belt and wrapped around a cylinder; then the ciphertext is read up and down the cylinder in rows.  (This is really the same as reading rows as columns, and the circumference of the cylinder determines the with of the table!  Can you see why?)  This device was rumoured to have been used by Sparta in the Peloponnesian wars (Plutarch describes this centuries later, but it is disputed: the referenced "staff" may just be a message keeping device or signet\footnote{See Thomas Kelly, ``The Myth of the Skytale,'' \emph{Cryptologia} 22(3) (1998), 244--260, \href{https://doi.org/10.1080/0161-119891886902}{doi:10.1080/0161-119891886902}.}).
-\todo{AI: the \textbackslash href here had only one argument (it needs a link text
-too), which broke compilation, so I completed the footnote with the verified
-citation: the author is Thomas \emph{Kelly} (no second e), Cryptologia 22(3),
-1998, pp.~244--260 -- the DOI you had was correct. Also in this paragraph:
-``the with of the table'' (width), and straight quotes around "staff" render
-poorly in LaTeX (`` '' is the usual idiom).}
+Another approach to cryptography is not to change the letters of the plaintext at all, but to simply reorder them to obtain the ciphertext.  For example, one might write a message left to right in successive rows to form a square, and then read it off in successive columns to obtain the ciphertext (Figure~\ref{fig:transposition-example}).  This is called \textbf{simple columnar transposition}.  This can be implemented by a physical device called a \textbf{skytale} (a stick or staff).  The message is written on a belt and wrapped around a cylinder; then the ciphertext is read up and down the cylinder in rows.  (This is really the same as reading rows as columns, and the circumference of the cylinder determines the width of the table!  Can you see why?)  This device was rumoured to have been used by Sparta in the Peloponnesian wars (Plutarch describes this centuries later, but it is disputed: the referenced ``staff''' may just be a message keeping device or signet\footnote{See Thomas Kelly, ``The Myth of the Skytale,'' \emph{Cryptologia} 22(3) (1998), 244--260, \href{https://doi.org/10.1080/0161-119891886902}{doi:10.1080/0161-119891886902}.}).
 
 \begin{figure}
 \begin{center}
@@ -326,10 +309,6 @@ poorly in LaTeX (`` '' is the usual idiom).}
 \end{figure}
 
 \webonly{\bespokedemo{transposition-tool}}
-\todo{AI: you removed the scytale figure and its two demos from the text -- the
-scytale-demo and scytale-tool components still exist in the frontend (harmless,
-they just sit unreferenced). Want me to delete them, or keep them in case the
-scytale returns?}
 
 
 Any cipher in which the letters of the message are simply rearranged is called a \textbf{transposition cipher}.  The key to a transposition cipher is also a permutation, but this time on the letters of the plaintext, not the letters of the alphabet.  Another famous example is the rail fence cipher.
@@ -378,16 +357,9 @@ P & P & Q & R & S & T & U & V & W & X & Y & Z & A & B & C & D & E & F & G & H & 
 
 \webonly{\bespokedemo{vigenere-tool}}
 
-Can you see why this cipher was considered more secure?  The cryptanalysis of the Vigen\`ere cipher, described as `impossible of translation' as recently as a 1907 \KS{1917?} Scientific American article, is clever, but encryption can be done by hand.  It is even said that Casanova used his masterful cryptanalysis of a lady's secret message to woo her (see \emph{Secret History}). \todo{AI: verified -- it is 1917 (not 1907), and strictly it was the
-\emph{Scientific American Supplement}: Anon., ``A new cipher code,''
+Can you see why this cipher was considered more secure?  The cryptanalysis of the Vigen\`ere cipher, described as `impossible of translation' as recently as a 1917 \emph{Scientific American Supplement} article\footnote{\emph{Scientific American Supplement}: Anon., ``A new cipher code,''
 Scientific American Supplement vol.~83, no.~2143 (27 January 1917), p.~61,
-doi:10.1038/scientificamerican01271917-61csupp; the phrase is ``impossible of
-translation.'' So the sentence's `1907' should become 1917, and ideally
-`Scientific American' becomes `Scientific American Supplement.' The Casanova
-story checks out as told in Bauer's \emph{Secret History} (the lady was the
-Marquise d'Urf\'e; the source is Casanova's memoirs). One more flag: this
-paragraph and the next write Vigen\textbackslash'ere (acute), but elsewhere you
-use the correct Vigen\textbackslash`ere (grave, Vigen\`ere).}  We will discuss Vigen\'ere again below.
+doi:10.1038/scientificamerican01271917-61csupp}, is clever, but encryption can be done by hand.  It is even said that Casanova used his masterful cryptanalysis of a lady's secret message to woo her (see \emph{Secret History}).  We will discuss Vigen\`ere again below.
 
 
 
@@ -397,10 +369,6 @@ If one takes the Vigen\`ere cipher to its extreme and uses a keyword whose lengt
 
 This may be a good moment for some mathematical formalism.  Let us suppose we are working with \textbf{binary bitstrings}, i.e. strings of 1s and 0s.  There's a useful binary operation called \textbf{XOR}, denoted by $\oplus$ and it is defined as follows:  $0 \oplus 0 = 1 \oplus 1 = 0$, $0 \oplus 1 = 1 \oplus 0 = 1$.  With this language, we can define the one-time pad (on binary bitstrings) as follows:  XOR the key with the plaintext, character by character.  See Figure~\ref{fig:onetime-example} for a real-life example from 1940's espionage.
 
-\todo{AI: done -- cropped the museum label out of the photo (new file
-one-time-pad-cropped.jpg; the original composite is untouched in the repo) and
-moved the label text into the caption as a quote, transcribed from the photo.
-Reword as you like.}
 
 \begin{figure}
 \begin{center}
@@ -420,12 +388,9 @@ Reword as you like.}
 	It is a property of XOR that if $a \oplus b = c$, then $c \oplus b = a$.  Therefore, given a plaintext and ciphertext, we can recover a key which encrypts the plaintext to the ciphertext by taking XOR between plaintext and ciphertext, character-by-character.
 \end{proof}
 
-\begin{quiz}
-  Find the correct onetime pad that will encrypt "0100" to "1110".
-\end{quiz}
-\todo{AI: the answer is $0100 \oplus 1110 = 1010$. Want an aisolution block after
-this quiz, per the convention elsewhere in the book? (Also: the straight quotes
-around "0100" and "1110" will render as inch marks in LaTeX.)}
+\begin{checkin}
+  Find the correct onetime pad that will encrypt \texttt{0100} to \texttt{1110}.
+\end{checkin}
 	
 
 \subsubsection{Other old ciphers}
@@ -558,37 +523,15 @@ For example, in the Caesar cipher, the keyspace consists of the $26$ possible al
 
 \webonly{\bespokedemo{caesar-crack-tool}}
 
-Therefore, the security of a symmetric key cryptosystem is bounded in terms of its keyspace:  a small keyspace necessarily means a weak system.  But a big keyspace does not guarantee a strong system.  Even with a very large keyspace, a clever \textbf{cryptanalyst} (one who attempts to break a cryptosystem) may have a more efficient algorithm than an exhaustive search.  An example of this is the alphabetic cipher mentioned in Section \KS{GIVE SEC}.
-\todo{AI: the target is the ``Substitution ciphers'' subsubsection, which has no
-\textbackslash label yet -- if you add \textbackslash label\{sec:substitution\}
-there, this becomes Section~\textbackslash ref\{sec:substitution\}. Happy to do
-both if you'd like.}  For english, the keyspace consists of all possible permutations of 26 roman letters.  That's a space of size $26!$ ($26$ factorial).  That means there are more than $400,000,000,000,000,000,000,000,000$ possible keys.  Trying one per nanosecond (a nanosecond may by time for a couple of instructions on a modern laptop) that will take over $12,000,000$ millennia.
+Therefore, the security of a symmetric key cryptosystem is bounded in terms of its keyspace:  a small keyspace necessarily means a weak system.  But a big keyspace does not guarantee a strong system.  Even with a very large keyspace, a clever \textbf{cryptanalyst} (one who attempts to break a cryptosystem) may have a more efficient algorithm than an exhaustive search.  An example of this is the alphabetic cipher mentioned in Section~\ref{sec:substitution}.  For english, the keyspace consists of all possible permutations of 26 roman letters.  That's a space of size $26!$ ($26$ factorial).  That means there are more than $400,000,000,000,000,000,000,000,000$ possible keys.  Trying one per nanosecond (a nanosecond may by time for a couple of instructions on a modern laptop) that will take over $12,000,000$ millennia.
 
 Despite this large keyspace, however, solving alphabetic ciphers is a popular pastime, as evidenced by the Cryptogram found in many weekend newspapers, which is essentially an alphabetic ciphertext without a key provided; the goal is to obtain the plaintext.  This amusement dates to the middle ages (Wikipedia).  Methods vary, but are typically based on patterns inherent in the target language.  For example, in english, the letter `E' is the most frequently used letter, so one may guess that the most frequently occurring letter in the ciphertext should correspond to `E.'  Proceeding by guessing and familiarity with english allows many people to solve these in a pleasantly passed half hour over breakfast (at least before social media).
 
 \webonly{\bespokedemo{cryptogram-tool}}
-\todo{AI: built as requested -- ``The Daily Cryptogram'' with a newspaper
-masthead, a bank of cryptology sayings, New puzzle / Show solution / Erase
-guesses buttons, and an A--Z alphabet at the bottom: type a guess under any
-cipher letter and it appears in a handwriting font (Caveat, bundled) under every
-occurrence in the puzzle; delete it to blank the slot; two slots given the same
-guess turn red. Like the newspaper puzzles, no letter ever stands for itself.
-One terminology flag: the todo (and a few spots in this section) says
-``transposition'' but these keys are \emph{substitution} ciphers -- a
-transposition cipher reorders letter positions, per your own definition above.
-I implemented substitution, as newspaper cryptograms use.}
 
-Let us return to the Vigen\'ere cipher.  There are several ways to intuit the extra security provided by Vigen\'ere as opposed to Caesar.  One is about how long a brute force attack would take.  We saw that a Caesar cipher brute force attack takes $26$ tries, the size of the keyspace.  The Vigen\'{e}re cipher has 26 possible keys for \emph{each letter}, and success on one letter isn't easily detectable by itself (how do I know whether the first letter is T or L without some more of the first word to compare with?).  Since a key is a word or string of letters, altogether, there are \emph{many} more keys to try in an exhaustive search.
+Let us return to the Vigen\`ere cipher.  There are several ways to intuit the extra security provided by Vigen\`ere as opposed to Caesar.  One is about how long a brute force attack would take.  We saw that a Caesar cipher brute force attack takes $26$ tries, the size of the keyspace.  The Vigen\`{e}re cipher has 26 possible keys for \emph{each letter}, and success on one letter isn't easily detectable by itself (how do I know whether the first letter is T or L without some more of the first word to compare with?).  Since a key is a word or string of letters, altogether, there are \emph{many} more keys to try in an exhaustive search.
 
-But Vigen'ere also thwarts another classical attack on any transposition cipher:  statistical analysis, usually called \textbf{frequency analysis}.  This is the approach referred to above, where the use of statistics of the english language can lead to a break.  But since Vigen\'ere uses a different key for each letter, the frequencies of english don't carry over to the ciphertext.  The letter "e" may be encrypted to "r" in one place in the message and to "q" in another.
-\todo{AI: two flags in this paragraph: (1) ``attack on any transposition
-cipher'' should be \emph{substitution} cipher -- frequency analysis is the
-attack on substitution; plain frequency analysis actually does not break a
-transposition cipher at all, since transposition leaves the letter frequencies
-unchanged. (Same slip in the sentence ``Instead of a transposition cipher that
-replaces one letter of the alphabet with another'' back in the substitution
-section.) (2) Vigen'ere here is missing its backslash -- and note the
-acute/grave issue flagged above.}
+But Vigen\`ere also thwarts another classical attack on any substitution cipher:  statistical analysis, usually called \textbf{frequency analysis}.  This is the approach referred to above, where the use of statistics of the english language can lead to a break.  But since Vigen\`ere uses a different key for each letter, the frequencies of english don't carry over to the ciphertext.  The letter "e" may be encrypted to "r" in one place in the message and to "q" in another.
 
 \begin{figure}
 	\begin{center}
@@ -613,12 +556,8 @@ acute/grave issue flagged above.}
 
 
 
-In \todo{AI: 1863 -- Friedrich W. Kasiski, \emph{Die Geheimschriften und die
-Dechiffrir-Kunst} (Berlin: E.~S. Mittler und Sohn, 1863), the first published
-general attack on polyalphabetic ciphers (the ``Kasiski examination'').
-Charles Babbage had already broken Vigen\`ere around 1854 but never published;
-this was established from his notes by Ole Immanuel Franksen (\emph{Mr.
-Babbage's Secret}, 1985), if you want the fuller story.}, however, it was found that a more advanced variant of frequency analysis can be applied to a Vigen\'ere cipher to break the encryption by hand, at least if the message is sufficiently long compared to the keyword.
+
+In the mid-1800's, however, Babbage and Kasiski\footnote{Published by Friedrich W. Kasiski in \emph{Die Geheimschriften und die Dechiffrir-Kunst} (Berlin: E.~S. Mittler und Sohn, 1863), but discovered earlier by Babbage; see Ole Immanuel Franksen, \emph{Mr. Babbage's Secret}, 1985.} found that a more advanced variant of frequency analysis can be applied to a Vigen\`ere cipher to break the encryption by hand, at least if the message is sufficiently long compared to the keyword.
 
 In general, the security of a symmetric key cryptosystem is affected by the size of the keyspace and the availability of efficient \textbf{cryptographic attacks}, or methods that may reveal the plaintext, without use of the secret key.  Exhaustive search is a cryptographic attack that is always available, but one hopes for something faster.
 
@@ -628,9 +567,7 @@ In the modern world, symmetric key cryptography is still very important.  Modern
 \subsubsection{The Enigma Machine}
 
 
-We will discuss one more famous symmetric key system, which no history of cryptography can ignore.  The famouse \textbf{enigma machine} was used in World War II by the Germans, and represented the apex of modern cryptography at the time.  Encryption and decryption was performed by an electric machine that looked a little like a typewriter in a portable box.  It had a keyboard, but also a separate lampboard laid out in the same keyboard pattern, containing a light for each letter of the alphabet.  When you typed a letter of the plaintext, the corresponding letter of the ciphertext lit up on the lampboard.  The operator could type in the plaintext and note down the letters that lit up on the lampboard with each keypress.  In this way, letter by letter, the plaintext was changed to ciphertext.  Decryption happened the same way:  you typed the ciphertext on the keyboard and the letters of the plaintext lit up in the same order on the lampboard.  The machine didn't need to know whether it was encrypting or decrypting, because the cipher was such that if X in the first position encrypted to Q, then Q in the first position encrypted to X, and so on.  In other words, encrypting and decrypting were the same function.  We will call this property \textbf{enigma symmetry}.  
-
-Try encrypting and decrypting with the enigma simulator below, to demonstrate this property.  Keep in mind that you need to reset the machine between messages.
+We will discuss one more famous symmetric key system, which no history of cryptography can ignore.  The famous \textbf{enigma machine} was used in World War II by the Germans, and represented the apex of modern cryptography at the time.  Encryption and decryption was performed by an electric machine that looked a little like a typewriter in a portable box.  It had a keyboard, but also a separate lampboard laid out in the same keyboard pattern, containing a light for each letter of the alphabet.  When you typed a letter of the plaintext, the corresponding letter of the ciphertext lit up on the lampboard.  The operator could type in the plaintext and note down the letters that lit up on the lampboard with each keypress.  In this way, letter by letter, the plaintext was changed to ciphertext.  Decryption happened the same way:  you typed the ciphertext on the keyboard and the letters of the plaintext lit up in the same order on the lampboard.  The machine didn't need to know whether it was encrypting or decrypting, because the cipher was such that if X in the first position encrypted to Q, then Q in the first position encrypted to X, and so on.  In other words, encrypting and decrypting were the same function.  We will call this property \textbf{enigma symmetry}.  
 
 \begin{figure}
 \begin{center}
@@ -639,25 +576,25 @@ Try encrypting and decrypting with the enigma simulator below, to demonstrate th
 \caption{A German Enigma I cipher machine (1936) in its wooden carrying case, showing the keyboard, the lampboard above it, and the plugboard cables at the front.  Photograph: Central Intelligence Agency, public domain, via Wikimedia Commons.}
 \label{fig:enigma-machine}
 \end{figure}
-\todo{AI: photo added -- public-domain CIA photograph, from
-commons.wikimedia.org/wiki/File:Enigma-Machine.jpg. Typos spotted in this
-subsection, left untouched: ``famouse,'' ``engima'' (twice), ``complicted,''
-``consituted,'' ``such a ring setting'' (missing ``as'').}
+%commons.wikimedia.org/wiki/File:Enigma-Machine.jpg
+
+\webonly{
+\begin{checkin}
+  Try encrypting and decrypting with the enigma simulator below, to demonstrate this property.  Keep in mind that you need to reset the machine between messages.
+\end{checkin}
+}
 
 \webonly{\bespokedemo{enigma-tool}}
-\todo{AI: simulator built -- a historically accurate Enigma I: rotors I--V with
-the real wirings and turnover notches, reflector B, plugboard, ring settings
-(behind an ``advanced'' toggle), the odometer stepping including the
-double-step anomaly, a clickable keyboard/lampboard in the machine's layout,
-and a Reset button for the decryption experiment your text asks for. The logic
-is unit-tested against published machine vectors. One suggestion: the sentence
-above (``Try encrypting and decrypting with the enigma simulator below...'')
-will also appear in the print edition, where there is no simulator -- consider
-wrapping it in \textbackslash webonly.}
+%a historically accurate Enigma I: rotors I--V with
+%the real wirings and turnover notches, reflector B, plugboard, ring settings
+%(behind an ``advanced'' toggle), the odometer stepping including the
+%double-step anomaly, a clickable keyboard/lampboard in the machine's layout,
+%and a Reset button for the decryption experiment your text asks for. The logic
+%is unit-tested against published machine vectors. 
 
-The engima machine was a vastly more complicated cipher than the Vigen\'ere cipher, but it had something in common.  At each position of the plaintext (1st letter, 2nd letter, etc.), the machine would implement a different transposition cipher.  However, where the Vigen\'ere cipher used a simple Caesar cipher at each position, dictated by the key, the Enigma used a more complicated transposition generated and constantly updated by mechanical and electrical means.  The \emph{key} in this context was the full list of machine settings at the beginning of the message.  The machine needed to be reset with the appropriate key immediately before the text input began, so the first transposition, say $\sigma_1$, was applied to the first letter of the plaintext or ciphertext, say $x_1$, and so on and so forth.  After each key tap, the machine would change configuration so the next transposition was setup for the next letter.  If one started with the machine in the incorrect configuration, or reset the machine at a position other than the first letter of the text, the message would decrypt incorrectly.  The machine changed configuration with each keystroke by the means of rotors, which turned.
+The enigma machine was a vastly more complicated cipher than the Vigen\`ere cipher, but it had something in common.  At each position of the plaintext (1st letter, 2nd letter, etc.), the machine would implement a different substitution cipher.  However, where the Vigen\`ere cipher used a simple Caesar cipher at each position, dictated by the key, the Enigma used a more complicated substitution generated and constantly updated by mechanical and electrical means.  The \emph{key} in this context was the full list of machine settings at the beginning of the message.  The machine needed to be reset with the appropriate key immediately before the text input began, so the first substitution, say $\sigma_1$, was applied to the first letter of the plaintext or ciphertext, say $x_1$, and so on and so forth.  After each key tap, the machine would change configuration so the next substitution was setup for the next letter.  If one started with the machine in the incorrect configuration, or reset the machine at a position other than the first letter of the text, the message would decrypt incorrectly.  The machine changed configuration with each keystroke by the means of rotors, which turned.
 
-To describe the Enigma machine, then, we must explain \emph{which} permutations apply to the letters of the plaintext.  Because of the enigma symmetry, the permutations must consist of cycles of size two.  In other words, we have to break the alphabet into pairs.  The interior wiring of the engima accomplished this:  one lightbulb was wired to one key at any moment.  The wires ran through 26-notched \textbf{rotors} with internal wiring.  These rotors individually rotated positions between keystrokes.  Each rotor had 26 input contacts and 26 output contacts, wired in a complicted way so that each input connected to one output.  Rotating one rotor by a notch (there were 26 total positions, or notches) would change which contacts touched which on the next rotor.  
+To describe the Enigma machine, then, we must explain \emph{which} permutations apply to the letters of the plaintext.  Because of the enigma symmetry, the permutations must consist of cycles of size two.  In other words, we have to break the alphabet into pairs.  The interior wiring of the enigma accomplished this:  one lightbulb was wired to one key at any moment.  The wires ran through several \textbf{rotors} with internal wiring.  These rotors individually rotated positions between keystrokes.  Each rotor had 26 input contacts and 26 output contacts, wired in a complicated way so that each input connected to one output.  Rotating one rotor by one position (there were 26 total positions) would change which contacts touched which on the next rotor.  
 
 \begin{figure}
 \begin{center}
@@ -666,13 +603,7 @@ To describe the Enigma machine, then, we must explain \emph{which} permutations 
 \caption{Enigma rotors.  Left: the spring-loaded contact pins on one face of a rotor, and the toothed wheel used to turn it by hand.  Right: a rotor seen from the other side, showing the flat circular contact plates and the alphabet ring.  Each of the 26 pins on one face is wired internally to one of the 26 plates on the other.  Photograph: TedColes, public domain, via Wikimedia Commons.}
 \label{fig:enigma-rotors}
 \end{figure}
-\todo{AI: rotor photo added (public domain, from
-commons.wikimedia.org/wiki/File:Enigma\_rotors\_and\_spindle\_showing\_contacts\_rachet\_and\_notch.jpg).
-Terminology flag for the paragraph above: a rotor had 26 \emph{positions}
-(contacts), but ``notch'' usually refers to the single \emph{turnover notch}
-on the ring that trips the next rotor once per revolution -- so ``26-notched
-rotors'' and ``(there were 26 total positions, or notches)'' conflate the two;
-`positions' or `contacts' would be accurate.}
+%commons.wikimedia.org/wiki/File:Enigma\_rotors\_and\_spindle\_showing\_contacts\_rachet\_and\_notch.jpg
 
 The machine also had a plugboard.  This had holes for each letter, and the operator could connect certain letters by wires.  The electrical connections from key to light were also routed through the plugboard, which scrambled them even more.
 
@@ -683,12 +614,9 @@ The machine also had a plugboard.  This had holes for each letter, and the opera
 \caption{The Enigma plugboard (\emph{Steckerbrett}), at the front of the machine.  Here two cables swap the letter pairs S--O and J--A; letters without a cable pass through unchanged.  Photograph: Bob Lord, CC BY-SA 3.0, via Wikimedia Commons.}
 \label{fig:enigma-plugboard}
 \end{figure}
-\todo{AI: plugboard photo added. This one is CC BY-SA 3.0 (attribution in the
-caption satisfies the license; it was the only clear cabled close-up on Commons
--- the public-domain alternatives show an empty board). Source:
-commons.wikimedia.org/wiki/File:Enigma-plugboard.jpg.}
+%commons.wikimedia.org/wiki/File:Enigma-plugboard.jpg
 
-To summarize, for each letter typed on the keyboard, a new permutation was applied.  For this reason, the encryption and decryption machine had to begin in the same state, so they would, at each letter, be using the same permutation.  The initial state, which consituted the \textbf{key} was written in a big codebook distributed to army units.
+To summarize, for each letter typed on the keyboard, a new permutation was applied.  For this reason, the encryption and decryption machine had to begin in the same state, so they would, at each letter, be using the same permutation.  The initial state, which constituted the \textbf{key} was written in a big codebook distributed to army units.
 
 \begin{figure}
 \begin{center}
@@ -697,57 +625,28 @@ To summarize, for each letter typed on the keyboard, a new permutation was appli
 \caption{A monthly Luftwaffe Enigma key sheet (\emph{Maschinen-Schl\"ussel Nr.~649}), marked ``Geheime Kommandosache!'' (secret command matter).  One row per day, read bottom-up, giving the day's rotor choice and order (\emph{Walzenlage}), ring settings (\emph{Ringstellung}), and plugboard connections (\emph{Steckerverbindungen}).  German Luftwaffe, public domain, via Wikimedia Commons.}
 \label{fig:enigma-keysheet}
 \end{figure}
-\todo{AI: key sheet added (public domain WWII German government document, from
-commons.wikimedia.org/wiki/File:Enigma\_keylist\_3\_rotor.jpg). It shows exactly
-the settings your paragraph lists, so the caption cross-references them.}
+%commons.wikimedia.org/wiki/File:Enigma\_keylist\_3\_rotor.jpg
 
-The settings included the position of the rotors, but also a choice of rotors (you could choose to insert three of a kit of five or six rotors, depending on the model), a list of hand-wiring via the plugboard, and some other items, such a ring setting.  The rotors themselves advanced in the manner of a car odometer:  the rightmost rotor moved one position for each key pressed, and the next rotor moved one position each time the first rotor made a complete rotation, and so on.
+The settings included the position of the rotors, but also a choice of rotors (you could choose to insert three of a kit of five or eight rotors, depending on the model), a list of hand-wiring via the plugboard, and some other items, such as a ring setting.  The rotors themselves advanced in the manner of a car odometer:  the rightmost rotor moved one position for each key pressed, and the next rotor moved one position each time the first rotor's \emph{turnover notch} passed a certain spot (once per revolution), and so on.
 
-Since each rotor had $26$ notches, the collection of three rotors had $26^3 = 17,576$ initial positions.  That's not an unreasonable number for exhaustive search, with mechanical aid, at least by itself.  The plugboard had a much more fearsome $10^{14}$ settings, or so.  That was \emph{not} a reasonable number for exhaustive search.  Combined with the other settings, there were some $10^{??}$ possible keys.  This is a huge keyspace.  The Germans thought it was unbreakable.
-\todo{AI: for $10^{??}$: the standard figure is about $1.6 \times 10^{20}$, so
-$10^{20}$ -- that is 60 rotor choices-and-orders ($5 \times 4 \times 3$)
-$\times$ $17{,}576$ start positions $\times$ $150{,}738{,}274{,}937{,}250
-\approx 1.5 \times 10^{14}$ plugboard settings (10 cables) -- consistent with
-the $10^{14}$ you quote just above. If you also count the $26^2$ meaningful
-ring settings, it becomes about $1.1 \times 10^{23}$. So: $10^{20}$ (usual
-convention) or $10^{23}$ (counting rings). Also: ``each rotor had 26 notches''
--- same notch/position terminology flag as above.}
+Since each rotor had $26$ positions, the collection of three rotors had $26^3 = 17,576$ initial positions.  That's not an unreasonable number for exhaustive search, with mechanical aid, at least by itself.  The plugboard had a much more fearsome $10^{14}$ settings, or so.  That was \emph{not} a reasonable number for exhaustive search.  Combined with the other settings, there were some $10^{23}$ possible keys\footnote{$5 \times 4 \times 3$ ways to choose and order three rotors; $26^3$ start positions; around $10^{14}$ ways to place 10 plugboard cables; $26^2$ options obtained from rotating rings}.  This is a huge keyspace.  The Germans thought it was unbreakable.
 
 However, the clever insight was to break up the keyspace into several parts:  most importantly, the rotors and plugboard.  By exploiting some of the particularities (and human failings) of how messages were sent, the allies were able to get a little bit of information about the permutations inside the machine.  They called these \textbf{cribs}.  These were \textbf{constraints} the key had to satisfy.  The key idea was this:  with these constraints in hand, some rotor positions had \textbf{no} possible plugboard settings that would satisfy the constraints.
 
-The allied cryptanalysis of the enigma machine was one of the first uses of the large computing machines that were the precursors to modern computers.  These machines, called \textbf{bombes}, were designed to mimic the rotors, and capable of testing all $17,576$ rotor positions.  By exploiting cribs, cryptanalysts were able to determine some pairs of letters and other restrictive properties that the permutations had to satisfy.  The bombes would run electrical current through every possible rotor position, and check these conditions, stopping and reporting any rotor position candidate that passed them.  This reduced the number of possible rotor positions to a manageable list of possibilities for further cryptanalysis.
+The allied cryptanalysis of the enigma machine involved a large single-purpose-built electromechanical computing machine, long before modern computers.  These machines, called \textbf{bombes}, were designed to mimic the rotors, and capable of testing all $17,576$ rotor positions.  The first bomba was built by the Polish Cipher Bureau, and later models were built at Britain's Bletchley Park.  By exploiting cribs, cryptanalysts were able to determine some pairs of letters and other restrictive properties that the permutations had to satisfy.  The bombes would run electrical current through every possible rotor position, and check these conditions, stopping and reporting any rotor position candidate that passed them.  This reduced the number of possible rotor positions to a manageable list of possibilities for further cryptanalysis.
 
-\todo{AI: fact-check of the Enigma passage, as requested. Accurate as written:
-the lampboard/keyboard description, enigma symmetry (self-reciprocal
-encryption), the need to reset between messages, pairs/2-cycles forced by the
-wiring, cribs as constraints, and the key insight that some rotor positions
-admit \emph{no} plugboard setting consistent with a crib (that is exactly
-Welchman's diagonal-board bombe logic). Corrections to consider:
-(1) ``three of a kit of five or six'' -- Army/Air Force chose 3 of 5; the Navy
-M3 chose 3 of \emph{8} (and the M4 added a fourth, non-stepping rotor), so
-``five or eight'' would be right.
-(2) The middle rotor actually advanced when the \emph{turnover notch} of the
-rightmost rotor passed -- once per revolution but not at Z/A like an odometer
-digit, and there is a famous ``double-stepping'' quirk of the middle rotor;
-``in the manner of a car odometer'' is a fine simplification, just don't lean
-on it harder.
-(3) ``one of the first uses of the large computing machines that were the
-precursors to modern computers'' -- the bombes were electromechanical,
-special-purpose, and not programmable; the electronic computer at Bletchley
-(Colossus, 1943) attacked the \emph{Lorenz} teleprinter cipher, not Enigma.
-Wikipedia explicitly lists ``Turing built a computer to break Enigma'' among
-common misconceptions, so I'd soften this to ``electromechanical
-machines... that helped inspire the computers to come.''
-(4) Worth crediting: the Polish Cipher Bureau (Rejewski, R\'ozycki, Zygalski)
-broke Enigma first in 1932 and built the original \emph{bomba}; the
-Turing--Welchman bombe descends from it.
-(5) A lovely fact you may want: the reflector also meant \emph{no letter ever
-encrypts to itself} -- a severe flaw, and precisely what made cribs so
-powerful.
-(6) The transposition/substitution slip recurs throughout this subsection
-(``a different transposition cipher... the Enigma used a more complicated
-transposition''): each keypress applies a \emph{substitution} (a permutation
-of the alphabet), not a transposition.}
+Any little quirk of an encryption system can be exploited.  For example, the design of enigma didn't allow a letter to be encrypted to itself.  Because of staticky radio signals, operators sent the first part of the message (the \emph{daily key}) twice.  And uncautious homesick soldiers had a tendency to use the initials of their loved ones as keys.
+\todo{AI: one historical correction here: what was sent twice was not the
+\emph{daily} key but the operator's own three-letter \emph{message key} (the
+rotor start position for that one message), enciphered under the daily key
+from the codebook -- the doubled message key is exactly the redundancy
+Rejewski's attack exploited (the Germans dropped the doubling in 1940). The
+homesick-soldiers detail is right: predictable message keys like a
+girlfriend's initials were called ``cillies'' at Bletchley. Two tiny things
+nearby: the skytale paragraph now has a stray third quote in ``staff''' (three
+' marks, renders as ``staff''+'), and the bombe sentence mixes number
+(``involved a large single-purpose-built... machine... These machines'').}
+
 
 
 
@@ -759,21 +658,15 @@ To capture this idea, we formalize complexity in terms of the notion of \textbf{
 \begin{quote}
 \emph{how does the runtime grow as a function of the input size?}
 \end{quote}
-\todo{AI: displayed the question on its own indented line as requested (quote
-environment; words unchanged).}  This is something that doesn't change as technology advances.  What changes as technology advances is how we translate asymptotic complexity into practical decision-making.
+This is something that doesn't change as technology advances.  What changes as technology advances is how we translate asymptotic complexity into practical decision-making.
 
 An example is perhaps the best way to explain this concept of asymptotic runtime.  The \textbf{input size} is the number of bits it takes to put the question into the computer.  If the problem is factoring, then the input is the integer $N$ which is to be factored.  To write down $N$ and feed it to the computer, however, you need to write it in binary or decimal notation (you don't write $N$ ticks in a row on a piece of paper!).  In this case the \emph{number of digits} is the size -- that's how much space it takes to write down the number to input to the computer.  The number of binary digits of $N$ is approximately $\log_{2}(N)$.
 
 Let's say we wish to find a factor of the integer $N$ by trial division.  The \textbf{trial division} algorithm proceeds as follows:  for each integer $k$ less than or equal to $\sqrt{N}$, compute $N/k$ and see if the remainder is zero (in other words, if it divides evenly).  If it divides evenly, we have found a factor.  If $N$ has a \textbf{proper factor} (something other than itself and $1$), then this algorithm will find it, since one of its proper factors will be less than $\sqrt{N}$.
 
 \begin{checkin}
-  Can you see why?  Pause and convince yourself that this must be true.  What if both were bigger than $\sqrt{N}$?
+  Can you see why?  Pause and convince yourself that this must be true.  What if all of its proper factors were bigger than $\sqrt{N}$? 
 \end{checkin}
-\todo{AI: this was \textbackslash begin\{checK\}...\textbackslash end\{check\} --
-neither is a defined environment, so it broke compilation; I changed both to
-\texttt{checkin} (the book's ``Concept Check''). If you meant a different kind
-of box, say the word. (Small wording note: ``both'' has no antecedent yet --
-the footnote it replaced used to name the two factors.)}
 
 The \textbf{asymptotic runtime} or \textbf{asymptotic complexity} is the time taken as a function of that input size, as the input size grows.  For our example algorithm, the time taken is $\sqrt{N}$ trial divisions.  Assume for simplicity for the moment that a trial division takes a constant amount of time\footnote{this is not true, but we will ignore that for now}.  Then the time taken as a function of input size is $\sqrt{N}$ steps as a function of $\log_2(N)$.  If we let $X := \log_2(N)$ represent the input size, then\footnote{the notation $:=$ means that I am defining the symbol on the left to be the quantity on the right} we have $N = 2^X$ and we obtain a runtime of $\sqrt{N} = N^{1/2} = 2^{X/2} = \sqrt{2}^X$.  This is an \emph{exponential} function in $X$, so we say that trial division is an \textbf{exponential algorithm}.
 
@@ -929,13 +822,8 @@ There are terms for the security of a cryptosystem against an adversary with oth
 \subsection{Randomness and pseudorandomness}
 
 
-In order to implement cryptography, randomness is crucial.  For example, a user must choose their secret key randomly.  Any predictable means of choosing a key represents a security vulnerability.  But true randomness requires physics.  It is possible to generate true randomness from physical sensors.  For example, COMPANY WHICH famously set up a wall of lava lamps and pointed a camera at them, and used the pixels of the images to generate randomness.
-\todo{AI: it's Cloudflare -- the ``LavaRand'' wall of about 100 lava lamps in
-the lobby of their San Francisco office (since 2017), feeding an entropy source
-for their production servers; the name and idea come from Silicon Graphics'
-1997 Lavarand. Fun extras if you want them: their London office uses chaotic
-double pendulums and Lisbon a wave machine. See
-cloudflare.com/learning/ssl/lava-lamp-encryption/.}  Modern laptops can use human mouse movements, clock readings, or heat sensors, among others.  This is expensive and slow, however.
+In order to implement cryptography, randomness is crucial.  For example, a user must choose their secret key randomly.  Any predictable means of choosing a key represents a security vulnerability.  But true randomness requires physics.  It is possible to generate true randomness from physical sensors.  For example, Cloudflare famously set up a wall of lava lamps and pointed a camera at them, and used the pixels of the images to generate randomness\footnote{See
+cloudflare.com/learning/ssl/lava-lamp-encryption/.}.  Modern laptops can use human mouse movements, clock readings, or heat sensors, among others.  This is expensive and slow, however.
 
 The alternative is pseudorandomness.  Pseudorandomness is not random at all:  it refers to a deterministic program which generates bits (0s and 1s) according to a fixed algorithm, but for which the bits \emph{look really random}.  What does that mean?  Depending on the use case, it can mean different things.  For cryptography, it means that the next bits should not be predictable, even if someone has seen the most recent bits.  The algorithm begins with a \textbf{seed}, a number which sets the initial state of the algorithm, and from which all the bits are generated.  This seed might ideally be chosen truly randomly.  But then the algorithm runs quickly and easily to generate as much random-looking stuff as you need for your purposes.
 
@@ -956,13 +844,7 @@ Ideally, when generating randomness for use in cryptography, one should choose a
 
 \subsection{Living with quantum computers}
 
-In YEAR, it was proposed that using properties of quantum physics may allow us to build machines that lie outside our standard classical model of computation.  In other words, machines that can do certain things classical computers cannot.  Peter Shor, in YEAR, demonstrated that a quantum computer could factor integers in polynomial (not exponential!) time.  It is not known if classical computers can factor in polynomial time.  The best known algorithms for classical computers achieve only \emph{sub-exponential} time (which is strictly between polynomial and exponential).
-\todo{AI: the two YEARs: quantum computation was proposed around 1980--1982 --
-the standard attribution is Paul Benioff (1980) and Yuri Manin (1980)
-independently, with Richard Feynman's influential ``Simulating Physics with
-Computers'' talk/paper in 1981/1982 -- so ``In the early 1980s'' is the safe
-phrasing, or ``In 1982'' if you want to name Feynman. Shor's algorithm: 1994
-(FOCS; journal version 1997).}
+In the early 1980s, it was proposed that using properties of quantum physics may allow us to build machines that lie outside our standard classical model of computation.  In other words, machines that can do certain things classical computers cannot\footnote{P.~Benioff, ``The computer as a physical system: A microscopic quantum mechanical Hamiltonian model of computers as represented by Turing machines,'' \emph{J.~Stat.~Phys.}~22 (1980), 563--591; Yu.~I. Manin, \emph{Vychislimoe i nevychislimoe} [\emph{Computable and Noncomputable}] (Moscow: Sovetskoe Radio, 1980); R.~P. Feynman, ``Simulating physics with computers,'' \emph{Int.~J.~Theor.~Phys.}~21 (1982), 467--488.}.  Peter Shor, in 1994, demonstrated\footnote{P.~W. Shor, ``Algorithms for quantum computation: discrete logarithms and factoring,'' \emph{Proc.~35th Annual Symposium on Foundations of Computer Science (FOCS)} (IEEE, 1994), 124--134; expanded journal version: ``Polynomial-time algorithms for prime factorization and discrete logarithms on a quantum computer,'' \emph{SIAM J.~Comput.}~26(5) (1997), 1484--1509.} that a quantum computer could factor integers in polynomial (not exponential!) time.  It is not known if classical computers can factor in polynomial time.  The best known algorithms for classical computers achieve only \emph{sub-exponential} time (which is strictly between polynomial and exponential).
 
 This realization has profound implications for cryptography.  Shor's algorithm and its variations can solve the standard hard cryptographic problems of the years 1980-2020 easily.  The only challenge was to build a quantum computer.  Engineers have been working on this task for many decades now, and we are succeeding.  In the not-too-distant future, quantum computers will be a reality.  It is only a matter of scale before their existence will render all our standard cryptography insecure!
 
@@ -1141,11 +1023,8 @@ The Caesar cipher is best viewed as a cryptosystem based on modular arithmetic m
 \]
 and then the corresponding decryption is
 \[
-% AI-FLAGGED ORIGINAL:
-%\text{decryption}: c \mapsto c - x \pmod{26}.
 \text{decryption}: c \mapsto c - s \pmod{26}.
 \]
-\KS{Fixed by AI: the secret shift is $s$ (encryption is $m \mapsto m+s$), so decryption must subtract $s$, not the undefined $x$.}
 Then the \textbf{plaintext space}, \textbf{ciphertext space} and keyspace are all equal to $\ZZ/26\ZZ$ (although we think of this as the roman alphabet).  Figure~\ref{fig:vig-square} shows the addition table of $\ZZ/26\ZZ$ written in this way.
 
 \begin{figure}
@@ -1543,11 +1422,8 @@ We just have to keep in mind the Principles of Modular Arithmetic (Section~\ref{
 \[
 	\begin{pmatrix} a & b \\ c & d \end{pmatrix}^{-1}
 	=
-% AI-FLAGGED ORIGINAL:
-%	\frac{1}{ad-bc} \begin{pmatrix} d & -b \\ -c & a \end{pmatrix}^{-1}
 	\frac{1}{ad-bc} \begin{pmatrix} d & -b \\ -c & a \end{pmatrix}
 \]
-\KS{Fixed by AI: the adjugate matrix on the right should not itself be inverted; the $2\times2$ inverse formula is $\frac{1}{ad-bc}\left(\begin{smallmatrix} d & -b \\ -c & a\end{smallmatrix}\right)$ with no exponent $-1$.}
 (This is the usual formula for the inverse, but we can only use it if division by $ad-bc$ is allowed.)
 For example, the following matrix is \emph{not invertible} modulo $6$, because its determinant, $2$, is not invertible modulo $6$:
 \[
@@ -1940,10 +1816,8 @@ a^{\varphi(n)} \equiv 1 \pmod n.
 \end{proof}
 
 \begin{checkin}
-% AI-FLAGGED ORIGINAL:
-%    Observe that $\varphi(17)=6$ and $7^6 \equiv 7 \pmod{14}$.
     Observe that $\varphi(14)=6$ and $7^6 \equiv 7 \pmod{14}$.
-\KS{Fixed by AI: the modulus here is $14$, and $\varphi(14)=6$ (whereas $\varphi(17)=16$). The footnote answer also refers to modulus $14$, so this should read $\varphi(14)=6$.}  This seems to contradict Euler's Theorem.  Why doesn't it?\footnote{Answer:  Euler's Theorem requires that the base, $a$, be in the multiplicative group.  But $a=7$ is not coprime to $14$, so Euler's Theorem doesn't apply to this base.}
+This seems to contradict Euler's Theorem.  Why doesn't it?\footnote{Answer:  Euler's Theorem requires that the base, $a$, be in the multiplicative group.  But $a=7$ is not coprime to $14$, so Euler's Theorem doesn't apply to this base.}
 \end{checkin}
 \begin{aisolution}
 Euler's Theorem only applies to bases $a \in (\ZZ/n\ZZ)^*$, i.e. bases coprime to $n$.  Here $\gcd(7,14) = 7 \neq 1$, so $7 \notin (\ZZ/14\ZZ)^*$ and the theorem simply does not apply.  (Indeed $7^2 = 49 \equiv 7 \pmod{14}$, so $7^k \equiv 7 \pmod{14}$ for every $k\geq 1$; the powers of $7$ never reach $1$.)
@@ -2306,13 +2180,13 @@ using part (3).  Thus $h^{(p-1)/2} \equiv 1 \pmod p$ if $x$ is even, and $\equiv
 
 
 \subsubsection{The Baby-Step Giant-Step Algorithm}
-\KS{AI: this is the section referenced elsewhere as \texttt{sec:baby-giant}, but it has no matching label, so that cross-reference renders as "LABEL:sec:baby-giant" in the EC El~Gamal section. Add \texttt{\textbackslash label\{sec:baby-giant\}} right here to fix it.}
+\label{sec:baby-giant}
 
 The first algorithm we will study which is faster than exhaustive search for the Discrete Logarithm Problem is known as the \emph{Baby-Step-Giant-Step} algorithm, and is due to Shanks \KS{add citation}.  It is an example of a \emph{meet-in-the-middle} algorithm, because we compute two lists and look for a collision.  To motivate the algorithm, suppose we compute two lists of randomly generated elements of $\ZZ/p\ZZ$.  The first list consists of elements of the form $g^j$, i.e., random powers of the generator $g$.  The second list consists of elements of the form $hg^k$, i.e. random powers of $g$, all multiplied by $h$.  If we notice a collision, i.e. $g^j = h g^k$, then rearranging, we obtain $g^{j-k} = h$ and $j-k$ is the solution to the problem.  
 
-Such an attack is sometimes called a \emph{birthday attack}.  It is an improvement over the more na\"ive method of computing a single list of random powers of $g$ and hoping to collide with $h$.  Indeed, the number of comparisons that may result in a collision in this na\"ive method is equal to the length $\ell$ of the list.  But with two lists of length $\ell$, there are ${\ell\choose 2} = \frac{\ell(\ell-1)}{2}$\KS{Fixed by AI: the original wrote $\frac{\ell(\ell+1)}{2}$, but $\binom{\ell}{2}=\frac{\ell(\ell-1)}{2}$.} comparisons that may `get lucky.'  This results in an improved runtime, since we obtain more new comparisons per computation of an element.  (It does require more memory, however).
+Such an attack is sometimes called a \emph{birthday attack}.  It is an improvement over the more na\"ive method of computing a single list of random powers of $g$ and hoping to collide with $h$.  Indeed, the number of comparisons that may result in a collision in this na\"ive method is equal to the length $\ell$ of the list.  But with two lists of length $\ell$, there are ${\ell\choose 2} = \frac{\ell(\ell-1)}{2}$ comparisons that may `get lucky.'  This results in an improved runtime, since we obtain more new comparisons per computation of an element.  (It does require more memory, however).
 
-Shanks' Baby-Step-Giant-Step algorithm takes the randomness out of this two-list approach, by generating two lists which are expected to `cover' the space of possibilities fairly evenly.  To make this precise, start with the observation that every integer $0 \le n < 100$ can be written with two base-ten digits in a unique way.  Similarly, any integer $0 \le n < p-1$ can be written uniquely with two digits in base $\sqrt{p-1}$, or at least, approximately so, since if $\sqrt{p-1}$ is not an integer, we will use the closest integer greater than it.  That is, we let $N = \lceil \sqrt{p-1} \rceil$.\KS{Fixed by AI: the original ``$\rceil p-1 \lceil$'' had reversed ceiling brackets and, more importantly, omitted the square root; the base used is $\sqrt{p-1}$, so $N=\lceil\sqrt{p-1}\rceil$.}
+Shanks' Baby-Step-Giant-Step algorithm takes the randomness out of this two-list approach, by generating two lists which are expected to `cover' the space of possibilities fairly evenly.  To make this precise, start with the observation that every integer $0 \le n < 100$ can be written with two base-ten digits in a unique way.  Similarly, any integer $0 \le n < p-1$ can be written uniquely with two digits in base $\sqrt{p-1}$, or at least, approximately so, since if $\sqrt{p-1}$ is not an integer, we will use the closest integer greater than it.  That is, we let $N = \lceil \sqrt{p-1} \rceil$.
 
 The first list is the `baby steps':
 \[
@@ -2512,12 +2386,6 @@ the probability is around $u^{-u}$. \KS{give proper citation}.  Thus, we expect 
 
 We will assume that the factoring is done by trial division in terms of the factor base (in fact, there are various improvements that can be made).
 The runtime for finding relations can then be expressed as a product:
-% AI: reflowed onto one factor per line -- as a single line this product of
-% four text-labelled factors was far wider than the column and got a horizontal
-% scrollbar in the web reader. Original:
-% \[
-% 	(\text{\# of relations needed})(\text{average tries per success})(\text{\# of trial divisions to factor})(\text{cost of a trial division}).
-% \]
 \begin{align*}
 	 & (\text{\# of relations needed}) \\
 	 {}\cdot{} & (\text{average tries per success}) \\
@@ -2693,8 +2561,7 @@ Suppose $m$ is a message to be signed.  We think of it as an exponent, so it liv
 
 Alice, who wishes to sign the document $m$, will create \emph{two} private-public key pairs.  The first, $a$ and $A = g^a$ is her private public key pair for long term.  The second, is an ephemeral key for signing, which we will call $k$ and $K = g^k$ ($k$ is for `key').  The signed message will be made up of $(m, K, s)$ where $s$ is chosen such that $aK + sk\equiv m$ modulo $p-1$.  In other words, $s$ should be thought of as an exponent.  But strangely, we are also thinking of $K$ as an exponent as well, in this context.
 
-To verify the signature, Bob will combine Alice's public key $A$ with the signed message $(m,K,s)$.  He will compute $A^K K^s$ and $g^m$.  Since $A^K K^s = g^{aK + sk}$, these are equal if and only if $aK + sk = m$, i.e. if $(m,K,s)$ is a correctly signed document. \KS{Fixed by AI: the condition should be $aK+sk=m$ (matching the exponent $g^{aK+sk}$ and the signing equation); the original ``$aB+bs=m$'' used symbols $B,b$ that do not appear in this signature scheme.}
-
+To verify the signature, Bob will combine Alice's public key $A$ with the signed message $(m,K,s)$.  He will compute $A^K K^s$ and $g^m$.  Since $A^K K^s = g^{aK + sk}$, these are equal if and only if $aK + sk = m$, i.e. if $(m,K,s)$ is a correctly signed document. 
 
 Summarizing the discussion, we have the following algorithm:
 
@@ -2791,12 +2658,6 @@ The Euclidean algorithm is merely a formalization of this very intuitive process
 	15 &= 3 \cdot 5 + 0
 \end{align*}
 Each row has the form:
-% AI: reflowed onto two aligned lines and moved the "(to become ...)" role
-% notes into the following sentence -- as a single line this display was far
-% wider than the column and rendered munged in the web reader.  Original:
-% \[
-% 	(\text{larger pile}) = (\text{number of copies}) \cdot (\text{smaller pile (to become new bigger pile)}) + (\text{remainder (to become new smaller pile)})
-% \]
 \begin{align*}
 	(\text{larger pile}) = {}& (\text{number of copies}) \cdot (\text{smaller pile}) \\
 	&{} + (\text{remainder}).
@@ -2896,7 +2757,8 @@ At the end of this computation, we have a recipe card for $4$, i.e., we have lea
 \[
 	196 \cdot (-11) + 180 \cdot 12 = 4.
 \]
-In other words, we have solved the original problem, and found $(x,y) = (-11,12)$.  \KS{Fixed by AI: the solution found is $(x,y)=(-11,12)$ (consistent with the recipe card and the equation $196\cdot(-11)+180\cdot12=4$ just above); the original ``$(-11,10)$'' has the wrong $y$-value ($196\cdot(-11)+180\cdot10=-356\neq4$).}
+In other words, we have solved the original problem, and found $(x,y) = (-11,12)$. 
+
 
 If we wish to solve more general linear Diophantine equations, of the form $ax + by = c$ where $c \neq \gcd(a,b)$, then we observe two things:
 \begin{enumerate}
@@ -2930,11 +2792,8 @@ Let $g = \gcd(a,b)$.  To solve the Diophantine equation $ax + by = c$, we have:\
 \item When $c$ is not a multiple of $\gcd(a,b)$, there are no solutions.
 \item When $c = d g$, the full set of solutions is given by
 \[
-% AI-FLAGGED ORIGINAL:
-%\{ d(x_0, y_0) + k(-b/g, a/b) : k \in \ZZ \}.
 \{ d(x_0, y_0) + k(-b/g, a/g) : k \in \ZZ \}.
 \]
-\KS{Fixed by AI: the homogeneous solution direction is $(-b/g,a/g)$ (as in the $c=0$ case just above); the original ``$a/b$'' should be ``$a/g$''.}
 where $(x_0, y_0)$ is any one solution to $ax+by=g$ (for example, found by the extended Euclidean algorithm).
 \end{enumerate}
 
@@ -3644,14 +3503,6 @@ For example, the ring $\FF_3[x]/(x^2+1)$ has exactly 9 elements:
 0,1,2,x,x+1,x+2,2x,2x+1,2x+2.
 \]
 Any other element can be reduced to one of these.  The two rules in this case are
-% AI-FLAGGED ORIGINAL:
-%\[
-%3 \equiv 0, \quad x \equiv 2
-%\]
-%This second rule came from rearranging $x +1 \equiv 0$ to become $x \equiv -1 \equiv 2$.  It's a nicer rule to handle.  Then, for example, applying these rules we can reduce:
-%\[
-%x^2 + 7x = 2^2 + 7 \cdot 2 = 2^2 + 1 \cdot 2 = 4 + 2 = 6 = 0.
-%\]
 \[
 3 \equiv 0, \quad x^2 \equiv 2
 \]
@@ -3659,7 +3510,6 @@ This second rule came from rearranging $x^2 +1 \equiv 0$ to become $x^2 \equiv -
 \[
 x^2 + 7x \equiv 2 + 7x \equiv 2 + x \equiv x+2.
 \]
-\KS{Fixed by AI: the modulus is $m(x)=x^2+1$, so the reduction rule is $x^2\equiv-1\equiv2$ (one cannot set $x\equiv2$; the element $x$ has degree $1$ and is already reduced). Correctly reducing $x^2+7x$: replace $x^2$ by $2$ and reduce $7\equiv1\pmod3$, giving $2+x=x+2$ (an element of the listed residue set), not $0$.}
 
 
 
@@ -3830,23 +3680,14 @@ We will work in $\ZZ/5\ZZ$.
     \text{slope} \equiv  \frac{4-2}{2-0} \equiv \frac{2}{2} \equiv 1 \pmod{5}.
     \]
     Since $P$ is on the line $y \equiv x + n$, we have $2 \equiv 1 \cdot 0 + n$ so the $y$-intercept $n$ is $2$ and $L$ is the line
-% AI-FLAGGED ORIGINAL:
-%    Since $P$ is on the line $y \equiv 2x + n$, we have $2 \equiv 2 \cdot 0 + n$ so the $y$-intercept $n$ is $2$ and $L$ is the line
-%    \[
-%    L : y \equiv 2x + 2 \pmod{5}.
-%    \]
     \[
     L : y \equiv x + 2 \pmod{5}.
     \]
-\KS{Fixed by AI: the slope was just computed as $1$ (not $2$), so the line through $P,Q$ is $y\equiv x+2$. Check: $Q=(2,4)$ satisfies $2+2=4$, whereas $2\cdot2+2=6\equiv1\neq4$. (The substitution below already uses $(x+2)^2$, i.e.\ slope $1$.)}
 
     Next, we find the third intersection point of $L$ and $E$.  To do this, we substitute $L$ into $E$:
     \[
-% AI-FLAGGED ORIGINAL:
-%    (x+2)^2 \equiv x^3  + 3 x + 4 \pmod{5}.
     (x+2)^2 \equiv x^3  + 2 x + 4 \pmod{5}.
     \]
-\KS{Fixed by AI: the right-hand side is the curve $x^3+2x+4$, not $x^3+3x+4$. Indeed $(x+2)^2=x^2+4x+4$ and $x^3+2x+4-(x^2+4x+4)=x^3-x^2-2x$, matching the simplified cubic below.}
     Simplifying,
     \[
     x^3 - x^2 -2x \equiv 0 \pmod{5}.
@@ -3855,7 +3696,8 @@ We will work in $\ZZ/5\ZZ$.
     \[
     0 + 2 + x_R \equiv -(-1) \equiv 1 \pmod{5}.
     \]
-    So $x_R = 4$ and we can plug into $L$ to obtain $y_R \equiv x_R + 2 \equiv 4 + 2 \equiv 1 \pmod{5}$.\KS{Fixed by AI: the line is $y\equiv x+2$ (slope $1$), so $y_R\equiv x_R+2\equiv4+2\equiv1$. The original ``$2x_R+2\equiv2\cdot4+2$'' used the wrong slope, and moreover $2\cdot4+2=10\equiv0\neq1$.}  So the third intersection point is $R = (4,1)$.
+    So $x_R = 4$ and we can plug into $L$ to obtain $y_R \equiv x_R + 2 \equiv 4 + 2 \equiv 1 \pmod{5}$.
+    So the third intersection point is $R = (4,1)$.
 
     Finally, the last step is to reflect $R$ across the $x$-axis, which means changing the sign on the $y$ coordinate (keep in mind $-1 \equiv 4 \pmod{5}$):
     \[
@@ -3970,7 +3812,7 @@ On the curve $y^2 \equiv x^3 +2x + 1$ modulo 7, try to compute the addition of t
 
 \textbf{Question 3.}  On the curve $y^2 \equiv x^3 +2x + 1$ modulo 35, try to compute the addition of the two points $P = (28,13)$ and $Q = (21,22)$ by hand.\\
 
-\textbf{Soln.} We begin by considering the slope, rise over run:  $-9/7$.\KS{Fixed by AI: the run is $x_P-x_Q=28-21=7$ (positive), so the slope is $-9/7$, not $-9/-7\equiv9/7$. This matters for the ``shadow'' reasoning: $-9/7\equiv1/2\equiv3\pmod5$ matches the slope in Question~1, whereas $9/7\equiv2\pmod5$ would not.}  Since we are working modulo $35$, we must compute the inverse of $7$ modulo $35$.  But if we begin that process (which involves an extended Euclidean algorithm), we will come up against the fact that $7$ is not invertible modulo $35$, since they share a non-trivial factor of $7$.  Boom!  The universe explodes as we attempt to divide by something which is not invertible!  In calmer parlance, we cannot proceed.\\
+\textbf{Soln.} We begin by considering the slope, rise over run:  $-9/7$.  Since we are working modulo $35$, we must compute the inverse of $7$ modulo $35$.  But if we begin that process (which involves an extended Euclidean algorithm), we will come up against the fact that $7$ is not invertible modulo $35$, since they share a non-trivial factor of $7$.  Boom!  The universe explodes as we attempt to divide by something which is not invertible!  In calmer parlance, we cannot proceed.\\
 
 Now let's step back and analyse the situation.  Observe the following things:
 \begin{enumerate}
@@ -4006,7 +3848,6 @@ a \rightarrow a^2
 \rightarrow a^{7!}
 \rightarrow \cdots
 \end{equation}
-\KS{Fixed by AI: the fifth term was written $a^{5!!}$ (double factorial); it should be $a^{5!}$ to match the factorial sequence (cf.\ the CRT version below, which has $a_1^{5!}$).}
 To compute this, we can first square, then cube, then raise to the fourth power, etc.
 
 Behind the scenes, so to speak, the Chinese remainder theorem tells us that our arithmetic efforts are simultaneously reproduced modulo $p$ and modulo $q$.  Under the isomorphism of CRT,
@@ -4177,7 +4018,8 @@ which we can then solve as
 Q = (j + kN)P.
 \]
 
-Compare this formalism to Section~\ref{sec:baby-giant} (2.8.1).\KS{AI: \texttt{\textbackslash ref\{sec:baby-giant\}} here is undefined (renders as "LABEL:sec:baby-giant") -- the label is missing at the Baby-Step Giant-Step subsubsection; add it there. Also, the hand-written "(2.8.1)" should then become the automatic reference number.}
+Compare this formalism to Section~\ref{sec:baby-giant}.
+
 
 \subsection{Elliptic Curve Diffie-Hellman}
 
@@ -4441,16 +4283,12 @@ form a field, under the operations
 \[
 (a+bi)+(c+di) = (a+c) + (b+d)i, 
 \quad
-% AI-FLAGGED ORIGINAL:
-%(a+bi)(c+di) = (ab - bd) + (ac+bd)i
 (a+bi)(c+di) = (ac - bd) + (ad+bc)i
 \]
-\KS{Fixed by AI: the complex product is $(ac-bd)+(ad+bc)i$. The original real part ``$ab-bd$'' should be ``$ac-bd$'', and the imaginary part ``$ac+bd$'' should be ``$ad+bc$''.}
 The multiplication rule just written may seem arbitrary, but it is a simple consequence of the `rule' that $i^2 = -1$, i.e.
 \[
 (a+bi)(c+di) = ac + bdi^2 + (ad+bc)i = (ac - bd) + (ad+bc)i.
 \]
-\KS{Fixed by AI: the cross terms give $(ad+bc)i$, not $(ac+bd)i$ (both occurrences corrected on this line).}
 
 In fact, this construction is precisely what we did in constructing finite fields:  we could begin with the polynomial ring $\RR[x]$ and take a quotient by the polynomial $x^2+1$, i.e. apply the rule $x^2 = -1$.  We would obtain a field whose elements can all be expressed as linear polynomials $bx + a$ for $a,b \in \RR$.  But writing $i$ instead of $x$, we obtain the definition above.
 
@@ -4595,9 +4433,9 @@ In Figure~\ref{fig:bloch} we see how these two parameters $0 \le \theta \le 2\pi
 \end{figure}
 
 \KS{move this?}
-Then \textbf{relative phase} is the angle the complex number $b/a$ makes with the real axis, i.e. $\varphi$.  The \textbf{relative magnitude} is the length of the complex number $b/a$, i.e. $\sin \frac{\theta}{2} / \cos \frac{\theta}{2}$. \KS{Fixed by AI: with the state $\cos(\theta/2)\,|0\rangle+e^{i\varphi}\sin(\theta/2)\,|1\rangle$ (so $a=\cos(\theta/2),\,b=e^{i\varphi}\sin(\theta/2)$), the ratio with phase $\varphi$ and magnitude $\tan(\theta/2)=\sin(\theta/2)/\cos(\theta/2)$ is $b/a$, not $a/b$. Corrected both occurrences.}
+Then \textbf{relative phase} is the angle the complex number $b/a$ makes with the real axis, i.e. $\varphi$.  The \textbf{relative magnitude} is the length of the complex number $b/a$, i.e. $\sin \frac{\theta}{2} / \cos \frac{\theta}{2}$. 
 
-(As a quick concept check, if $\varphi=0$ and $\theta=0$, we get $|0 \rangle$ which has relative phase undefined and relative magnitude $0$.\KS{Fixed by AI: at $\theta=0$ the state is $\cos(0)|0\rangle+\sin(0)|1\rangle=|0\rangle$ (north pole), not $|1\rangle$; and indeed its relative magnitude $|b/a|=0$, consistent with $|0\rangle$.}\KS{more concept checks here})
+(As a quick concept check, if $\varphi=0$ and $\theta=0$, we get $|0 \rangle$ which has relative phase undefined and relative magnitude $0$.\KS{more concept checks here})
 
 
 \begin{quiz}
@@ -4806,7 +4644,7 @@ Consider the qubit state superposition $i|0\rangle + \sqrt{3}|1 \rangle$.
         \cos(\theta/2) = \frac{1}{2}, \quad
         e^{i\varphi} \sin(\theta/2) = -i \frac{\sqrt{3}}{2}.
         \]
-        Taking $\theta = 2\pi/3$ solves the first equation, and plugging that into the second, we need\KS{Fixed by AI: $\cos(\theta/2)=1/2$ requires $\theta/2=\pi/3$, i.e.\ $\theta=2\pi/3$ (then $\sin(\theta/2)=\sqrt3/2$, giving $e^{i\varphi}=-i$). The value $\theta=\pi/3$ gives $\cos(\pi/6)=\sqrt3/2\neq1/2$. Cf.\ the identical computation in the Test Review section, which correctly uses $2\pi/3$.}
+        Taking $\theta = 2\pi/3$ solves the first equation, and plugging that into the second, we need
         \[
         e^{i\varphi} = -i
         \]
@@ -5185,7 +5023,8 @@ In the final phase, they may use a few of these bits to check whether there was 
 
 The security guarantee of QKD is very different from the other systems we have studied.  Here, we rely on the physical laws of quantum physics to guarantee (with overwhelming probability, anyway) that an eavesdropper can be \emph{detected}.  If an eavesdropper is detected, we simply give up and perhaps start over.
 
-To see that Phase III detects an eavesdropper with some probability, consider what happens in the following two cases.  In both cases, imagine that we are in the first row of the example table above.  That is, Alice sends 0 in the L basis, meaning $| \uparrow \rangle$, and Bob measures the photon in the L basis.  If no eavesdropper is on the channel, Bob will measure a 0.\KS{Fixed by AI: Alice sent bit $0$ ($|\uparrow\rangle$); Bob measuring in the L basis recovers $|\uparrow\rangle$ with probability $1$, which decodes to $0$, not $1$.}
+To see that Phase III detects an eavesdropper with some probability, consider what happens in the following two cases.  In both cases, imagine that we are in the first row of the example table above.  That is, Alice sends 0 in the L basis, meaning $| \uparrow \rangle$, and Bob measures the photon in the L basis.  If no eavesdropper is on the channel, Bob will measure a 0.
+
 
 However, if there is an eavesdropper on the channel, say Eve, then she cannot interact with the photon without measuring it.  Let's consider two possibilities:
 
@@ -5448,7 +5287,7 @@ This has no solution.
     |00 \rangle + i|01 \rangle
     \right).
     \]
-    These two states result in the \emph{same probabilities} for the second qubit.  However, this state IS entangled, because if it were not, then we would have a solution to\KS{Fixed by AI: the point of this remark is precisely that independent second-qubit probabilities do NOT imply unentangled; the derivation below yields a contradiction, so the state IS entangled (as the last sentence also concludes). Changed ``is NOT entangled, because if it were'' to ``IS entangled, because if it were not''.}
+    These two states result in the \emph{same probabilities} for the second qubit.  However, this state IS entangled, because if it were not, then we would have a solution to
     \[
     ac = 1, ad = 1, bc = 1, bd = i.
     \]
@@ -6400,7 +6239,6 @@ If we simplify some of these, we get
 				\right)
 				\]
 				\end{solution}
-\KS{Fixed by AI: reading the fourth column ($\omega^{3i}$) of the $8\times8$ matrix, the $|101\rangle$ ($i=5$) coefficient is $\omega^{15}=\omega^{7}=-i\omega$ and the $|111\rangle$ ($i=7$) coefficient is $\omega^{21}=\omega^{5}=-\omega$; the original had these two swapped (and they match the matrix's own $6$th row col.\ $6$).}
 
  
 			\item The next several questions are a progression.
@@ -6517,7 +6355,6 @@ To motivate our method for discovering this square root, let's do an example wit
 \end{NiceTabular}
 \end{center}
 
-\KS{Fixed by AI: the $\alpha=13$ row had $\alpha^2=11,\ \alpha^3=8$; correctly, modulo $15$, $13\equiv-2$ so $13^2\equiv4$ and $13^3\equiv7$. The row is now $1,13,4,7,1,13$, and the boxed square root of $1$ is $13^2\equiv4$.}
 In the table, I've boxed the power that's \emph{halfway} to $1$, i.e. $\alpha^{r/2}$ where $\alpha^r \equiv 1$.  It is a square root of $1$.  Since it is not $1$ or $-1$, we can use this to factor.  For example, taking the top box, $4^2 \equiv 1 \pmod{15}$ so we take $\gcd(4-1,15) = 3$.
 
 The lesson we've learned is that if we can find the order of $\alpha$ modulo $N$, and that order is even, we \emph{might} be lucky enough to have found a surprise square root.  The resulting algorithm is like this:
@@ -6751,7 +6588,6 @@ So, the entire state changes to
                \begin{pmatrix} 3 \\ \sqrt{2} - 1 \\ 1 \\  -\sqrt{2}-1 \\ -1 \\ -\sqrt{2}-1 \\ 1 \\ \sqrt{2} - 1
      \end{pmatrix} % AI-FIXED: entries 4 and 6 were -1, should be -sqrt(2)-1; and 7th entry of preceding col-7 vector was -i, should be i
 					\end{align*}
-\KS{Fixed by AI (see comment above): in the third summand (QFT column $7$, $\omega^{7i}$) the $i=6$ entry is $\omega^{42}=\omega^2=i$, not $-i$; and in the result the $i=3,5$ entries equal $-\sqrt2-1$ (e.g.\ $i\omega-1-\omega=-\sqrt2-1$), not $-1$. Verified numerically.}
      For the computation above, we use the fact that
      \[
      \omega = \frac{1}{\sqrt{2}} + i \frac{1}{\sqrt{2}}, \quad \frac{2}{\sqrt{2}} = \sqrt{2}.
@@ -7587,18 +7423,14 @@ e_2 = x^2
 \]
 Ephemeral public key:
 \begin{align*}
-	K &= gk + e_2 = 27x^3 + 75x^2 + 6x + 5 % AI-FIXED: was gk + e_1
-\end{align*}
-\KS{Fixed by AI: the ephemeral public key is $K=gk+e_2$ (per the scheme definition), not $gk+e_1$. Verified: $gk+e_2=27x^3+75x^2+6x+5$ over $\FF_{101}[x]/(x^4+1)$, matching the stated value.}
+	K &= gk + e_2 = 27x^3 + 75x^2 + 6x + 5 \end{align*}
 \item Create error for us in ciphertext:
 \[
 e_3 = 100x^2 + x
 \]
 Ciphertext:
 \begin{align*}
-	  C &= Bk + e_3 + \ell m = 79x^3 + 23x + 51 % AI-FIXED: was Bk + e_2
-\end{align*}
-\KS{Fixed by AI: the ciphertext uses the error $e_3$ (per the scheme, $C=Bk+e_3+\ell m$), not $e_2$. Verified: $Bk+e_3+\ell m=79x^3+23x+51$ over $\FF_{101}[x]/(x^4+1)$, matching the stated value.}
+	  C &= Bk + e_3 + \ell m = 79x^3 + 23x + 51 \end{align*}
 \end{enumerate}
 \item {Bob's Decryption}
 \begin{enumerate}
