@@ -1,4 +1,3 @@
-Warning:not_parsed:>CLOSE MathParser failed to match rule 'Anything'
 Warning:not_parsed:>VERTBAR MathParser failed to match rule 'Anything'
 Warning:not_parsed:ADDOP.NUMBER>MULOP MathParser failed to match rule 'Anything'
 Warning:not_parsed:OPFUNCTION>OPEN MathParser failed to match rule 'Anything'

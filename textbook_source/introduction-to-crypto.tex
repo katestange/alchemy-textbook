@@ -181,6 +181,44 @@ The simplest and most famous example is the Caesar cipher, attributed to Julius 
 
 \bespokedemo{caesar-tool}
 
+\todo{AI: worked example and exercises below, added on request.  Every
+ciphertext here was computed with the book's own cipher engine
+(\texttt{frontend/src/lib/demos/ciphers.js}), the same code that drives the
+interactive tools, so the text and the demos cannot disagree.}
+
+\begin{example}[AI generated]
+\emph{Encryption.}  Let us encrypt the Vulcan salutation \texttt{LIVE LONG AND PROSPER} with a shift of $7$.  Spaces are not part of the message, so the plaintext is \texttt{LIVELONGANDPROSPER}, and each letter moves seven places forward, wrapping from \texttt{Z} around to \texttt{A}.  Numbering the alphabet \texttt{A} $= 0$ through \texttt{Z} $=25$, this is the map $x \mapsto x + 7 \bmod 26$:  for instance \texttt{V} $= 21$ and $21 + 7 = 28 \equiv 2 \pmod{26}$, which is \texttt{C}.  Letter by letter we obtain
+\[
+	\texttt{SPCLSVUNHUKWYVZWLY}.
+\]
+
+\emph{Decryption.}  Decryption runs the same procedure backwards:  subtract the shift instead of adding it.  Suppose the ciphertext \texttt{MAXGXXWLHYMAXFTGR} arrives, with the key $19$.  Moving each letter back nineteen places gives
+\[
+	\texttt{THENEEDSOFTHEMANY},
+\]
+which the reader separates into \texttt{THE NEEDS OF THE MANY}.  Notice that we could equally well have shifted \emph{forward} by $26 - 19 = 7$, since $-19 \equiv 7 \pmod{26}$:  decrypting with key $k$ is the same as encrypting with key $26-k$.
+\end{example}
+
+\begin{problem}[AI generated]
+Encrypt \texttt{SET PHASERS TO STUN} with a Caesar shift of $12$.
+\end{problem}
+\begin{aisolution}
+Write the plaintext without spaces as \texttt{SETPHASERSTOSTUN} and add $12$ to each letter modulo $26$ (so \texttt{S} $=18$ becomes $18+12 = 30 \equiv 4$, which is \texttt{E}).  The ciphertext is
+\[
+	\texttt{EQFBTMEQDEFAEFGZ}.
+\]
+\end{aisolution}
+
+\begin{problem}[AI generated]
+The message \texttt{WTEGIXLIJMREPJVSRXMIV} was encrypted with a Caesar shift of $4$.  Decrypt it.
+\end{problem}
+\begin{aisolution}
+Shift every letter back by $4$ (equivalently, forward by $22$):  \texttt{W} $\to$ \texttt{S}, \texttt{T} $\to$ \texttt{P}, \texttt{E} $\to$ \texttt{A}, and so on.  This yields \texttt{SPACETHEFINALFRONTIER}, that is,
+\[
+	\texttt{SPACE THE FINAL FRONTIER}.
+\]
+\end{aisolution}
+
 
 
 In general, one may use any \textbf{permutation} (reordering) of the alphabet, not just a cipherwheel rotation.  It is useful to have a mathematical language for permutations, so we will pause to describe the usual one.  One way to give a permutation of the alphabet is just as a function, like this:
@@ -310,6 +348,69 @@ Another approach to cryptography is not to change the letters of the plaintext a
 
 \webonly{\bespokedemo{transposition-tool}}
 
+\todo{AI: worked example and exercises below, added on request; ciphertexts
+computed with the book's own engine, as above.}
+
+\begin{example}[AI generated]
+\emph{Encryption.}  Take the Borg greeting \texttt{RESISTANCE IS FUTILE} and a skytale whose circumference holds six letters.  We write the eighteen letters of the message in rows of six:
+\begin{center}
+\begin{tabular}{cccccc}
+  R & E & S & I & S & T \\
+  A & N & C & E & I & S \\
+  F & U & T & I & L & E \\
+\end{tabular}
+\end{center}
+Now read \emph{down} the columns, taking them left to right:  the first column gives \texttt{RAF}, the second \texttt{ENU}, and so on.  The ciphertext is
+\[
+	\texttt{RAFENUSCTIEISILTSE}.
+\]
+The letters of the plaintext are all still present --- only their order has changed.  That is what makes this a transposition rather than a substitution.
+
+\emph{Decryption.}  To decrypt, the recipient needs a rod of the same circumference, which is to say the same number of columns.  Suppose we receive \texttt{BPESACMOMTETUY}, fourteen letters, and know the key is $7$.  Fourteen letters in seven columns means $14/7 = 2$ rows, so the letters come off two at a time down each column:  \texttt{BP} fills the first column, \texttt{ES} the second, \texttt{AC} the third, and so on:
+\begin{center}
+\begin{tabular}{ccccccc}
+  B & E & A & M & M & E & U \\
+  P & S & C & O & T & T & Y \\
+\end{tabular}
+\end{center}
+Reading across the rows recovers \texttt{BEAMMEUPSCOTTY}, or \texttt{BEAM ME UP SCOTTY}.
+\end{example}
+
+\begin{problem}[AI generated]
+Encrypt \texttt{ENGAGE THE WARP DRIVE} with a skytale of circumference $6$ (that is, write it in rows of six and read down the columns).
+\end{problem}
+\begin{aisolution}
+The eighteen letters fill three rows of six exactly:
+\begin{center}
+\begin{tabular}{cccccc}
+  E & N & G & A & G & E \\
+  T & H & E & W & A & R \\
+  P & D & R & I & V & E \\
+\end{tabular}
+\end{center}
+Reading down the columns in turn gives \texttt{ETP}, \texttt{NHD}, \texttt{GER}, \texttt{AWI}, \texttt{GAV}, \texttt{ERE}, so the ciphertext is
+\[
+	\texttt{ETPNHDGERAWIGAVERE}.
+\]
+\end{aisolution}
+
+\begin{problem}[AI generated]
+The message \texttt{TRTEFOIOKISVSTNTEEOD} was encrypted with a skytale of circumference $4$.  Decrypt it.
+\end{problem}
+\begin{aisolution}
+There are twenty letters in four columns, hence $20/4 = 5$ rows, so the ciphertext comes off five letters at a time down each column:  \texttt{TRTEF} is the first column, \texttt{OIOKI} the second, \texttt{SVSTN} the third, \texttt{TEEOD} the fourth.
+\begin{center}
+\begin{tabular}{cccc}
+  T & O & S & T \\
+  R & I & V & E \\
+  T & O & S & E \\
+  E & K & T & O \\
+  F & I & N & D \\
+\end{tabular}
+\end{center}
+Reading across the rows gives \texttt{TOSTRIVETOSEEKTOFIND}:  Tennyson's \texttt{TO STRIVE, TO SEEK, TO FIND} (and not to yield).
+\end{aisolution}
+
 
 Any cipher in which the letters of the message are simply rearranged is called a \textbf{transposition cipher}.  The key to a transposition cipher is also a permutation, but this time on the letters of the plaintext, not the letters of the alphabet.  Another famous example is the rail fence cipher.
 
@@ -357,6 +458,51 @@ P & P & Q & R & S & T & U & V & W & X & Y & Z & A & B & C & D & E & F & G & H & 
 
 \webonly{\bespokedemo{vigenere-tool}}
 
+\todo{AI: worked example and exercises below, added on request; ciphertexts
+computed with the book's own engine, as above.}
+
+\begin{example}[AI generated]
+\emph{Encryption.}  Let us encrypt \texttt{SPACE THE FINAL FRONTIER} with the keyword \texttt{VULCAN}.  The keyword is written repeatedly above the plaintext, and each key letter supplies the shift for the letter beneath it:  \texttt{V} $= 21$, \texttt{U} $=20$, \texttt{L} $=11$, \texttt{C} $=2$, \texttt{A} $=0$, \texttt{N} $=13$.
+\begin{center}
+\begin{tabular}{c|ccccccccccc}
+  KEY & V & U & L & C & A & N & V & U & L & C & A \\ \hline
+  PLAINTEXT & S & P & A & C & E & T & H & E & F & I & N \\ \hline
+  CIPHERTEXT & N & J & L & E & E & G & C & Y & Q & K & N \\
+\end{tabular}
+\end{center}
+(The table shows the first eleven letters; the pattern continues.)  The first column is the Caesar shift by $21$ applied to \texttt{S}:  $18 + 21 = 39 \equiv 13 \pmod{26}$, which is \texttt{N}.  Carrying on to the end of the message gives
+\[
+	\texttt{NJLEEGCYQKNNGZCQNGDYC}.
+\]
+Notice what the keyword buys us:  the two \texttt{E}s among these first eleven plaintext letters encrypt to \emph{different} ciphertext letters, \texttt{E} and \texttt{Y}, because they fall under different key letters.  A frequency count of the ciphertext therefore no longer looks like English.  (The first of them happens to be enciphered as itself, since it falls under the key letter \texttt{A}, a shift of $0$ --- a reminder that the Vigen\`ere cipher, unlike the Enigma below, does allow a letter to stand for itself.)
+
+\emph{Decryption.}  The recipient, who knows the keyword, writes it above the ciphertext in the same way and \emph{subtracts} each shift.  Suppose we receive \texttt{SSJOTHRTDSZYGIKOMS} with keyword \texttt{BORG}.  Under \texttt{B} $=1$ the letter \texttt{S} $=18$ becomes $18 - 1 = 17 = $ \texttt{R}; under \texttt{O} $= 14$ the next letter \texttt{S} becomes $18 - 14 = 4 = $ \texttt{E}; and so on.  The plaintext is
+\[
+	\texttt{RESISTANCEISFUTILE}.
+\]
+\end{example}
+
+\begin{problem}[AI generated]
+Encrypt \texttt{TO BOLDLY GO} with the keyword \texttt{KLINGON}.
+\end{problem}
+\begin{aisolution}
+The plaintext \texttt{TOBOLDLYGO} has ten letters, so only the first ten letters of the repeated keyword are used, namely \texttt{KLINGONKLI}.  Adding the corresponding shifts modulo $26$ (\texttt{T} $=19$ under \texttt{K} $=10$ gives $29 \equiv 3 = $ \texttt{D}, and so on) produces
+\[
+	\texttt{DZJBRRYIRW}.
+\]
+\end{aisolution}
+
+\begin{problem}[AI generated]
+The message \texttt{UJGOVUJGOVCFRXMORBBMHST} was encrypted with the keyword \texttt{BLAKE}.  Decrypt it.
+\end{problem}
+\begin{aisolution}
+Writing \texttt{BLAKE} repeatedly above the ciphertext and subtracting the shifts $1, 11, 0, 10, 4$ in turn recovers
+\[
+	\texttt{TYGERTYGERBURNINGBRIGHT},
+\]
+the opening of Blake's poem:  \texttt{TYGER TYGER BURNING BRIGHT}.  The repeated \texttt{UJGOV} at the start of the ciphertext is a clue of exactly the kind Babbage and Kasiski exploited:  identical plaintext (\texttt{TYGER} twice) a multiple of the key length apart encrypts identically.
+\end{aisolution}
+
 Can you see why this cipher was considered more secure?  The cryptanalysis of the Vigen\`ere cipher, described as `impossible of translation' as recently as a 1917 \emph{Scientific American Supplement} article\footnote{\emph{Scientific American Supplement}: Anon., ``A new cipher code,''
 Scientific American Supplement vol.~83, no.~2143 (27 January 1917), p.~61,
 doi:10.1038/scientificamerican01271917-61csupp}, is clever, but encryption can be done by hand.  It is even said that Casanova used his masterful cryptanalysis of a lady's secret message to woo her (see \emph{Secret History}).  We will discuss Vigen\`ere again below.
@@ -391,7 +537,56 @@ This may be a good moment for some mathematical formalism.  Let us suppose we ar
 \begin{checkin}
   Find the correct onetime pad that will encrypt \texttt{0100} to \texttt{1110}.
 \end{checkin}
-	
+
+\todo{AI: worked example and exercises below, added on request.  These are
+bitstrings rather than words, to match the binary formalism of this section;
+every XOR was checked by machine.}
+
+\begin{example}[AI generated]
+\emph{Encryption.}  A starship transmits the eight-bit message \texttt{01101001}, having agreed in advance on the pad \texttt{11010110}.  We XOR the two strings bit by bit:  a $1$ in the key flips the plaintext bit, a $0$ leaves it alone.
+\begin{center}
+\begin{tabular}{rc}
+  plaintext  & \texttt{01101001} \\
+  key        & \texttt{11010110} \\
+  \hline
+  ciphertext & \texttt{10111111} \\
+\end{tabular}
+\end{center}
+Reading the first column:  $0 \oplus 1 = 1$.  The second:  $1 \oplus 1 = 0$.  And so on to the end.  The ciphertext is \texttt{10111111}.
+
+\emph{Decryption.}  Because $c \oplus b = a$ whenever $a \oplus b = c$ (the fact proved in the theorem above), decryption is the very same operation:  XOR the ciphertext with the pad.  Suppose we receive \texttt{10011100} and hold the pad \texttt{11000101}.
+\begin{center}
+\begin{tabular}{rc}
+  ciphertext & \texttt{10011100} \\
+  key        & \texttt{11000101} \\
+  \hline
+  plaintext  & \texttt{01011001} \\
+\end{tabular}
+\end{center}
+The plaintext is \texttt{01011001}.  A word of warning that gives the cipher its name:  this pad must now be destroyed.  If a second message were sent under the same pad, an eavesdropper could XOR the two ciphertexts together --- the key cancels, leaving the XOR of the two plaintexts, and the security is gone.
+\end{example}
+
+\begin{problem}[AI generated]
+Encrypt the plaintext \texttt{11100010} with the one-time pad \texttt{01011011}.
+\end{problem}
+\begin{aisolution}
+XOR the two strings bit by bit ($1 \oplus 0 = 1$, $1 \oplus 1 = 0$, $1 \oplus 0 = 1$, $0 \oplus 1 = 1$, \ldots):
+\[
+	\texttt{11100010} \oplus \texttt{01011011} = \texttt{10111001}.
+\]
+\end{aisolution}
+
+\begin{problem}[AI generated]
+Decrypt the ciphertext \texttt{00111011}, which was encrypted with the one-time pad \texttt{10110110}.
+\end{problem}
+\begin{aisolution}
+Decryption is the same XOR:
+\[
+	\texttt{00111011} \oplus \texttt{10110110} = \texttt{10001101}.
+\]
+You can check the answer by encrypting it again with the same pad, which must return the ciphertext you started with.
+\end{aisolution}
+
 
 \subsubsection{Other old ciphers}
 
@@ -450,6 +645,93 @@ A tutorial on this cipher is available in my video library.  See Figure~\ref{fig
 \end{figure}
 
 \webonly{\bespokedemo{adfgvx-tool}}
+
+\todo{AI: worked example and exercises below, added on request.  All four use
+the square of Figure~\ref{fig:adfgvx-example} and the same column-order key
+convention as that figure; ciphertexts computed with the book's own engine.}
+
+\begin{example}[AI generated]
+\emph{Encryption.}  Let us encrypt \texttt{WARP CORE BREACH} with the square of Figure~\ref{fig:adfgvx-example} and the column order \texttt{3 1 4 2}.
+
+\emph{Step 1 (substitution).}  Each letter is replaced by its row letter followed by its column letter in the square.  Looking up \texttt{w} we find it in row \texttt{F}, column \texttt{D}, so \texttt{w} becomes \texttt{FD}; then \texttt{a} is in row \texttt{D}, column \texttt{G}, giving \texttt{DG}; and so on.  The fourteen plaintext letters become twenty-eight:
+\[
+	\texttt{FD DG VX VA AA AD VX XA VG VX XA DG AA GV}
+\]
+
+\emph{Step 2 (transposition).}  Write that stream in rows of four, and label the columns with the key, which tells us in what order to read them:
+\begin{center}
+\begin{tabular}{cccc}
+  3 & 1 & 4 & 2 \\
+  \hline
+  F & D & D & G \\
+  V & X & V & A \\
+  A & A & A & D \\
+  V & X & X & A \\
+  V & G & V & X \\
+  X & A & D & G \\
+  A & A & G & V \\
+\end{tabular}
+\end{center}
+We read the column labelled $1$ first, giving \texttt{DXAXGAA}; then the column labelled $2$, giving \texttt{GADAXGV}; then $3$, giving \texttt{FVAVVXA}; then $4$, giving \texttt{DVAXVDG}.  Concatenating,
+\[
+	\texttt{DXAXGAAGADAXGVFVAVVXADVAXVDG}.
+\]
+This is the step that makes the cipher strong for its day:  the two halves of each letter's pair have been torn apart and scattered into different columns, so a frequency attack on pairs has nothing to bite on.
+
+\emph{Decryption.}  Suppose we receive \texttt{DGGGVGVGXGXFGDDFDDXFAVAX} with the column order \texttt{2 4 1 3}.  There are twenty-four letters in four columns, so the grid has six rows, and each column takes six consecutive ciphertext letters --- but in the order the key dictates.  The first six letters \texttt{DGGGVG} are the column labelled $1$ (the third column), the next six \texttt{VGXGXF} are the column labelled $2$ (the first column), then \texttt{GDDFDD} is column $3$ (the fourth), and \texttt{XFAVAX} is column $4$ (the second):
+\begin{center}
+\begin{tabular}{cccc}
+  2 & 4 & 1 & 3 \\
+  \hline
+  V & X & D & G \\
+  G & F & G & D \\
+  X & A & G & D \\
+  G & V & G & F \\
+  X & A & V & D \\
+  F & X & G & D \\
+\end{tabular}
+\end{center}
+Reading across the rows restores the pair stream \texttt{VX DG GF GD XA GD GV GF XA VD FX GD}, and looking each pair up in the square (row letter first, then column letter) gives \texttt{RAISESHIELDS}, that is, \texttt{RAISE SHIELDS}.
+\end{example}
+
+\begin{problem}[AI generated]
+Encrypt \texttt{RED ALERT} using the square of Figure~\ref{fig:adfgvx-example} and the column order \texttt{3 1 4 2}.
+\end{problem}
+\begin{aisolution}
+Step 1 replaces each of the eight letters by its pair:  \texttt{VX XA FX DG VD XA VX XG}.  Writing those sixteen letters in rows of four gives
+\begin{center}
+\begin{tabular}{cccc}
+  3 & 1 & 4 & 2 \\
+  \hline
+  V & X & X & A \\
+  F & X & D & G \\
+  V & D & X & A \\
+  V & X & X & G \\
+\end{tabular}
+\end{center}
+Reading the columns in the order $1, 2, 3, 4$ --- that is, the second column, then the fourth, then the first, then the third --- gives \texttt{XXDX}, \texttt{AGAG}, \texttt{VFVV}, \texttt{XDXX}, so the ciphertext is
+\[
+	\texttt{XXDXAGAGVFVVXDXX}.
+\]
+\end{aisolution}
+
+\begin{problem}[AI generated]
+The message \texttt{GXAXDFDAFADXVVVF} was encrypted with the square of Figure~\ref{fig:adfgvx-example} and the column order \texttt{4 2 1 3}.  Decrypt it.
+\end{problem}
+\begin{aisolution}
+Sixteen letters in four columns means four rows, so each column holds four letters.  The key \texttt{4 2 1 3} says the third column is read first, so \texttt{GXAX} is the third column, \texttt{DFDA} the second, \texttt{FADX} the fourth, and \texttt{VVVF} the first:
+\begin{center}
+\begin{tabular}{cccc}
+  4 & 2 & 1 & 3 \\
+  \hline
+  V & D & G & F \\
+  V & F & X & A \\
+  V & D & A & D \\
+  F & A & X & X \\
+\end{tabular}
+\end{center}
+Reading across the rows gives the pair stream \texttt{VD GF VF XA VD AD FA XX}, and the square turns those pairs into \texttt{LIVELONG}:  \texttt{LIVE LONG}.
+\end{aisolution}
 
 Another famous polygraphic cipher is matrix encryption, which is often called a Hill cipher, but sometimes credited to both Levine and Hill during the first half of the twentieth century.  In this system, letters are replaced with their positions in the alphabet (so `A' becomes `1' etc.), and then groups of letters are considered vectors.  Matrices then act on the vectors.  We will see this in Section~\ref{sec:hill}.
 
@@ -585,6 +867,62 @@ We will discuss one more famous symmetric key system, which no history of crypto
 }
 
 \webonly{\bespokedemo{enigma-tool}}
+
+\todo{AI: worked example and exercises below, added on request.  Since these
+require the simulator, they are wrapped in \textbackslash webonly, matching the
+Concept Check above.  Settings are given exactly as the tool's controls are
+labelled, and the worked example uses the tool's default configuration so a
+student can simply open it and type.  Every ciphertext was computed with the
+simulator's own engine (\texttt{frontend/src/lib/demos/enigma.js}).}
+
+\webonly{
+\begin{example}[AI generated]
+Unlike the ciphers above, the Enigma is not one you work by hand:  the whole point of the machine is that the substitution changes with every keystroke.  So use the simulator, and read this example as a set of machine settings.
+
+\emph{Encryption.}  Set the machine as follows --- these are the simulator's default settings, so if you have not touched it, you are ready to go.
+\begin{center}
+\begin{tabular}{rl}
+  rotors (left, middle, right) & \texttt{I}, \texttt{II}, \texttt{III} \\
+  starting positions & \texttt{A}, \texttt{A}, \texttt{A} \\
+  ring settings & \texttt{A}, \texttt{A}, \texttt{A} \\
+  plugboard & \texttt{AB CD} \\
+\end{tabular}
+\end{center}
+Now type \texttt{ENGAGE} and note the letters that light up in turn.  You should read
+\[
+	\texttt{FQIDFN}.
+\]
+Two features are worth pausing over.  First, the plaintext has two \texttt{E}s and two \texttt{G}s, and each pair encrypts differently:  the \texttt{E}s become \texttt{F} and \texttt{N}, the \texttt{G}s become \texttt{I} and \texttt{F}.  A different substitution really is applied at every position.  Second, no letter ever encrypts to itself; that design decision, meant to strengthen the machine, was one of the weaknesses the codebreakers exploited.
+
+\emph{Decryption.}  Press \emph{Reset machine} --- this is essential, as it returns the rotors to the starting positions \texttt{AAA} --- and then type the ciphertext \texttt{FQIDFN}.  The lamps spell out
+\[
+	\texttt{ENGAGE}.
+\]
+This is the enigma symmetry:  the same settings and the same procedure both encrypt and decrypt.  If you forget to reset, the rotors begin in the wrong place and you will get nonsense, which is exactly what happened to a careless operator in 1943.
+\end{example}
+
+\begin{problem}[AI generated]
+Set the simulator to rotors \texttt{I}, \texttt{II}, \texttt{III}, starting positions \texttt{X}, \texttt{Y}, \texttt{Z}, ring settings \texttt{A}, \texttt{A}, \texttt{A}, and plugboard \texttt{AB CD}.  Encrypt \texttt{WARP SPEED}.  Then reset the machine and check that typing your ciphertext returns the plaintext.
+\end{problem}
+\begin{aisolution}
+Typing \texttt{WARPSPEED} at those settings lights up
+\[
+	\texttt{EFNDFAIPG}.
+\]
+Pressing \emph{Reset machine} (back to positions \texttt{XYZ}) and typing \texttt{EFNDFAIPG} returns \texttt{WARPSPEED}, confirming the symmetry.
+\end{aisolution}
+
+\begin{problem}[AI generated]
+A message has been intercepted:  \texttt{AKGVGLTAUN}.  The day's key sheet gives rotors \texttt{II}, \texttt{IV}, \texttt{V}, starting positions \texttt{B}, \texttt{L}, \texttt{A}, ring settings \texttt{A}, \texttt{A}, \texttt{A}, and plugboard \texttt{QW ER}.  Decrypt it.  (The ring settings are the simulator's defaults, so you need only change the rotors, the positions and the plugboard.)
+\end{problem}
+\begin{aisolution}
+Enter the settings, make sure the rotor windows read \texttt{B}, \texttt{L}, \texttt{A}, and type the ciphertext.  The lamps spell
+\[
+	\texttt{SETPHASERS},
+\]
+that is, \texttt{SET PHASERS}.  Note how much this asks of the recipient:  get any one of the rotor order, the starting positions, the ring settings or the plugboard wrong, and the output is gibberish --- which is why the key sheets of Figure~\ref{fig:enigma-keysheet} were guarded so carefully.
+\end{aisolution}
+}
 %a historically accurate Enigma I: rotors I--V with
 %the real wirings and turnover notches, reflector B, plugboard, ring settings
 %(behind an ``advanced'' toggle), the odometer stepping including the
