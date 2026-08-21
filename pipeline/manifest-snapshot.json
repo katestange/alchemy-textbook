@@ -1,14 +1,14 @@
 {
- "total_blocks": 997,
+ "total_blocks": 1001,
  "total_sections": 155,
- "duplicate_hash_groups": 5,
+ "duplicate_hash_groups": 4,
  "chapters": {
   "1": {
-   "aisolution": 12,
+   "aisolution": 16,
    "checkin": 3,
-   "example": 6,
-   "paragraph": 120,
-   "problem": 12,
+   "example": 8,
+   "paragraph": 114,
+   "problem": 16,
    "proof": 1,
    "theorem": 1
   },

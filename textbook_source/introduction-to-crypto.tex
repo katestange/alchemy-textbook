@@ -85,9 +85,8 @@
 \newcommand{\KS}[1]{}
 \newcommand{\todo}[1]{}
 \fi
-% AI: \todo was used in the text but not defined, so nothing compiled; I defined it
+% \todo was used in the text but not defined, so nothing compiled; it is defined
 % here to mirror \KS (teal instead of violet, hidden the same way by \commentsfalse).
-% My replies in the text are \todo{AI: ...} notes.
 
 \title{The Alchemy of Mathematical Cryptography}
 \author{Katherine E. Stange}
@@ -180,11 +179,6 @@ The simplest and most famous example is the Caesar cipher, attributed to Julius 
 \end{figure}
 
 \bespokedemo{caesar-tool}
-
-\todo{AI: worked example and exercises below, added on request.  Every
-ciphertext here was computed with the book's own cipher engine
-(\texttt{frontend/src/lib/demos/ciphers.js}), the same code that drives the
-interactive tools, so the text and the demos cannot disagree.}
 
 \begin{example}[AI generated]
 \emph{Encryption.}  Let us encrypt the Vulcan salutation \texttt{LIVE LONG AND PROSPER} with a shift of $7$.  Spaces are not part of the message, so the plaintext is \texttt{LIVELONGANDPROSPER}, and each letter moves seven places forward, wrapping from \texttt{Z} around to \texttt{A}.  Numbering the alphabet \texttt{A} $= 0$ through \texttt{Z} $=25$, this is the map $x \mapsto x + 7 \bmod 26$:  for instance \texttt{V} $= 21$ and $21 + 7 = 28 \equiv 2 \pmod{26}$, which is \texttt{C}.  Letter by letter we obtain
@@ -300,6 +294,44 @@ Observe that a permutation can't take two letters to the same letter, so the arr
 
 There are 26! (twenty-six factorial) ways to reorder the roman alphabet, hence 26! possible permutations of the alphabet.
 
+\begin{example}[AI generated]
+\emph{Encryption.}  Let us encrypt with the permutation given above --- the one whose cycle notation is $(\mathrm{C\,R\,Y\,P\,T\,O})\;(\mathrm{G\,A\,M\,E\,S})\;(\mathrm{B\,L\,I\,N\,D})\;(\mathrm{F\,U\,H\,Q})\;(\mathrm{V\,W\,Z})\;(\mathrm{J\,K})\;(\mathrm{X})$.  Take the plaintext \texttt{MAKE IT SO}.  We look up each letter in the table (or follow its arrow):  \texttt{M} $\to$ \texttt{E}, \texttt{A} $\to$ \texttt{M}, \texttt{K} $\to$ \texttt{J}, \texttt{E} $\to$ \texttt{S}, \texttt{I} $\to$ \texttt{N}, \texttt{T} $\to$ \texttt{O}, \texttt{S} $\to$ \texttt{G}, \texttt{O} $\to$ \texttt{C}.  The ciphertext is
+\[
+	\texttt{EMJSNOGC}.
+\]
+The cycle notation is the quickest way to do this by hand:  to encrypt a letter, find it in its cycle and take the letter to its right, wrapping around at the end of the bracket.  Reading \texttt{M} in $(\mathrm{G\,A\,M\,E\,S})$, the letter to its right is \texttt{E}; reading \texttt{S} in the same cycle, we are at the end of the bracket, so we wrap to \texttt{G}.
+
+Notice also the lonely cycle $(\mathrm{X})$.  It says \texttt{X} $\to$ \texttt{X}:  this permutation leaves \texttt{X} exactly where it is.  A general substitution cipher is perfectly happy to encrypt a letter as itself, which --- as we shall see --- the Enigma machine was not, to its cost.
+
+\emph{Decryption.}  To decrypt we need the \emph{inverse} permutation, and here the cycle notation earns its keep:  simply read each cycle \emph{backwards}, taking the letter to the \emph{left} of the one you have.  Suppose we receive
+\[
+	\texttt{CTSDMRQMDDSI}.
+\]
+The first letter is \texttt{C}.  In the cycle $(\mathrm{C\,R\,Y\,P\,T\,O})$, the letter to the left of \texttt{C} is \texttt{O} (wrapping around the bracket), so the first plaintext letter is \texttt{O}.  Next \texttt{T}:  to its left sits \texttt{P}.  Continuing letter by letter gives \texttt{OPENACHANNEL}, that is, \texttt{OPEN A CHANNEL}.
+\end{example}
+
+\begin{problem}[AI generated]
+Using the same permutation, encrypt \texttt{THE PRIME DIRECTIVE}.
+\end{problem}
+\begin{aisolution}
+Replacing each letter using the table (\texttt{T} $\to$ \texttt{O}, \texttt{H} $\to$ \texttt{Q}, \texttt{E} $\to$ \texttt{S}, and so on) gives
+\[
+	\texttt{OQSTYNESBNYSRONWS}.
+\]
+Note that all four \texttt{E}s of the plaintext become \texttt{S}, and all three \texttt{I}s become \texttt{N}:  a monoalphabetic cipher uses one fixed substitution throughout, which is exactly the regularity that frequency analysis exploits.
+\end{aisolution}
+
+\begin{problem}[AI generated]
+Using the same permutation, decrypt \texttt{GSOMRCHYGSUCYQCES}.
+\end{problem}
+\begin{aisolution}
+Read the cycles backwards (or read the table's output row and look upwards).  The first letter \texttt{G} sits in $(\mathrm{G\,A\,M\,E\,S})$, and the letter to its left --- wrapping around --- is \texttt{S}; then \texttt{S} yields \texttt{E}, and \texttt{O} yields \texttt{T}.  Carrying on gives
+\[
+	\texttt{SETACOURSEFORHOME},
+\]
+that is, \texttt{SET A COURSE FOR HOME}.
+\end{aisolution}
+
 Instead of a substitution cipher that replaces one letter of the alphabet with another, one may use unusual symbols to replace letters, such as the `dancing men' in the eponymous Sherlock Holmes story (\emph{The Adventure of the Dancing Men}, Sir Arthur Conan Doyle).  An interesting example is that of a \textbf{Polybius square}, used for signalling long distances in ancient Greece.  The letters of the alphabet are arranged into a grid (the `Polybius square'), and each letter of the plaintext is then replaced by the coordinates it occupies in the grid (See Figure~\ref{fig:polybius-example}).
 
 \begin{figure}
@@ -320,6 +352,44 @@ $$}%
 \end{figure}
 
 \webonly{\bespokedemo{polybius-tool}}
+
+\begin{example}[AI generated]
+\emph{Encryption.}  Let us encrypt \texttt{SPOCK LIVES} with the square of Figure~\ref{fig:polybius-example}.  Each letter is replaced by its coordinates, row first and then column.  Hunting for \texttt{S} in the grid, we find it in row $4$, column $3$, so \texttt{S} becomes $43$; \texttt{P} sits in row $3$, column $5$, giving $35$; \texttt{O} is at row $3$, column $4$, giving $34$.  Continuing through the message:
+\[
+	\texttt{43 35 34 13 25 31 24 51 15 43}.
+\]
+Each letter has become two digits, so the ciphertext is twice as long as the plaintext.  This is what made the cipher useful for signalling:  Polybius' own proposal was to hold up torches in two groups, one group for the row and one for the column, so a message could be sent across a valley with nothing but firelight and patience.
+
+\emph{Decryption.}  Decryption reverses the lookup:  take the digits two at a time, and read off the letter in that row and column.  Suppose we receive
+\[
+	\texttt{43 44 11 42 21 31 15 15 44 13 34 32 32 11 33 14}.
+\]
+The first pair $43$ means row $4$, column $3$, which is \texttt{S}; then $44$ is \texttt{T}, $11$ is \texttt{A}, $42$ is \texttt{R}, $21$ is \texttt{F}.  Working through all sixteen pairs gives \texttt{STARFLEETCOMMAND}, that is, \texttt{STARFLEET COMMAND}.
+
+One wrinkle deserves attention.  The grid has twenty-five cells but the alphabet has twenty-six letters, so \texttt{I} and \texttt{J} share the cell $24$.  Encryption is therefore unambiguous, but decryption is not:  a $24$ could be either letter, and the reader must decide from context whether \texttt{IAM} was meant to be \texttt{JAM}.  This is a small instance of a general truth --- a cipher whose encryption is not injective cannot be perfectly decrypted --- and it is why the ADFGVX cipher, which we meet below, uses a $6 \times 6$ square instead:  thirty-six cells hold all twenty-six letters \emph{and} the ten digits, with no sharing.
+\end{example}
+
+\begin{problem}[AI generated]
+Encrypt \texttt{CAPTAIN KIRK} with the square of Figure~\ref{fig:polybius-example}.
+\end{problem}
+\begin{aisolution}
+Looking each letter up in the grid and writing row then column:
+\[
+	\texttt{13 11 35 44 11 24 33 25 24 42 25}.
+\]
+(Eleven letters, so twenty-two digits.)
+\end{aisolution}
+
+\begin{problem}[AI generated]
+Decrypt \texttt{52 11 42 35 21 11 13 44 34 42 33 24 33 15}, encrypted with the square of Figure~\ref{fig:polybius-example}.
+\end{problem}
+\begin{aisolution}
+Taking the pairs in turn:  $52$ is row $5$, column $2$, which is \texttt{W}; $11$ is \texttt{A}; $42$ is \texttt{R}; $35$ is \texttt{P}.  Continuing gives
+\[
+	\texttt{WARPFACTORNINE},
+\]
+that is, \texttt{WARP FACTOR NINE}.
+\end{aisolution}
 
 In each case, the cipher is encrypted and decrypted with knowledge of a \textbf{secret key}.  The key to the Caesar cipher is the number of positions to shift.  The key to a general monoalphabetic substitution cipher is the list of substitutions for each letter.
 
@@ -347,9 +417,6 @@ Another approach to cryptography is not to change the letters of the plaintext a
 \end{figure}
 
 \webonly{\bespokedemo{transposition-tool}}
-
-\todo{AI: worked example and exercises below, added on request; ciphertexts
-computed with the book's own engine, as above.}
 
 \begin{example}[AI generated]
 \emph{Encryption.}  Take the Borg greeting \texttt{RESISTANCE IS FUTILE} and a skytale whose circumference holds six letters.  We write the eighteen letters of the message in rows of six:
@@ -458,9 +525,6 @@ P & P & Q & R & S & T & U & V & W & X & Y & Z & A & B & C & D & E & F & G & H & 
 
 \webonly{\bespokedemo{vigenere-tool}}
 
-\todo{AI: worked example and exercises below, added on request; ciphertexts
-computed with the book's own engine, as above.}
-
 \begin{example}[AI generated]
 \emph{Encryption.}  Let us encrypt \texttt{SPACE THE FINAL FRONTIER} with the keyword \texttt{VULCAN}.  The keyword is written repeatedly above the plaintext, and each key letter supplies the shift for the letter beneath it:  \texttt{V} $= 21$, \texttt{U} $=20$, \texttt{L} $=11$, \texttt{C} $=2$, \texttt{A} $=0$, \texttt{N} $=13$.
 \begin{center}
@@ -537,10 +601,6 @@ This may be a good moment for some mathematical formalism.  Let us suppose we ar
 \begin{checkin}
   Find the correct onetime pad that will encrypt \texttt{0100} to \texttt{1110}.
 \end{checkin}
-
-\todo{AI: worked example and exercises below, added on request.  These are
-bitstrings rather than words, to match the binary formalism of this section;
-every XOR was checked by machine.}
 
 \begin{example}[AI generated]
 \emph{Encryption.}  A starship transmits the eight-bit message \texttt{01101001}, having agreed in advance on the pad \texttt{11010110}.  We XOR the two strings bit by bit:  a $1$ in the key flips the plaintext bit, a $0$ leaves it alone.
@@ -645,10 +705,6 @@ A tutorial on this cipher is available in my video library.  See Figure~\ref{fig
 \end{figure}
 
 \webonly{\bespokedemo{adfgvx-tool}}
-
-\todo{AI: worked example and exercises below, added on request.  All four use
-the square of Figure~\ref{fig:adfgvx-example} and the same column-order key
-convention as that figure; ciphertexts computed with the book's own engine.}
 
 \begin{example}[AI generated]
 \emph{Encryption.}  Let us encrypt \texttt{WARP CORE BREACH} with the square of Figure~\ref{fig:adfgvx-example} and the column order \texttt{3 1 4 2}.
@@ -867,13 +923,6 @@ We will discuss one more famous symmetric key system, which no history of crypto
 }
 
 \webonly{\bespokedemo{enigma-tool}}
-
-\todo{AI: worked example and exercises below, added on request.  Since these
-require the simulator, they are wrapped in \textbackslash webonly, matching the
-Concept Check above.  Settings are given exactly as the tool's controls are
-labelled, and the worked example uses the tool's default configuration so a
-student can simply open it and type.  Every ciphertext was computed with the
-simulator's own engine (\texttt{frontend/src/lib/demos/enigma.js}).}
 
 \webonly{
 \begin{example}[AI generated]
