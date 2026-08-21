@@ -266,3 +266,23 @@ function otpMap(text, pad, sign) {
 
 export const otpEncode = (text, pad) => otpMap(text, pad, +1);
 export const otpDecode = (text, pad) => otpMap(text, pad, -1);
+
+// Binary one-time pad: the form the chapter defines, XOR bit by bit. Both
+// encryption and decryption are the same operation, since a XOR b XOR b = a.
+// Non-bit characters in the message are ignored (so "0110 1001" is fine); the
+// pad is consumed one bit per message bit and repeats if it is too short,
+// which is precisely the misuse the text warns about.
+
+export function randomBits(n) {
+  const vals = new Uint8Array(n);
+  crypto.getRandomValues(vals);
+  return Array.from(vals, (v) => (v & 1 ? '1' : '0')).join('');
+}
+
+/** XOR `bits` with `pad`, bit by bit. Returns '' if either side has no bits. */
+export function xorBits(bits, pad) {
+  const b = (bits || '').replace(/[^01]/g, '');
+  const k = (pad || '').replace(/[^01]/g, '');
+  if (!b || !k) return '';
+  return [...b].map((bit, i) => (bit === k[i % k.length] ? '0' : '1')).join('');
+}
