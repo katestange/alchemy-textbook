@@ -463,14 +463,7 @@ All the systems discussed so far are \textbf{symmetric key cryptosystems}.  Such
 	\item A \textbf{decryption method}, that uses the \textbf{secret key} to transform the \textbf{ciphertext} into the \textbf{plaintext}.
 \end{enumerate}
 
-There are a few important features of such a cryptosystem.  One is that the secret key must be shared ahead of time in some secretive manner before the system can be used.  In the time before modern cryptography, when these were the only schemes available, big banks would fly a courier with a briefcase handcuffed to his arm:  the briefcase contained the secret key.  \KS{verify this historical claim, which I've read in many places}
-\todo{AI: mostly verified, one nuance. The canonical source is Singh's \emph{The
-Code Book} (1999, ch.~6): in the 1970s banks distributed keys via vetted
-\emph{dispatch riders} carrying \emph{padlocked briefcases}, and the process
-became a ``horrendous logistical nightmare'' as networks grew. The ``handcuffed
-to the arm'' detail appears only in popular retellings (e.g. the Inventors Hall
-of Fame profile of Diffie), not in Singh or Levy's \emph{Crypto} -- so either
-say padlocked briefcases (citing Singh) or present the handcuffs as folklore.}  The need to obtain shared secret keys before encrypted communication is sometimes called the \textbf{key distribution problem}.
+There are a few important features of such a cryptosystem.  One is that the secret key must be shared ahead of time in some secretive manner before the system can be used.  In the time before modern cryptography, when these were the only schemes available, big banks would fly a courier with a padlocked briefcase:  the briefcase contained the secret key.  The need to obtain shared secret keys before encrypted communication is sometimes called the \textbf{key distribution problem}.
 
 Another important feature, when the scheme is viewed in this abstract manner, is that the security of the system appears closely tied to the \textbf{keyspace}, that is, the set of all possible keys.
 
@@ -681,18 +674,8 @@ Except that it is.
 
 The loophole is that Alice can share some information for Bob to use in aiming his message at Alice.  This is called Alice's \textbf{public key}.  She generates it in a special way that also generates a \textbf{private key} which she keeps secret, and which allows her to decrypt the message.  Bob encrypts his message using Alice's public key, resulting in a ciphertext that can only be decrypted with Alice's private key.
 
-Even now, you may be skeptical.  \KS{Insert some history of PKE}
-\todo{AI: the standard history, dates verified: Ralph Merkle proposed key
-agreement via ``puzzles'' in 1974, as a Berkeley undergraduate course project
-proposal -- which was rejected (it finally appeared in CACM in 1978). Diffie and
-Hellman published ``New Directions in Cryptography'' (IEEE Trans.\ Inform.\
-Theory, November 1976), containing the key exchange of this section. Rivest,
-Shamir and Adleman found RSA in April 1977 (CACM February 1978, publicized in
-Martin Gardner's August 1977 Scientific American column). And the secret
-prehistory, delicious for a lecture: at GCHQ, James Ellis proposed ``non-secret
-encryption'' in 1970, Clifford Cocks found essentially RSA in 1973, and Malcolm
-Williamson found Diffie--Hellman in 1974 -- all classified until December 1997,
-with Ellis dying one month before the public announcement.}
+Even now, you may be skeptical.  
+
 
 Therefore, I will convince you by demonstrating the first of our public-key schemes.  
 
@@ -729,16 +712,7 @@ This is what motivates the \textbf{Diffie-Hellman Key Exchange}. This is a sligh
 \end{enumerate}
 
 Now Eve must turn the information of $\alpha^a$ and $\alpha^b$ into the information of $\alpha^{ab}$ to break the system.  It turns out this problem, called the \textbf{Computational Diffie-Hellman Problem}, appears to have high complexity.  That is, no one knows a fast algorithm for it (remember, we are working mod $p$).  So Eve can't break this system (as far as we know).
-However, computing $\alpha^a$ and the other exponents in the algorithm \emph{does} have fast algorithms (low complexity), so all these computations can be done very quickly.  Otherwise this wouldn't be a practical scheme, i.e. one we can use in reality on the hardware we have.  In fact, this scheme is very practical and is in use around the world ADD STATISTICS.
-\todo{AI: a citable figure: as of mid-2025, about 75\% of the roughly 150{,}000
-most-visited websites support TLS 1.3 (Qualys SSL Pulse, June 2025 scan), and
-TLS 1.3 performs \emph{every} key exchange with ephemeral (usually
-elliptic-curve) Diffie--Hellman -- static RSA key transport was removed from
-the protocol entirely. So something like: ``the majority of secure web
-connections today begin with a Diffie--Hellman key exchange.'' (If you'd rather
-quote \% of \emph{traffic} than \% of sites, Cloudflare Radar's
-adoption-and-usage page has a live TLS-version breakdown -- it blocks my
-fetcher, so read it in a browser.)}
+However, computing $\alpha^a$ and the other exponents in the algorithm \emph{does} have fast algorithms (low complexity), so all these computations can be done very quickly.  Otherwise this wouldn't be a practical scheme, i.e. one we can use in reality on the hardware we have.  In fact, this scheme is very practical and is in use around the world:  as of mid-2025, about 75\% of the roughly 150{,}000 most-visited websites support TLS 1.3, which uses this protocol. 
 
 It is exactly this disparity between the complexity of performing the key exchange and the complexity of breaking the key exchange that provides the security of this key exchange scheme.  Unfortunately, we don't actually \emph{know} that the Computational Diffie-Hellman Problem is difficult!  We are fairly confident only because many researchers (mathematicians and computer scientists) have tried to come up with an efficient algorithm, but have failed.  In other words, the security of the modern internet is based only on a \emph{conjecture}.
 
@@ -895,7 +869,7 @@ Both numbers land on the same ray of the clock: $7 = 5\cdot 1 + 2$ sits on the r
 \end{aisolution}
 
 
-We use the notation $\ZZ/n\ZZ$ for the set of residues modulo $n$, or the set of `notches' of the clock.  This is a finite set.  If $n$ is equal to a prime $p$, we also write $\FF_p$ (this is in anticipation of our work with finite fields in Section\KS{whatever later chapter}\todo{AI: the target is the \textbackslash section\{Finite Fields\} chapter, which has no label yet -- add \textbackslash label\{sec:finite-fields\} under it and this becomes Section~\textbackslash ref\{sec:finite-fields\}}).  Let's record this as a formal definition.
+We use the notation $\ZZ/n\ZZ$ for the set of residues modulo $n$, or the set of `notches' of the clock.  This is a finite set.  If $n$ is equal to a prime $p$, we also write $\FF_p$ (this is in anticipation of our work with finite fields in Section~\ref{sec:finite-fields}).  Let's record this as a formal definition.
 
 
 \begin{definition}
@@ -2139,8 +2113,7 @@ One way to solve the CDHP would be to figure out $a$ and $b$ and then compute $g
 
 Notice that the exponent lives modulo $p-1$, so we can't really ask for $a$ more specifically than that (if $a$ works, then so does $a + p-1$).  We often assume we are looking for the smallest positive $a$, i.e. $0 \le a < p-1$.
 
-The CDHP and DLP are believed to be equivalent, but this is only known in certain special cases.  It was shown by den Boer that there is a reduction when $\varphi(p-1)$ is smooth (\emph{smooth} means it is divisible by only fairly small primes), and this method was extended by Maurer to the situation where there is an efficiently constructible elliptic curve of smooth order over $\FF_q$ for each $q$ dividing $p-1$.  For recent progress on a quantum analogue, see Galbraith-Panny-Smith-Vercauteren. \KS{add proper citations}
-\todo{AI: citations, verified: B. den Boer, ``Diffie--Hellman is as strong as
+The CDHP and DLP are believed to be equivalent, but this is only known in certain special cases.  It was shown by den Boer that there is a reduction when $\varphi(p-1)$ is smooth (\emph{smooth} means it is divisible by only fairly small primes), and this method was extended by Maurer to the situation where there is an efficiently constructible elliptic curve of smooth order over $\FF_q$ for each $q$ dividing $p-1$.  For recent progress on a quantum analogue, see Galbraith-Panny-Smith-Vercauteren\footnote{To dive deeper, see B. den Boer, ``Diffie--Hellman is as strong as
 discrete log for certain primes,'' CRYPTO~'88, LNCS 403, pp.~530--539.
 U. Maurer, ``Towards the equivalence of breaking the Diffie--Hellman protocol
 and computing discrete logarithms,'' CRYPTO~'94, LNCS 839, pp.~271--281.
@@ -2204,7 +2177,7 @@ using part (3).  Thus $h^{(p-1)/2} \equiv 1 \pmod p$ if $x$ is even, and $\equiv
 \subsubsection{The Baby-Step Giant-Step Algorithm}
 \label{sec:baby-giant}
 
-The first algorithm we will study which is faster than exhaustive search for the Discrete Logarithm Problem is known as the \emph{Baby-Step-Giant-Step} algorithm, and is due to Shanks \KS{add citation}\todo{AI: verified: D. Shanks, ``Class number, a theory of factorization, and genera,'' in \emph{1969 Number Theory Institute}, Proc.\ Sympos.\ Pure Math.\ XX, Amer.\ Math.\ Soc., 1971, pp.~415--440}.  It is an example of a \emph{meet-in-the-middle} algorithm, because we compute two lists and look for a collision.  To motivate the algorithm, suppose we compute two lists of randomly generated elements of $\ZZ/p\ZZ$.  The first list consists of elements of the form $g^j$, i.e., random powers of the generator $g$.  The second list consists of elements of the form $hg^k$, i.e. random powers of $g$, all multiplied by $h$.  If we notice a collision, i.e. $g^j = h g^k$, then rearranging, we obtain $g^{j-k} = h$ and $j-k$ is the solution to the problem.  
+The first algorithm we will study which is faster than exhaustive search for the Discrete Logarithm Problem is known as the \emph{Baby-Step-Giant-Step} algorithm, and is due to Shanks \footnote{D. Shanks, ``Class number, a theory of factorization, and genera,'' in \emph{1969 Number Theory Institute}, Proc.\ Sympos.\ Pure Math.\ XX, Amer.\ Math.\ Soc., 1971, pp.~415--440}.  It is an example of a \emph{meet-in-the-middle} algorithm, because we compute two lists and look for a collision.  To motivate the algorithm, suppose we compute two lists of randomly generated elements of $\ZZ/p\ZZ$.  The first list consists of elements of the form $g^j$, i.e., random powers of the generator $g$.  The second list consists of elements of the form $hg^k$, i.e. random powers of $g$, all multiplied by $h$.  If we notice a collision, i.e. $g^j = h g^k$, then rearranging, we obtain $g^{j-k} = h$ and $j-k$ is the solution to the problem.  
 
 Such an attack is sometimes called a \emph{birthday attack}.  It is an improvement over the more na\"ive method of computing a single list of random powers of $g$ and hoping to collide with $h$.  Indeed, the number of comparisons that may result in a collision in this na\"ive method is equal to the length $\ell$ of the list.  But with two lists of length $\ell$, there are ${\ell\choose 2} = \frac{\ell(\ell-1)}{2}$ comparisons that may `get lucky.'  This results in an improved runtime, since we obtain more new comparisons per computation of an element.  (It does require more memory, however).
 
@@ -2404,7 +2377,7 @@ We begin with the probability that a random integer $0 \le n \le p-1$ can be fac
 \[
 	u = \frac{\log p}{\log B}, \quad B = p^{1/u},
 \]
-the probability is around $u^{-u}$. \KS{give proper citation}\todo{AI: verified: the density $\rho(u)$ goes back to K. Dickman, ``On the frequency of numbers containing prime factors of a certain relative magnitude,'' Arkiv f\"or Matematik, Astronomi och Fysik 22A(10) (1930), 1--14; the uniform $u^{-u(1+o(1))}$ estimate used in factoring/index-calculus analyses is Canfield--Erd\H{o}s--Pomerance, J.~Number Theory 17 (1983), 1--28; a friendly survey is A. Granville, ``Smooth numbers: computational number theory and beyond,'' MSRI Publications 44 (2008), 267--323}.  Thus, we expect that it will take around $u^u$ trial values $g^k$ before we find one that factors completely in the factor base.
+the probability is around $u^{-u}$\footnote{The density $\rho(u)$ goes back to K. Dickman, ``On the frequency of numbers containing prime factors of a certain relative magnitude,'' Arkiv f\"or Matematik, Astronomi och Fysik 22A(10) (1930), 1--14; the uniform $u^{-u(1+o(1))}$ estimate used in factoring/index-calculus analyses is Canfield--Erd\H{o}s--Pomerance, J.~Number Theory 17 (1983), 1--28; a friendly survey is A. Granville, ``Smooth numbers: computational number theory and beyond,'' MSRI Publications 44 (2008), 267--323}.  Thus, we expect that it will take around $u^u$ trial values $g^k$ before we find one that factors completely in the factor base.
 
 We will assume that the factoring is done by trial division in terms of the factor base (in fact, there are various improvements that can be made).
 The runtime for finding relations can then be expressed as a product:
@@ -2468,7 +2441,7 @@ then this algorithm has runtime $L_p(1/2,1)$ and variants have runtimes $L_p(\al
 \subsubsection{Logjam attack}
 
 Observe that most of the work in this algorithm lies in the precomputation phase.  This phase depends only on the prime and primitive root, not on the value of $h$.  This is also true of the \emph{number field sieve} and \emph{function field sieve}.  
-This led to the famous \textbf{Logjam attack} \KS{give citation to webpage weakdh.org}\todo{AI: verified: D. Adrian et al., ``Imperfect Forward Secrecy: How Diffie--Hellman Fails in Practice,'' ACM CCS 2015, pp.~5--17 (Best Paper Award); website \texttt{weakdh.org}. For the cost claim later in this paragraph: the paper itself says the linear-algebra hardware to break one 1024-bit prime per year is ``plausibly on the order of hundreds of millions of dollars,'' and the weakdh.org FAQ says ``a few hundred million dollars'' -- so you can cite the original paper rather than Wikipedia}, revealed publicly on May 20, 2015.  This attack consisted of two components.  The first was a weakness in the $TLS$ handshake protocol between client and server that allowed a \textbf{man-in-the-middle} (someone altering messages passing between client and server) to force the server to use a relatively weak (but still built-in) $512$-bit prime, even when server settings dictated the use of a stronger prime.  The second component was a large precomputation for the number field sieve for the most commonly used prime(s) $p$.  It turns out that some $8.4\%$ of the top 1 million websites were using this most popular prime number.  By running the precomputation offline before the attack, the online, active phase of the attack could be made very quick (a matter of around a minute).  The researchers who created and revealed the Logjam attack speculated that a nation state agency such as the National Security Agency may have the server power and money (in the hundreds of millions\KS{cite wikipedia or the original paper}) to run pre-computations for the most common $1024$-bit prime, obviating the need for the first component, and allowing them to decrypt a significant portion of internet traffic (around a quarter of websites and two thirds of VPNs).  The researchers released instructions to server administrators on how to avoid this attack.
+This led to the famous \textbf{Logjam attack}\footnote{D. Adrian et al., ``Imperfect Forward Secrecy: How Diffie--Hellman Fails in Practice,'' ACM CCS 2015, pp.~5--17 (Best Paper Award); website \texttt{weakdh.org}}, revealed publicly on May 20, 2015.  This attack consisted of two components.  The first was a weakness in the $TLS$ handshake protocol between client and server that allowed a \textbf{man-in-the-middle} (someone altering messages passing between client and server) to force the server to use a relatively weak (but still built-in) $512$-bit prime, even when server settings dictated the use of a stronger prime.  The second component was a large precomputation for the number field sieve for the most commonly used prime(s) $p$.  It turns out that some $8.4\%$ of the top 1 million websites were using this most popular prime number.  By running the precomputation offline before the attack, the online, active phase of the attack could be made very quick (a matter of around a minute).  The researchers who created and revealed the Logjam attack speculated that a nation state agency such as the National Security Agency may have the server power and money (in the hundreds of millions) to run pre-computations for the most common $1024$-bit prime, obviating the need for the first component, and allowing them to decrypt a significant portion of internet traffic (around a quarter of websites and two thirds of VPNs).  The researchers released instructions to server administrators on how to avoid this attack.
 
 
 \subsection{A lower bound on solving discrete log}
@@ -2645,7 +2618,7 @@ If you have the prime factorization of your two integers, it is easy to compute 
 
 A quick note about a funny special case: $\gcd(n,0) = n$.  This is simply because everything divides zero (remember, $a$ divides $b$ if $b$ is a multiple of $a$; but $0 = 0m$ is a multiple of everything), so the largest integer dividing both is simply the largest integer dividing $n$.
 
-Since factoring large integers is hard, using the prime factorization is not the most efficient way to compute a gcd.  Fortunately, we have one of the most ancient and fundamental mathematical algorithms known, the Euclidean algorithm. \KS{maybe a bit about history}\todo{AI: verified: it is Propositions 1--2 of Book~VII of Euclid's \emph{Elements} (c.~300 BC), and Knuth (TAOCP vol.~2, \S4.5.2) calls it ``the granddaddy of all algorithms, because it is the oldest nontrivial algorithm that has survived to the present day''}
+Since factoring large integers is hard, using the prime factorization is not the most efficient way to compute a gcd.  Fortunately, we have one of the most ancient and fundamental mathematical algorithms known, the Euclidean algorithm.  It can be found in Propositions 1--2 of Book~VII of Euclid's \emph{Elements} (c.~300 BC).  Famous computer scientist Donald Knuth calls\footnote{TAOCP vol.~2, \S4.5.2} it ``the granddaddy of all algorithms, because it is the oldest nontrivial algorithm that has survived to the present day.''
 
 To understand the algorithm intuitively, without having to memorize anything, imagine the two integers $a$ and $b$ as piles of sticks.  Since $g$ is their gcd, both of them could be organized into tied bundles of $g$ sticks.  We proceed according to one rule:  we can subtract from the larger pile a number of sticks equal to the size of the smaller pile.
 
@@ -3452,6 +3425,7 @@ The remaining aspect of the quadratic sieve is how to find such relations.  Like
  In order to sieve, 
 
 \section{Finite Fields}
+\label{sec:finite-fields}
 
 \subsection{The polynomial ring $\FF_p[x]$}
 
