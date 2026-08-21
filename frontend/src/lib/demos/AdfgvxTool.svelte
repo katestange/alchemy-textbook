@@ -13,10 +13,15 @@
   let source = 'plain';
 
   $: order = parseColumnOrder(keyText);
-  $: keyError = order ? null : 'Key must be a permutation of 1…n, e.g. “3 4 2 1”.';
+  $: keyError = order ? null : 'Key must be the numbers 1…n in some order, e.g. “3 4 2 1” or “3421”.';
   $: if (order) {
     if (source === 'plain') cipher = adfgvxEncode(plain, order);
     else plain = adfgvxDecode(cipher, order);
+  } else if (source === 'plain') {
+    // Unusable key: blank the derived box rather than leaving the previous
+    // key's ciphertext sitting there, which reads as a live answer and makes
+    // the tool look stuck when the plaintext is edited (author report).
+    cipher = '';
   }
   $: stream = adfgvxSubstitute(plain);
 

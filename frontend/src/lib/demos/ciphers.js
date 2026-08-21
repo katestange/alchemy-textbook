@@ -118,12 +118,17 @@ export function colReadSequence(cols, order) {
 /** Parse a key like "3 4 2 1" / "3421" into an order array, or null if it is
  *  not a permutation of 1..n. */
 export function parseColumnOrder(s) {
-  const nums = (s.match(/\d+/g) || []).map(Number);
-  const n = nums.length;
-  if (!n) return null;
-  const seen = new Set(nums);
-  if (seen.size !== n || Math.min(...nums) !== 1 || Math.max(...nums) !== n) return null;
-  return nums;
+  const isPermutation = (nums) =>
+    nums.length > 0 && new Set(nums).size === nums.length &&
+    Math.min(...nums) === 1 && Math.max(...nums) === nums.length;
+  const separated = ((s || '').match(/\d+/g) || []).map(Number);
+  if (isPermutation(separated)) return separated;
+  // Unseparated form ("3421"): one digit per column. Readers type the key both
+  // ways, and /\d+/ above swallows "3421" as the single number 3421, so fall
+  // back to reading it digit by digit. Ten or more columns still need
+  // separators, since "10" cannot be told from "1, 0".
+  const digits = [...(s || '').replace(/\D/g, '')].map(Number);
+  return isPermutation(digits) ? digits : null;
 }
 
 // ---- Scytale -------------------------------------------------------------
