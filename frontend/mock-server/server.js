@@ -158,6 +158,11 @@ const server = http.createServer(async (req, res) => {
       return sendJSON(res, 200, { ok: true, budget_remaining_microdollars: 5_000_000 });
     }
 
+    if (req.method === 'POST' && url.pathname === '/api/logout') {
+      res.setHeader('Set-Cookie', 'session=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0');
+      return sendJSON(res, 200, { ok: true });
+    }
+
     const contentMatch = url.pathname.match(/^\/api\/content\/(.+)$/);
     if (req.method === 'GET' && contentMatch) {
       await loadManifest(); // ensures DEMO_HASH is populated

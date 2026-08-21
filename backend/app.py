@@ -1027,6 +1027,17 @@ async def api_claim(request: Request, response: Response):
     }
 
 
+@app.post("/api/logout")
+def api_logout(request: Request, response: Response):
+    """Sign out: delete the server-side session row (the cookie's token is
+    useless afterward even if it lingers) and clear the cookie."""
+    token = request.cookies.get(SESSION_COOKIE)
+    if token:
+        db_execute("DELETE FROM sessions WHERE session_token = ?", (token,))
+    response.delete_cookie(SESSION_COOKIE)
+    return {"ok": True}
+
+
 # --- cached content --------------------------------------------------------
 
 

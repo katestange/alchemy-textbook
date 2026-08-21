@@ -46,6 +46,17 @@ export async function claimCode(code) {
   return body; // { ok, budget_remaining_microdollars }
 }
 
+// Sign out: the backend deletes the session row and clears the cookie.
+// Best-effort -- the caller resets local session state regardless.
+export async function logout() {
+  try {
+    const res = await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 // Session check on load: the auth token lives in an HttpOnly cookie, so the
 // only way to know "am I already claimed?" after a reload is to ask.
 export async function whoami() {

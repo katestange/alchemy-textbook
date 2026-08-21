@@ -48,7 +48,7 @@
 
       <div class="mode-box">
         <h3>Static mode</h3>
-        <p>View the existing text &amp; AI add-ons</p>
+        <p>View the existing text &amp; margin notes</p>
         <button type="button" on:click={() => session.continueAnonymous()}>Enter</button>
       </div>
     </div>

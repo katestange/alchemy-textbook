@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import { whoami } from './lib/api.js';
+  import { whoami, logout } from './lib/api.js';
   import { session } from './lib/stores/session.js';
   import { loadBookConfig } from './lib/stores/bookConfig.js';
   import CodeEntry from './lib/components/CodeEntry.svelte';
@@ -33,6 +33,13 @@
     currentChapter = null;
   }
 
+  // Kill the server-side session, then drop back to the code-entry screen.
+  async function handleLogout() {
+    await logout();
+    currentChapter = null;
+    session.reset();
+  }
+
   // An internal cross-reference in the reading pane (e.g. a next/prev/TOC link
   // in the chapter's own header/footer). chapter === null means "book.html" ->
   // the table of contents.
@@ -56,8 +63,13 @@
         Static mode ·
         <button class="link-btn" type="button" on:click={() => session.reset()}>Have an invite code?</button>
       </span>
-    {:else if $session.budgetRemainingMicrodollars != null}
-      <span>Budget remaining: {formatBudget($session.budgetRemainingMicrodollars)}</span>
+    {:else}
+      <span>
+        {#if $session.budgetRemainingMicrodollars != null}
+          Budget remaining: {formatBudget($session.budgetRemainingMicrodollars)} ·
+        {/if}
+        <button class="link-btn" type="button" on:click={handleLogout}>Log out</button>
+      </span>
     {/if}
   </div>
 
