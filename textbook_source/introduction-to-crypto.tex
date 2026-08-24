@@ -148,7 +148,7 @@ The conceit in this text of framing cryptography as alchemy is also a nod to the
 
 \textbf{Cryptography} is at its core, the study of transforming information (classically this information is text, nowadays it would usually be a bit string) into another form, from which the original is recoverable only by certain allowed parties.  The topic has also expanded to include various other related abilities:  the ability to \textbf{verify} that a certain piece of information was produced only by a certain sender, for example.  All of these methods use similar mathematical techniques.
 
-The textbook will also touch on \textbf{coding theory} which transforms information for the purposes of making it resilient against corruption (lost bits, noisy transmissions), with no intent to obscure or hide it.  We use the word \textbf{encrypt} and \textbf{decrypt} for cryptography and \textbf{encode} and \textbf{decode} for coding theory.  The mathematics underlying coding theory has some of the same personalities, but in new contexts.
+The textbook will also touch on \textbf{coding theory} which transforms information for the purposes of making it resilient against corruption (lost bits, noisy transmissions), with no intent to obscure or hide it.  We use the words \textbf{encrypt} and \textbf{decrypt} for cryptography and \textbf{encode} and \textbf{decode} for coding theory.  The mathematics underlying coding theory has some of the same personalities, but in new contexts.
 
 Now let's take a little tour of the subject.
 
@@ -395,7 +395,7 @@ In each case, the cipher is encrypted and decrypted with knowledge of a \textbf{
 
 \subsubsection{Transposition ciphers}
 
-Another approach to cryptography is not to change the letters of the plaintext at all, but to simply reorder them to obtain the ciphertext.  For example, one might write a message left to right in successive rows to form a square, and then read it off in successive columns to obtain the ciphertext (Figure~\ref{fig:transposition-example}).  This is called \textbf{simple columnar transposition}.  This can be implemented by a physical device called a \textbf{skytale} (a stick or staff).  The message is written on a belt and wrapped around a cylinder; then the ciphertext is read up and down the cylinder in rows.  (This is really the same as reading rows as columns, and the circumference of the cylinder determines the width of the table!  Can you see why?)  This device was rumoured to have been used by Sparta in the Peloponnesian wars (Plutarch describes this centuries later, but it is disputed: the referenced ``staff'' may just be a message keeping device or signet\footnote{See Thomas Kelly, ``The Myth of the Skytale,'' \emph{Cryptologia} 22(3) (1998), 244--260, \href{https://doi.org/10.1080/0161-119891886902}{doi:10.1080/0161-119891886902}.}).
+Another approach to cryptography is not to change the letters of the plaintext at all, but to simply reorder them to obtain the ciphertext.  For example, one might write a message left to right in successive rows to form a square, and then read it off in successive columns to obtain the ciphertext (Figure~\ref{fig:transposition-example}).  This is called \textbf{simple columnar transposition}.  This can be implemented by a physical device called a \textbf{skytale} (a stick or staff).  The message is written on a belt and wrapped around a cylinder; then the ciphertext is read up and down the cylinder in rows.  (This is really the same as reading rows as columns, and the circumference of the cylinder determines the width of the table!  Can you see why?)  This device was rumoured to have been used by Sparta in the Peloponnesian wars (Plutarch describes this centuries later, but it is disputed: the referenced ``staff'' may just be a message keeping device or signet\footnote{See Thomas Kelly, ``The Myth of the Skytale,'' \emph{Cryptologia} 22(3) (1998), 244--260, \href{https://doi.org/10.1080/0161-119891886902}{doi:10.1080/0161-119891886902}.}).  \todo{AI: spelling: the book consistently uses `skytale' (a legitimate variant) but the interactive web demos say `scytale' -- unify one way or the other?}
 
 \begin{figure}
 \begin{center}
@@ -484,9 +484,9 @@ Any cipher in which the letters of the message are simply rearranged is called a
 
 \subsubsection{Multialphabetic substitution ciphers}
 
-The Vigen\`ere cipher deserves special attention, as it represents a conceptual advance from most other classical cryptography of the past several millennia.  It was gradually developed in the 1400s and 1500s by a number of people, none of which was Vigen\`ere (as is the case for many named mathematical ideas).  The key insight is that a Caesar cipher would be much more secure if a \emph{different} key were used for each letter of the plaintext.
+The Vigen\`ere cipher deserves special attention, as it represents a conceptual advance from most other classical cryptography of the past several millennia.  It was gradually developed in the 1400s and 1500s by a number of people, none of whom was Vigen\`ere (as is the case for many named mathematical ideas).  The key insight is that a Caesar cipher would be much more secure if a \emph{different} key were used for each letter of the plaintext.
 
-It is useful to have on hand a Vigen\`ere square, seen in Figure~\ref{fig:vig-square-intro}.  This shows the alphabet in each of its 26 possible shifted forms.  To begin, we choose a key word.  We could choose, for example, the word `POLLEN.'  Each letter of the key is interpreted as a shift:  numbering the letters A $= 0$ through Z $= 25$, the letter `P' represents a shift of $15$ positions.  Writing the keyword, repeatedly, above the plaintext, we encrypt each letter of the plaintext with the corresponding shift.  See Figure~\ref{fig:vig-example}
+It is useful to have on hand a Vigen\`ere square, seen in Figure~\ref{fig:vig-square-intro}.  This shows the alphabet in each of its 26 possible shifted forms.  To begin, we choose a key word.  We could choose, for example, the word `POLLEN.'  Each letter of the key is interpreted as a shift:  numbering the letters A $= 0$ through Z $= 25$, the letter `P' represents a shift of $15$ positions.  Writing the keyword, repeatedly, above the plaintext, we encrypt each letter of the plaintext with the corresponding shift.  See Figure~\ref{fig:vig-example}.
 
 \begin{figure}
 \begin{center}
@@ -591,7 +591,7 @@ This may be a good moment for some mathematical formalism.  Let us suppose we ar
 \webonly{\bespokedemo{otp-tool}}
 
 \begin{theorem}
-	Given any ciphertext and plaintext (both binary bitstrings), there is a one-time pad key which encrypts the ciphertext to the plaintext.
+	Given any ciphertext and plaintext (both binary bitstrings), there is a one-time pad key which encrypts the plaintext to the ciphertext.
 \end{theorem}
 
 \begin{proof}
@@ -599,7 +599,7 @@ This may be a good moment for some mathematical formalism.  Let us suppose we ar
 \end{proof}
 
 \begin{checkin}
-  Find the correct onetime pad that will encrypt \texttt{0100} to \texttt{1110}.
+  Find the correct one-time pad that will encrypt \texttt{0100} to \texttt{1110}.
 \end{checkin}
 
 \begin{example}[AI generated]
@@ -861,7 +861,7 @@ For example, in the Caesar cipher, the keyspace consists of the $26$ possible al
 
 \webonly{\bespokedemo{caesar-crack-tool}}
 
-Therefore, the security of a symmetric key cryptosystem is bounded in terms of its keyspace:  a small keyspace necessarily means a weak system.  But a big keyspace does not guarantee a strong system.  Even with a very large keyspace, a clever \textbf{cryptanalyst} (one who attempts to break a cryptosystem) may have a more efficient algorithm than an exhaustive search.  An example of this is the alphabetic cipher mentioned in Section~\ref{sec:substitution}.  For english, the keyspace consists of all possible permutations of 26 roman letters.  That's a space of size $26!$ ($26$ factorial).  That means there are more than $400,000,000,000,000,000,000,000,000$ possible keys.  Trying one per nanosecond (a nanosecond may by time for a couple of instructions on a modern laptop) that will take over $12,000,000$ millennia.
+Therefore, the security of a symmetric key cryptosystem is bounded in terms of its keyspace:  a small keyspace necessarily means a weak system.  But a big keyspace does not guarantee a strong system.  Even with a very large keyspace, a clever \textbf{cryptanalyst} (one who attempts to break a cryptosystem) may have a more efficient algorithm than an exhaustive search.  An example of this is the alphabetic cipher mentioned in Section~\ref{sec:substitution}.  For english, the keyspace consists of all possible permutations of 26 roman letters.  That's a space of size $26!$ ($26$ factorial).  That means there are more than $400,000,000,000,000,000,000,000,000$ possible keys.  Trying one per nanosecond (a nanosecond may be time for a couple of instructions on a modern laptop) that will take over $12,000,000$ millennia.
 
 Despite this large keyspace, however, solving alphabetic ciphers is a popular pastime, as evidenced by the Cryptogram found in many weekend newspapers, which is essentially an alphabetic ciphertext without a key provided; the goal is to obtain the plaintext.  This amusement dates to the middle ages (Wikipedia).  Methods vary, but are typically based on patterns inherent in the target language.  For example, in english, the letter `E' is the most frequently used letter, so one may guess that the most frequently occurring letter in the ciphertext should correspond to `E.'  Proceeding by guessing and familiarity with english allows many people to solve these in a pleasantly passed half hour over breakfast (at least before social media).
 
@@ -905,7 +905,7 @@ In the modern world, symmetric key cryptography is still very important.  Modern
 \subsubsection{The Enigma Machine}
 
 
-We will discuss one more famous symmetric key system, which no history of cryptography can ignore.  The famous \textbf{enigma machine} was used in World War II by the Germans, and represented the apex of modern cryptography at the time.  Encryption and decryption was performed by an electric machine that looked a little like a typewriter in a portable box.  It had a keyboard, but also a separate lampboard laid out in the same keyboard pattern, containing a light for each letter of the alphabet.  When you typed a letter of the plaintext, the corresponding letter of the ciphertext lit up on the lampboard.  The operator could type in the plaintext and note down the letters that lit up on the lampboard with each keypress.  In this way, letter by letter, the plaintext was changed to ciphertext.  Decryption happened the same way:  you typed the ciphertext on the keyboard and the letters of the plaintext lit up in the same order on the lampboard.  The machine didn't need to know whether it was encrypting or decrypting, because the cipher was such that if X in the first position encrypted to Q, then Q in the first position encrypted to X, and so on.  In other words, encrypting and decrypting were the same function.  We will call this property \textbf{enigma symmetry}.  
+We will discuss one more famous symmetric key system, which no history of cryptography can ignore.  The famous \textbf{enigma machine} was used in World War II by the Germans, and represented the apex of modern cryptography at the time.  Encryption and decryption were performed by an electric machine that looked a little like a typewriter in a portable box.  It had a keyboard, but also a separate lampboard laid out in the same keyboard pattern, containing a light for each letter of the alphabet.  When you typed a letter of the plaintext, the corresponding letter of the ciphertext lit up on the lampboard.  The operator could type in the plaintext and note down the letters that lit up on the lampboard with each keypress.  In this way, letter by letter, the plaintext was changed to ciphertext.  Decryption happened the same way:  you typed the ciphertext on the keyboard and the letters of the plaintext lit up in the same order on the lampboard.  The machine didn't need to know whether it was encrypting or decrypting, because the cipher was such that if X in the first position encrypted to Q, then Q in the first position encrypted to X, and so on.  In other words, encrypting and decrypting were the same function.  We will call this property \textbf{enigma symmetry}.  
 
 \begin{figure}
 \begin{center}
@@ -979,7 +979,7 @@ that is, \texttt{SET PHASERS}.  Note how much this asks of the recipient:  get a
 %and a Reset button for the decryption experiment your text asks for. The logic
 %is unit-tested against published machine vectors. 
 
-The enigma machine was a vastly more complicated cipher than the Vigen\`ere cipher, but it had something in common.  At each position of the plaintext (1st letter, 2nd letter, etc.), the machine would implement a different substitution cipher.  However, where the Vigen\`ere cipher used a simple Caesar cipher at each position, dictated by the key, the Enigma used a more complicated substitution generated and constantly updated by mechanical and electrical means.  The \emph{key} in this context was the full list of machine settings at the beginning of the message.  The machine needed to be reset with the appropriate key immediately before the text input began, so the first substitution, say $\sigma_1$, was applied to the first letter of the plaintext or ciphertext, say $x_1$, and so on and so forth.  After each key tap, the machine would change configuration so the next substitution was setup for the next letter.  If one started with the machine in the incorrect configuration, or reset the machine at a position other than the first letter of the text, the message would decrypt incorrectly.  The machine changed configuration with each keystroke by the means of rotors, which turned.
+The enigma machine was a vastly more complicated cipher than the Vigen\`ere cipher, but it had something in common.  At each position of the plaintext (1st letter, 2nd letter, etc.), the machine would implement a different substitution cipher.  However, where the Vigen\`ere cipher used a simple Caesar cipher at each position, dictated by the key, the Enigma used a more complicated substitution generated and constantly updated by mechanical and electrical means.  The \emph{key} in this context was the full list of machine settings at the beginning of the message.  The machine needed to be reset with the appropriate key immediately before the text input began, so the first substitution, say $\sigma_1$, was applied to the first letter of the plaintext or ciphertext, say $x_1$, and so on and so forth.  After each key tap, the machine would change configuration so the next substitution was set up for the next letter.  If one started with the machine in the incorrect configuration, or reset the machine at a position other than the first letter of the text, the message would decrypt incorrectly.  The machine changed configuration with each keystroke by the means of rotors, which turned.
 
 To describe the Enigma machine, then, we must explain \emph{which} permutations apply to the letters of the plaintext.  Because of the enigma symmetry, the permutations must consist of cycles of size two.  In other words, we have to break the alphabet into pairs.  The interior wiring of the enigma accomplished this:  one lightbulb was wired to one key at any moment.  The wires ran through several \textbf{rotors} with internal wiring.  These rotors individually rotated positions between keystrokes.  Each rotor had 26 input contacts and 26 output contacts, wired in a complicated way so that each input connected to one output.  Rotating one rotor by one position (there were 26 total positions) would change which contacts touched which on the next rotor.  
 
@@ -1022,7 +1022,7 @@ However, the clever insight was to break up the keyspace into several parts:  mo
 
 The allied cryptanalysis of the enigma machine involved large single-purpose-built electromechanical computing machines, long before modern computers.  These machines, called \textbf{bombes}, were designed to mimic the rotors, and capable of testing all $17,576$ rotor positions.  The first bomba was built by the Polish Cipher Bureau, and later models were built at Britain's Bletchley Park.  By exploiting cribs, cryptanalysts were able to determine some pairs of letters and other restrictive properties that the permutations had to satisfy.  The bombes would run electrical current through every possible rotor position, and check these conditions, stopping and reporting any rotor position candidate that passed them.  This reduced the number of possible rotor positions to a manageable list of possibilities for further cryptanalysis.
 
-Any little quirk of an encryption system can be exploited.  For example, the design of enigma didn't allow a letter to be encrypted to itself.  Because of staticky radio signals, operators sent the first part of the message (the \emph{message key}) twice.  And uncautious homesick soldiers had a tendency to use the initials of their loved ones as keys.
+Any little quirk of an encryption system can be exploited.  For example, the design of enigma didn't allow a letter to be encrypted to itself.  Because of staticky radio signals, operators sent the first part of the message (the \emph{message key}) twice.  And uncautious\todo{AI: `uncautious' is nonstandard (usually `incautious') -- intentional?} homesick soldiers had a tendency to use the initials of their loved ones as keys.
 
 
 \subsection{The notion of complexity}
@@ -1070,7 +1070,7 @@ Therefore, I will convince you by demonstrating the first of our public-key sche
 
 \subsubsection{Key exchange}
 
-Our first public-key scheme isn't strictly a type of encryption, but rather a type of \textbf{key exchange}, a protocol which results in Alice and Bob sharing some secret information (which they can then use as a secret key for a symmetric encryption such as Caesar cipher, modern symmetric encryption, or whatever their hearts' desire).  A key exchange can more formally be defined as a \textbf{protocol} (or procedure) performed by Alice and Bob, in communication, which allows both Alice and Bob to compute a piece of shared secret information, in such a way that an eavesdropped Eve, privy to all communication between Alice and Bob, cannot feasibly compute the same secret information.  They cannot control this information ahead of time, e.g. they cannot conspire to make it an english word, and it will typically be a random string.
+Our first public-key scheme isn't strictly a type of encryption, but rather a type of \textbf{key exchange}, a protocol which results in Alice and Bob sharing some secret information (which they can then use as a secret key for a symmetric encryption such as Caesar cipher, modern symmetric encryption, or whatever their hearts' desire).  A key exchange can more formally be defined as a \textbf{protocol} (or procedure) performed by Alice and Bob, in communication, which allows both Alice and Bob to compute a piece of shared secret information, in such a way that an eavesdropper Eve, privy to all communication between Alice and Bob, cannot feasibly compute the same secret information.  They cannot control this information ahead of time, e.g. they cannot conspire to make it an english word, and it will typically be a random string.
 
 Here's a sort of failed first attempt at a key exchange:
 
@@ -1087,7 +1087,7 @@ At the end of this process, Alice and Bob both have the information $5ab$.  The 
 
 So this hasn't gotten us anywhere.  But observe that Eve's process is \emph{different} than Alice's or Bob's:  she needed to know how to do division by $5$.  What if that were computationally intensive, so much so that she couldn't do it during her lifetime?
 
-This is what motivates the \textbf{Diffie-Hellman Key Exchange}. This is a slight variation on the work above, but where Eve's job \emph{is} computationally intensive.  It involves taking exponents modulo a large prime $p$.  If you are not familiar with modular arithmetic, you can either visit Section REF SEC, or, for the moment, you can take for granted that there's a special world of arithmetic called `mod p' which has some properties I'll explain below (but you will certainly want to learn modular arithmetic for the rest of this course!).
+This is what motivates the \textbf{Diffie-Hellman Key Exchange}. This is a slight variation on the work above, but where Eve's job \emph{is} computationally intensive.  It involves taking exponents modulo a large prime $p$.  If you are not familiar with modular arithmetic, you can either visit Section~\ref{sec:modular-arithmetic}, or, for the moment, you can take for granted that there's a special world of arithmetic called `mod p' which has some properties I'll explain below (but you will certainly want to learn modular arithmetic for the rest of this course!).
 
 \begin{enumerate}
 	\item Alice chooses a private key $a$ (an integer).
@@ -1159,7 +1159,7 @@ There is no wrong way to break a cryptosystem:  a break is a break.
 (Image from XKCD, https://xkcd.com/538/, Creative Commons Attribution Non-Commercial License, https://creativecommons.org/licenses/by-nc/2.5/)
 \end{center}
  
-Kerckhoffs stated a famous principal of modern cryptography:
+Kerckhoffs stated a famous principle of modern cryptography:
 
 \begin{quote}
  \emph{“A cryptographic system should be secure even if everything about the system, except the key, is public knowledge.” — Auguste Kerckhoffs}
@@ -1224,15 +1224,20 @@ In the early 1980s, it was proposed that using properties of quantum physics may
 
 This realization has profound implications for cryptography.  Shor's algorithm and its variations can solve the standard hard cryptographic problems of the years 1980-2020 easily.  The only challenge was to build a quantum computer.  Engineers have been working on this task for many decades now, and we are succeeding.  In the not-too-distant future, quantum computers will be a reality.  It is only a matter of scale before their existence will render all our standard cryptography insecure!
 
-One shouldn't think of a quantum computer as omniscient or omnipotent.  It has very specific narrow capabilities that classical computers do not, and is best used along with a classical computer for just those specific abilities.  In fact, there are a very short list of `quantum tricks' and most quantum algorithms are elaborations on this small list.  But the specific things it does well, it does quite impressively well.
+One shouldn't think of a quantum computer as omniscient or omnipotent.  It has very specific narrow capabilities that classical computers do not, and is best used along with a classical computer for just those specific abilities.  In fact, there is a very short list of `quantum tricks' and most quantum algorithms are elaborations on this small list.  But the specific things it does well, it does quite impressively well.
 
 This state of affairs has prompted a vast effort on the part of cryptographers to develop \textbf{post-quantum cryptography}, which means cryptography whose underlying hard problems are \emph{not} known to be easy for a quantum computer.  There are many candidates, including code-based cryptography, multivariate cryptography, isogeny-based cryptography, and lattice-based cryptography.  The latter is widely considered to be the most promising at the present moment, but the community wishes to diversify the underlying hard problems and mathematical methods.  So all are active areas of research.
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Modular arithmetic, the discrete logarithm, and Diffie-Hellman key exchange}
 
 \subsection{Modular arithmetic}
+\label{sec:modular-arithmetic}
 
 You are likely already familiar with modular arithmetic from your experience with an analog wall clock.  If I agree to meet you two hours after 11 o'clock, you know that this will be 1 o'clock.  The analog wall clock ignores multiples of 12.  Working in this way is called working \textbf{modulo} 12.  There is nothing special about the number twelve; we may work modulo any integer.
 
@@ -1244,9 +1249,9 @@ a \equiv b \pmod n
 whenever $a = b + nk$ for some integer $k$ (out loud, we say ``$a$ is equivalent to $b$ modulo $n$'' or ``$a$ is congruent to $b$ modulo $n$'').  More informally, that is to say, whenever $a$ and $b$ differ by a multiple of $n$, or whenever $a$ and $b$ have the same remainder upon division by $n$.
 \end{definition}
 
-For example\footnote{Whenever you meet a mathematical definition, you should create some examples and non-examples for yourself.}, $12 \equiv 2 \pmod 5$ and $-1 \equiv 3 \pmod 4$, but $0 \not\equiv 1 \pmod 2$.  We will henceforth assume that $n > 1$, since $n \le 1$, although well-defined, does not provide any extra utility.
+For example\footnote{Whenever you meet a mathematical definition, you should create some examples and non-examples for yourself.}, $12 \equiv 2 \pmod 5$ and $-1 \equiv 3 \pmod 4$, but $0 \not\equiv 1 \pmod 2$.  We will henceforth assume that $n > 1$, since working modulo $n \le 1$, although well-defined, does not provide any extra utility, and would just be confusing.
 
-It is sometimes helpful to imagine modular arithmetic as a wall clock (Figure~\ref{fig:7-clock}).  The usual infinite integer number line can be thought of as being wrapped around this clock in a spiral, so that every integer lands on one of the $n$ possible numbers painted on the clock.  These painted numbers are typically taken to be $\{ 0, 1, 2, 3, \ldots, n-1 \}$ (notice that we include zero and not $n$ itself), and this set\footnote{In a more mathematical formulation, the residues represent equivalence classes of integers.  For example, $0 \pmod n$ should be thought of as the infinite set of integers $\{ k \in \ZZ : n \mid k \}$.  In this course, where we are more concerned with practical matters, we will not focus on this.} is called the set of \textbf{residues modulo $n$}.  If $k$ is equivalent to one of these residues, say $a$, then we say that \textbf{$k$ has residue $a$ modulo $n$}.  
+It is sometimes helpful to imagine modular arithmetic as a wall clock (Figure~\ref{fig:7-clock}).  The usual infinite integer number line can be thought of as being wrapped around this clock in a spiral, so that every integer lands on one of the $n$ possible numbers painted on the clock.  These painted numbers are typically taken to be $\{ 0, 1, 2, 3, \ldots, n-1 \}$ (notice that we typically include zero and not $n$ itself), and this set is called the set of \textbf{residues modulo $n$}.  If $k$ is equivalent to one of these residues, say $a$, then we say that \textbf{$k$ has residue $a$ modulo $n$}.  
 
 \begin{checkin}
     Use Figure~\ref{fig:7-clock} to show that $7 \equiv -3 \pmod{5}$.
@@ -1256,47 +1261,49 @@ Both numbers land on the same ray of the clock: $7 = 5\cdot 1 + 2$ sits on the r
 \end{aisolution}
 
 
-We use the notation $\ZZ/n\ZZ$ for the set of residues modulo $n$, or the set of `notches' of the clock.  This is a finite set.  If $n$ is equal to a prime $p$, we also write $\FF_p$ (this is in anticipation of our work with finite fields in Section~\ref{sec:finite-fields}).  Let's record this as a formal definition.
-
+We use the notation $\ZZ/n\ZZ$ for the set of residues modulo $n$, or the set of `notches' of the clock, i.e.
+\[
+\ZZ/n\ZZ = \{ 0, 1, \ldots, n-1 \}.
+\]
+This is a finite set.  If $n$ is equal to a prime $p$, we also write $\FF_p$ (this is in anticipation of our work with finite fields in Section~\ref{sec:finite-fields}).  Let's record this as a formal definition.
 
 \begin{definition}
 	The residues modulo $n$ are denoted $\ZZ/n\ZZ$.  Explicitly,
 	\[
 		\ZZ/n\ZZ := \{ 0, 1, 2, \ldots, n-1 \}.
 	\]
+  If $n = p$ is prime, we write $\FF_p := \ZZ/n\ZZ$.
 \end{definition}
 
+Notice I've written $:=$ instead of $=$.  This is a mathematical convention:  when we are defining A as B, we write $A := B$ to remind the reader that it's a definition.
+
+Here's a fact that's very important, so I'll make it a Proposition.  Lemmas, Propositions and Theorems are all names for mathematical statements that can be proven (argued to be true).
+
+\begin{proposition}
 Every integer is equivalent modulo $n$ to exactly one element of $\ZZ/n\ZZ$.  
+\end{proposition}
+
+\begin{checkin}
+  Can you explain why this is true?  Look back at the definition.  What would happen if some integer $k$ were equivalent to two different residues modulo $n$?  (If you write a formal argument why, that's a proof.)\footnote{Here's one argument:  Suppose $k$ was equivalent to two different residues $a$ and $b$ modulo $n$.  That means (by definition), that the distances between $k$ and $a$ and between $k$ and $b$ are both multiples of $n$.  But then, that would imply the distance between $a$ and $b$ is a multiple of $n$.  But that sounds fishy!  Since $0 \le a,b \le n-1$, how could they be so far apart?}
+\end{checkin}
 
 \begin{remark}
-   If we were being more formal, we would define $\ZZ/n\ZZ$ to be a set of \emph{equivalence classes}, e.g. the residue $1$ should really be thought of as the set of all things congruent to $1$ modulo $n$, i.e. $\{ 1 + kn: k \in \ZZ \}$.  But for us, it's enough to think of them as the residues or remainders.
+   If we were being more formal, we would define $\ZZ/n\ZZ$ to be a set of \emph{equivalence classes}.  An equivalence class is the set of all the integers that are equivalent to some fixed residue.  For example, the residue $1$ should really be thought of as the set of all things congruent to $1$ modulo $n$, i.e. $\{ 1 + kn: k \in \ZZ \}$.  But for us, it's enough to think of them as the residues or remainders.
 \end{remark}
 
 \begin{checkin}
     Write out $\ZZ/10\ZZ$ and $\ZZ/3\ZZ$.\footnote{Answers: $\ZZ/10\ZZ = \{0,1,2,3,4,5,6,7,8,9\}$; $\ZZ/3\ZZ = \{ 0,1,2\}$.}
 \end{checkin}
-\begin{aisolution}
-We list the residues $0,1,\ldots,n-1$:
-\[
-\ZZ/10\ZZ = \{0,1,2,3,4,5,6,7,8,9\}, \qquad \ZZ/3\ZZ = \{0,1,2\}.
-\]
-\end{aisolution}
 
-It is typical to \textbf{reduce} integers modulo $n$ to one of the $n$ elements of $\ZZ/n\ZZ$.   So, for example, $15 \equiv 0 \pmod{5}$ since it is a multiple of $5$; and $1999999992 \equiv 2 \pmod{10}$ since reducing modulo $10$ is the same as taking the final digit.  
+To \textbf{reduce} an integer modulo $n$ to one of the $n$ elements of $\ZZ/n\ZZ$, means we find its residue (or remainder) on the clock.  So, for example, $15 \equiv 0 \pmod{5}$ since it is a multiple of $5$; and $1999999992 \equiv 2 \pmod{10}$ since reducing modulo $10$ is the same as taking the final digit.  
 
 \begin{checkin}
     Reduce $77772$ modulo $7$ (by pure thought).  Hint:  take out obvious multiples of $7$.\footnote{Answer: $2$ (since $77770$ is an obvious multiple of $7$).}
 \end{checkin}
-\begin{aisolution}
-Note $77770 = 7 \cdot 11110$ is a multiple of $7$, so $77772 = 77770 + 2 \equiv 2 \pmod 7$.
-\end{aisolution}
 
 \begin{checkin}
     Reduce  $1200004$ modulo $3$ (by pure thought).\footnote{Answer: Since $12$ is a recognizable multiple of $3$, $1200004 \equiv 4 \equiv 1 \pmod{3}$.}
 \end{checkin}
-\begin{aisolution}
-Since $1200000 = 3\cdot 400000$ is a multiple of $3$, we have $1200004 \equiv 4 \equiv 1 \pmod 3$.  (As a check, the digit sum is $1+2+4 = 7 \equiv 1 \pmod 3$.)
-\end{aisolution}
 
 Reducing into this `standard' set makes it easier to compare integers and see if they are equivalent modulo $n$.  Since $70 \equiv 0 \pmod{5}$ and $143 \equiv 3 \pmod{5}$, we know that they are not equivalent modulo $5$.
 
@@ -1304,9 +1311,9 @@ Reducing into this `standard' set makes it easier to compare integers and see if
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.4\textwidth]{wind-up.png}
-\hspace{2em}
-\includegraphics[width=0.3\textwidth]{clock.png}
+\includegraphics[width=0.52\textwidth]{wind-up.png}
+\hspace{1em}
+\includegraphics[width=0.39\textwidth]{clock.png}
 \end{center}
 \caption{An illustration of arithmetic modulo $5$ as a `clock.'  The integer number line can be thought of as wrapped around the clock, so that every integer hits one of the finitely many clock positions.  In this clock, the numbers $\ldots$, $-1$, $4$, $9$, $14$, $\ldots$ are all on the same `ray', so they are all equivalent modulo $5$.  We write $-1 \equiv 4 \equiv 9 \pmod{5}$ etc.  We choose the numbers $0,1,2,3,4$ to represent each ray.}
 \label{fig:7-clock}
@@ -1324,7 +1331,7 @@ Stated informally, this asserts that we can define addition and multiplication o
 As an example of the theorem in action\footnote{Whenever you meet a Theorem, you should test it out with actual values or mathematical examples, to see it happen.}, we may take $n=5$, $a_1 = 16$, $b_1 = 1$, $a_2 = -3$, $b_2 = 2$.  Then, the hypotheses are verified:  $16 \equiv 1 \pmod 5$ and $-3 \equiv 2 \pmod 5$.  Thus, we expect the conclusion to be verified.  Indeed, $a_1 + a_2 = 13$ and $b_1 + b_2 = 3$, and these are indeed equivalent\footnote{I leave it to the reader to check the second assertion of the conclusion, that concerning multiplication.} modulo $5$.
 
 \begin{checkin}
-    Verify that the example just given, the second conclusion of the Theorem (about multiplication) also holds.\footnote{Answer:  $a_1a_2 = -48 \equiv -8 \equiv 2 \pmod{5}$ and $b_1b_2 = 2 \equiv 2 \pmod{5}$.}
+    Verify that in the example just given, the second conclusion of the Theorem (about multiplication) also holds.\footnote{Answer:  $a_1a_2 = -48 \equiv -8 \equiv 2 \pmod{5}$ and $b_1b_2 = 2 \equiv 2 \pmod{5}$.}
 \end{checkin}
 \begin{aisolution}
 With $a_1 = 16$, $a_2 = -3$, $b_1 = 1$, $b_2 = 2$: the product $a_1a_2 = -48 = -50 + 2 \equiv 2 \pmod 5$, while $b_1 b_2 = 1\cdot 2 = 2 \equiv 2 \pmod 5$.  The two products agree modulo $5$, confirming $a_1a_2 \equiv b_1b_2 \pmod 5$.
@@ -1338,7 +1345,7 @@ The upshot is that modular arithmetic can be very efficient, which is important 
 \[
 	1000000000000001^{3000000} \equiv 1^{3000000} \equiv 1 \pmod{10}.
 \]
-If you gave this computation to a poorly programmed compute, it would attempt to multiply out the gigantic exponent before reducing modulo $10$, resulting in an overflow error.
+If you gave this computation to a poorly programmed computer, it would attempt to multiply out the gigantic exponent before reducing modulo $10$, resulting in an overflow error.
 
 This is a common trick on high-school math contests.  Here's another example, this time modulo $3$:
 \[
@@ -1367,7 +1374,7 @@ Since $3^2 = 9 \equiv 1 \pmod 8$ and $50000 = 2\cdot 25000$ is even,
 \]
 \end{aisolution}
 
-Later we will see other ticks for dealing with large exponents.  Informally, the complexity of modular addition and multiplication is a simple\footnote{actually a polynomial; we will discuss this later} function of the modulus itself, since things are quickly reduced into that range.
+Later we will see other tricks for dealing with large exponents.  Informally, the complexity of modular addition and multiplication is a simple\footnote{actually a polynomial; we will discuss this later} function of the modulus itself, since things are quickly reduced into that range.
 
 \subsubsection{Warning!  Don't reduce the exponents modulo $n$.}
 
@@ -1473,9 +1480,9 @@ Z & 25 & Z & A & B & C & D & E & F & G & H & I & J & K & L & M & N & O & P & Q &
 \end{figure}
 
 \subsubsection{Affine cipher}
-Viewing the encryption function as a formula in modular arithmetic, we come naturally to what is called the \textbf{affine cipher}.  For this cipher, we choose a modulus $n$, and then the key $(\alpha,\beta)$ consists two residues $\alpha, \beta \in \ZZ/n\ZZ$.  With this secret, the encryption function is
+Viewing the encryption function as a formula in modular arithmetic, we come naturally to what is called the \textbf{affine cipher}.  For this cipher, we choose a modulus $n$, and then the key $(\alpha,\beta)$ consists of two residues $\alpha, \beta \in \ZZ/n\ZZ$.  With this secret, the encryption function is
 \[
-	\text{encryption}: m \mapsto \alpha m + \beta \pmod{26},
+	\text{encryption}: m \mapsto \alpha m + \beta \pmod{n}.
 \]
 In order to understand the decryption function, we need to understand how to `undo' multiplication by $\alpha$.  Take a look at Figure~\ref{fig:mult-table-modn}, which shows the multiplication table modulo $26$.  The column under the letter corresponding to a residue $k$ is actually a table showing the effect of multiplication-by-$k$.  Examining this table, we observe that multiplication-by-$k$ is bijective for all the odd $k$ except for $13$.  So at least we expect that the encryption can be reversed.  In other words, from this we can conclude that no two plaintexts will go to the same ciphertext.  In fact, this is a general principle worth recording:
 \[
@@ -1589,13 +1596,13 @@ Examples:
 
 For the second example, we can give a more direct reason that $2$ is not invertible.  If $2x \equiv 1 \pmod 6$, then $2x + 6k = 1$ for some integer $k$.  But the left side of this equation is always an even number, and the right side is odd.  So $2$ is not invertible in this situation because it shares a factor of $2$ with the modulus.
 
-This notion of invertibility explains the $x \mapsto 2x \pmod 6$ affine cipher example just discussed:  $2$ and $3$ are inverses of each other.  So multiplying by one undoes multiplication by the other.
+This notion of invertibility explains the $x \mapsto 2x \pmod 5$ affine cipher example just discussed:  $2$ and $3$ are inverses of each other.  So multiplying by one undoes multiplication by the other.
 
 Let's pause for a bit of reflection on the philosophy of mathematical definition.  Two is the inverse of $3$ modulo $5$.  Said another way, $3$ is \emph{that element, which, when multiplied by $2$, gives $1$}.  This is an example of a fundamental mathematical paradigm:  we should define an element by what it does.  So it is very reasonable to interpret the symbol $1/2$ as the phrase \emph{that which, when multiplied by $2$ gives $1$}, and then say that $1/2 \equiv 3 \pmod 5$.  This answers the question `Can we \emph{divide} by $2$ in modulo $5$?'  The answer is yes, but not by trying to map the rational number $1/2$ somewhere on the clock, but instead by asking for an element which multiplies by $2$ to give $1$.  That element turns out to be $3$.
 
 Later, we will discuss how the Euclidean algorithm\footnote{I think of this as the mother of all algorithms} provides an efficient means to compute an inverse without having to do trial-and-error.
 
-With all of this mathematical formalism in hand, we can now provide the decryption algorithm for the affine cipher $Enc: m \mapsto \alpha m + \beta$.  It is $Dec: c \mapsto \alpha{-1}(c-\beta) = \alpha^{-1} c - \alpha^{-1}\beta \pmod n$.  In particular, an affine cipher with key $(\alpha, \beta)$ is decrypted by the same cipher with key $(\alpha^{-1}, -\alpha^{-1}\beta)$.  We can refer to this as the decryption key.
+With all of this mathematical formalism in hand, we can now provide the decryption algorithm for the affine cipher $Enc: m \mapsto \alpha m + \beta$.  It is $Dec: c \mapsto \alpha^{-1}(c-\beta) = \alpha^{-1} c - \alpha^{-1}\beta \pmod n$.  In particular, an affine cipher with key $(\alpha, \beta)$ is decrypted by the same cipher with key $(\alpha^{-1}, -\alpha^{-1}\beta)$.  We can refer to this as the decryption key.
 
 \KS{Put in an example of breaking the affine cipher with a system of equations}
 
@@ -1652,11 +1659,11 @@ The intuition behind the proof is that the existence of two inverses would mean 
 
 \begin{proof}
 	If there does exist an inverse, say $b$, then $x \mapsto ax$ and $x \mapsto bx$ are inverses to one another, so both bijective.
-	If there exists a second inverse, say $b^{-1}$, then
+	If there exists a second inverse, say $b'$, then
 	\[
 		ab \equiv ab' \equiv 1 \pmod n.
 	\]
-	But this implies that $a(b-b')\equiv 1 \pmod n$.  Therefore $b-b'$ and $0$ are both mapped to $0$ under the bijection $x \mapsto ax$.  By injectivity, then $b-b' \equiv 0 \pmod n$.
+	But this implies that $a(b-b')\equiv 0 \pmod n$.  Therefore $b-b'$ and $0$ are both mapped to $0$ under the bijection $x \mapsto ax$.  By injectivity, then $b-b' \equiv 0 \pmod n$.
 \end{proof}
 
 \subsubsection{The Principles of Modular Arithmetic}
@@ -1675,9 +1682,9 @@ When working modulo $n$, here are the basic principles:
 
 (Problem originally from Trappe and Washington)
 
-Suppose your little sister begins every message with `HA', and she send affine ciphertext CRWWZ.  How can you recover the plaintext?
+Suppose your little sister begins every message with `HA', and she sends affine ciphertext CRWWZ.  How can you recover the plaintext?
 
-Recall that the decryption of affine cipher is another affine cipher.  We will try to solve for the decryption key.  Replacing letters with numbers, $H = 7$, $A=0$, $C=2$, $R=17$, $W= 22$ and $Z = 25$.  The \emph{decryption} key $(\alpha,\beta)$ takes $C$ to $H$ and $R$ to $A$, i.e.,
+Recall that the decryption of an affine cipher is another affine cipher.  We will try to solve for the decryption key.  Replacing letters with numbers, $H = 7$, $A=0$, $C=2$, $R=17$, $W= 22$ and $Z = 25$.  The \emph{decryption} key $(\alpha,\beta)$ takes $C$ to $H$ and $R$ to $A$, i.e.,
 \[
 	2 \alpha + \beta = 7, \quad 17 \alpha + \beta = 0
 \]
@@ -1719,7 +1726,7 @@ Let us set some notation for the set of invertible elements modulo $n$.
 	\[
 		ab \equiv ab' \pmod n.
 		\]
-		But then, $a(b-b')$ is a multiple of $n$.  Since $b-b'$ is not a multiple of $n$, then $a$ must contain a factor common to $n$, i.e. $\gcd(a,n>1$.
+		But then, $a(b-b')$ is a multiple of $n$.  Since $b-b'$ is not a multiple of $n$, then $a$ must contain a factor common to $n$, i.e. $\gcd(a,n)>1$.
 \end{proof}
 
 We can rephrase the above by saying that
@@ -1920,7 +1927,7 @@ The determinant is $33 - 26 \equiv 33 \equiv 7 \pmod{26}$.  The inverse of $7$ m
 The matrix given in the last exercise was used as a key to a Hill cipher to encrypt a favourite vegetable of mine, and the resulting ciphertext was YGFI.  What is the vegetable?
 
 \begin{solution}
-YGFI is $24, 6, 5, 8$.  The inverse of the encryption matrix is the decryption matrix.  We computed this in part Exercise 1.  We can decrypt the ciphertext block by block by matrix multiplication.  For example, for the first block $(24, 6)$, we do 
+YGFI is $24, 6, 5, 8$.  The inverse of the encryption matrix is the decryption matrix.  We computed this in Problem 1.  We can decrypt the ciphertext block by block by matrix multiplication.  For example, for the first block $(24, 6)$, we do 
 \[
 	\begin{pmatrix}
 		19 & 13 \\ 22 & 9
@@ -2105,7 +2112,7 @@ The following image depicts, using arrows, what happens when we multiply by $2$ 
     \includegraphics[width=0.9\textwidth]{mult-dyn-2-5-6.png}
 \end{center}
 
-In the diagrams above (called \textbf{dynamical portraits}), we can highlight the \textbf{orbit} of $1$, i.e. its future path by following arrows.  In the case of $5 \pmod 6$, $1$ is part of a cycle (it is \textbf{periodic}), because $x \mapsto 5x$ is bijective, and so a permutation, which falls into cycles.
+In the diagrams above (called \textbf{dynamical portraits}), we can highlight the \textbf{orbit} of $1$, i.e. its future path by following arrows.  In the case of $2 \pmod 5$, $1$ is part of a cycle (it is \textbf{periodic}), because $x \mapsto 2x$ is bijective, and so a permutation, which falls into cycles.
 
 However, in $2 \pmod 6$, $1$ is \textbf{strictly preperiodic}, meaning that it travels some distance before joining a cycle.
 
@@ -2451,15 +2458,15 @@ Now let's consider the example of modular exponentiation using successive squari
 
 Input:  a base $g$, an exponent $e$ and a modulus $n$, all written in decimal notation.  Thus the size of the input is $M = O(\log n)$.
 
-Steps:  $log(n)$ squarings to create a list of successive squares, followed by at most $\log(n)$ multiplications to put the correct squares together according to the binary expansion.  Thus the runtime is $O(\log(n)) = O(M)$.
+Steps:  $\log(n)$ squarings to create a list of successive squares, followed by at most $\log(n)$ multiplications to put the correct squares together according to the binary expansion.  Thus the runtime is $O(\log(n)) = O(M)$.
 
-Thus the runtime is a polynomial (in fact, linear) number of multiplications.  How hard is a multiplication?  It is polynomial time (there are a lot of algorithms for this, some better than the schoolbook algorithm from grade school, but even that by-hand algorithm works digit-by-digit and is polynomial time.
+Thus the runtime is a polynomial (in fact, linear) number of multiplications.  How hard is a multiplication?  It is polynomial time (there are a lot of algorithms for this, some better than the schoolbook algorithm from grade school, but even that by-hand algorithm works digit-by-digit and is polynomial time).
 
 So, overall, the runtime of modular exponentiation is polynomial time.  I have a computer demo for this (`Runtimes') on the cryptography website.
 
 \subsection{The Discrete Logarithm}
 
-When working in the multiplicative group $(\ZZ/n\ZZ)^*$ will use the notation $L_g(h)$ for the exponent to which one must raise $g \in (\ZZ/n\ZZ)^*$ to get the value $h \in (\ZZ/n\ZZ)^*$.  This is called the \textbf{discrete logarithm of $h$ to the base $g$}.  In other words, $L_g(h) = x$ if and only if $g^x \equiv h \pmod n$.  If no power of $g$ gives $h$, then this is not defined.
+When working in the multiplicative group $(\ZZ/n\ZZ)^*$, we will use the notation $L_g(h)$ for the exponent to which one must raise $g \in (\ZZ/n\ZZ)^*$ to get the value $h \in (\ZZ/n\ZZ)^*$.  This is called the \textbf{discrete logarithm of $h$ to the base $g$}.  In other words, $L_g(h) = x$ if and only if $g^x \equiv h \pmod n$.  If no power of $g$ gives $h$, then this is not defined.
 
 Note that $L_g(h)$ lives naturally in the ring $\ZZ/\varphi(n)\ZZ$, because it is an exponent.  For this reason, it is good to avoid asking for `$L_g(h)$ modulo $n$' but instead say `$L_g(h)$ working in $(\ZZ/n\ZZ)^*$' to be completely clear.  The word logarithm refers to an exponent.  Beyond this analogy, \textbf{this is not the logarithm you encounter in calculus}.  It will never be a decimal, for example!
 
@@ -2472,7 +2479,7 @@ List the powers of $2$ modulo $13$: $2^1 \equiv 2$, $2^2 \equiv 4$, $2^3 \equiv 
 
 \KS{todo: pick other numbers in this checkin}
 \begin{checkin}
-    It is a fact that $p=101$ is prime, and $2$ is a primitive root modulo $p$.  It is a fact that $L_2(3)=69$ and $L_2(5)=24$ working in $(\ZZ/p\ZZ)^*)$.   It is also a fact that the integer factorization of $24$ is $24 = 2^3 \cdot 3$.  Using these facts, evaluate $L_2(24)$ working in $(\ZZ/p\ZZ)^*$ with minimal work (just combine the facts above).\footnote{Answer: From the factorization of $24$, we have $L_2(24) = 3 \cdot L_2(2) + L_2(3) = 3 \cdot 1 + 69 = 72$.  The log of $5$ is not needed.}
+    It is a fact that $p=101$ is prime, and $2$ is a primitive root modulo $p$.  It is a fact that $L_2(3)=69$ and $L_2(5)=24$ working in $(\ZZ/p\ZZ)^*$.   It is also a fact that the integer factorization of $24$ is $24 = 2^3 \cdot 3$.  Using these facts, evaluate $L_2(24)$ working in $(\ZZ/p\ZZ)^*$ with minimal work (just combine the facts above).\footnote{Answer: From the factorization of $24$, we have $L_2(24) = 3 \cdot L_2(2) + L_2(3) = 3 \cdot 1 + 69 = 72$.  The log of $5$ is not needed.}
 \end{checkin}
 \begin{aisolution}
 Discrete logs turn products into sums (of exponents, working modulo $p-1 = 100$).  Since $24 = 2^3\cdot 3$,
@@ -2495,7 +2502,7 @@ The security of the Diffie-Hellman Key Exchange relies on Eve not being able to 
 One way to solve the CDHP would be to figure out $a$ and $b$ and then compute $g^{ab}$.  We believe this is essentially the \emph{only} way to solve CDHP, but do not have a proof of that fact.  The problem of computing $a$ or $b$ is an example of the following problem.
 
 \begin{problem}[The Discrete Logarithm Problem (DLP)]
-	Given a prime $p$, a primitive root $g$, and the values $h = g^a$ modulo $p$, find $a$ modulo $p-1$.
+	Given a prime $p$, a primitive root $g$, and the value $h = g^a$ modulo $p$, find $a$ modulo $p-1$.
 \end{problem}
 
 Notice that the exponent lives modulo $p-1$, so we can't really ask for $a$ more specifically than that (if $a$ works, then so does $a + p-1$).  We often assume we are looking for the smallest positive $a$, i.e. $0 \le a < p-1$.
@@ -2813,7 +2820,7 @@ and
 \]
 Thus,
 \[
-	B^2 u^2 \sim d^{\sqrt{\log p \log \log p}}.
+	B^2 u^u \sim e^{\sqrt{\log p \log \log p}}.
 \]
 This is the runtime when $B$ is chosen to minimize runtime, and this is an example of a subexponential runtime.
 
@@ -2849,7 +2856,7 @@ This thought experiment can be turned into a formal proof that the best totally 
 
 Here's how it goes.  The group $(\ZZ/p\ZZ)^*$ is behind a curtain, and Mr. Spock is tasked with \emph{pretending}, as best he can, to have assigned silly but consistent names to its group elements.  The task for you is to solve the discrete logarithm problem which asks, which power of Gracie gives Helmut?  Mr. Spock doesn't actually \emph{know} which element of $(\ZZ/p\ZZ)^*$ is Gracie or Helmut, but he will pretend he does.  
 
-Now for a twist.  In our game, the group $(\ZZ/p\ZZ)^*$ is a third player.  It has decided which residue is Gracie and which is Helmut, but it has only kept this information to itself in a manilla envelope, like the envelope containing Colonel Mustard with the Rope in the Kitchen at the beginning of the board game Clue\footnote{If you don't know this reference, Clue is a game in which the solution to a crime is hidden in an envelope at the beginning, and the players take turns finding some clues to narrow down the possibilities.}.
+Now for a twist.  In our game, the group $(\ZZ/p\ZZ)^*$ is a third player.  It has decided which residue is Gracie and which is Helmut, but it has only kept this information to itself in a manilla\todo{AI: usually spelled `manila' (also once more below) -- intentional?} envelope, like the envelope containing Colonel Mustard with the Rope in the Kitchen at the beginning of the board game Clue\footnote{If you don't know this reference, Clue is a game in which the solution to a crime is hidden in an envelope at the beginning, and the players take turns finding some clues to narrow down the possibilities.}.
 
 Mr. Spock, meanwhile, can't see in the envelope, but is pretending to `be' the group $(\ZZ/p\ZZ)^*$ as we discussed.
 
@@ -2874,7 +2881,7 @@ Having laid out the general plan, what remains is to formalize the probabilities
     \end{theorem}
 
     \begin{proof}
-Mr. Spock plays the game as follows.  He keeps a list of your requests (which are all combinations of Gracie and Helmut, since you have no other elements to begin with). If you ask for $G^a H^b$ (where $G$ stands for Gracie and $H$ for Helmut), he stores this as $a + bx$ and assigns it a random silly name, which he also stores.  Every time you ask for an element, checks if it is in his list, and if not, adds it and makes up a new name.  Otherwise he responds with the existing name from the list.
+Mr. Spock plays the game as follows.  He keeps a list of your requests (which are all combinations of Gracie and Helmut, since you have no other elements to begin with). If you ask for $G^a H^b$ (where $G$ stands for Gracie and $H$ for Helmut), he stores this as $a + bx$ and assigns it a random silly name, which he also stores.  Every time you ask for an element, he checks if it is in his list, and if not, adds it and makes up a new name.  Otherwise he responds with the existing name from the list.
     
     Now go ahead, imagine your best algorithm.  Using that algorithm, make $N$ queries to Mr. Spock (the \emph{simulator} in CS terminology).  Then guess the answer, the hidden discrete logarithm, say $z$.  Let's call the actual answer in the envelope $y$, so $G^y = H$ in reality (in the group).
     
@@ -2884,7 +2891,7 @@ Mr. Spock plays the game as follows.  He keeps a list of your requests (which ar
     \[
     \frac{M}{p-1} \cdot \frac{1}{M} = \frac{1}{p-1}.
     \]
-    So your best bet is to hope Mr. Spock is caught, and that happens with, at best, probability $O(N^2/p)$.  So for a good chance at winning this game, you need to make about $\sqrt{N}$ queries.
+    So your best bet is to hope Mr. Spock is caught, and that happens with, at best, probability $O(N^2/p)$.  So for a good chance at winning this game, you need to make about $\sqrt{p}$ queries.
 \end{proof}
 
 What remains is to interpret the result as saying \emph{the best generic group algorithm requires at least $O(\sqrt{p})$ group operations}.  The idea here is that a generic algorithm is one which can do group operations, but can't use anything about the group element names or any other information about the group.  Then the key is that \emph{if there's a good such algorithm, then it would perform well against Mr. Spock in the game above}.  That is, a generic algorithm in this sense could be used with Mr. Spock since it doesn't require anything other than group operations.  The fact that Mr. Spock can get caught out and end the game early is an annoyance, but you can just assume you would have won in those cases (imagining that the game continued and Mr. Spock was actually in communication with the group and never lied).  Thus this `flaw' in the game only improves your chances of winning, since it's an automatic win.
@@ -2896,7 +2903,7 @@ This result is attributed to Schwarz by Shoup; see Galbraith's book (https://www
 
 \subsection{ElGamal Encryption}
 
-To turn Diffie-Hellman Key Exchange into an encryption method, we use the shared secret key $g^{ab}$ as a \textbf{mask} on the message.  That is, Bob creates a private key $b$ and his public key $B = g^b$.  Then Alice creates an ephemeral (meaning temporary) private key $k$ and its corresponding public key $K = g^k$.  She thinks of this private/public key pair as a one-time-use disposable key for this message only, for which reason it is sometimes called an \textbf{ephemeral key}.  She then creates $c = B^k m$.  By the usual Diffie-Hellman Key Exchange, this is the same as $g^{kb}m$, i.e. the message $m$, but `masked' by multiplication by the shared secret of the Diffie-Hellman Key Exchange.  The pair $(K, c)$ is considered the ciphertext, and is sent to Bob.  He can decrypt because, as in Diffie-Hellman, he can compute $K^b = g^{kb} = B^a$ and then divide $m$ by that.
+To turn Diffie-Hellman Key Exchange into an encryption method, we use the shared secret key $g^{ab}$ as a \textbf{mask} on the message.  That is, Bob creates a private key $b$ and his public key $B = g^b$.  Then Alice creates an ephemeral (meaning temporary) private key $k$ and its corresponding public key $K = g^k$.  She thinks of this private/public key pair as a one-time-use disposable key for this message only, for which reason it is sometimes called an \textbf{ephemeral key}.  She then creates $c = B^k m$.  By the usual Diffie-Hellman Key Exchange, this is the same as $g^{kb}m$, i.e. the message $m$, but `masked' by multiplication by the shared secret of the Diffie-Hellman Key Exchange.  The pair $(K, c)$ is considered the ciphertext, and is sent to Bob.  He can decrypt because, as in Diffie-Hellman, he can compute $K^b = g^{kb} = B^k$ and then divide $c$ by that.
 
 Summarizing the discussion, we have the following algorithm:
 
@@ -2978,7 +2985,7 @@ Summarizing the discussion, we have the following algorithm:
       \begin{enumerate}
 	      \item If they choose $k$ randomly, it gives a random $K$.  Then, they may try to choose $s$.  If they can discover $s$, then they can discover $m-ks = aK$, and since $K := g^k$, this allows them to solve for $a$, breaking the discrete logarithm problem.
 	      \item If they choose $s$ randomly, then they need to find $K$.  But $K$ must be $g^k$ for $k$ satisfying $m - ks = aK$.  It doesn't seem easy to find a pair $(k,K)$ that simultaneously has this linear relation and the exponential relation.
-	      \item It is not known of any way to choose $k, K, s$ in tandem in a clever way.
+	      \item There is no known way to choose $k, K, s$ in tandem in a clever way.
       \end{enumerate}
 
       The security therefore relies on a little bit more than just the discrete logarithm problem.
@@ -3060,7 +3067,7 @@ Therefore, $\gcd(180,196) = 4$.
 \end{example}
 
 The most important and stunning property of this algorithm is its runtime.
-How do know this algorithm terminates?  Because at each step the numbers involved are getting smaller, but always non-negative.  This can't continue forever, since there are only finitely many integers between the starting integers, and zero. 
+How do we know this algorithm terminates?  Because at each step the numbers involved are getting smaller, but always non-negative.  This can't continue forever, since there are only finitely many integers between the starting integers, and zero. 
 
 To analyse the runtime more exactly, we need to consider... \KS{finish runtime}
 
@@ -3075,12 +3082,12 @@ The Extended Euclidean Algorithm is just the Euclidean Algorithm, with slightly 
 			a_1x &\equiv b_1 \pmod{n_1} \\
 		a_2x &\equiv b_2 \pmod{n_2}
 		\end{align*}
-		in the variable $x$.  In particular, this makes the Sunzi's Theorem explicit \KS{this is looking ahead}.
+		in the variable $x$.  In particular, this makes Sunzi's Theorem explicit \KS{this is looking ahead}.
 \end{enumerate}
 
 The Euclidean algorithm computes the $\gcd$ in a constructive manner:  it computes a recipe, a set of instructions, as to how to add and subtract the two numbers from each other, repeatedly, to get to the gcd.  The point of the extended Euclidean algorithm is to capture the process, or recipe, and not just the result.  So the extended Euclidean algorithm is exactly the Euclidean one, but plus a little bookkeeping along the way that lets it end up with more information at the end.
 
-The extended Euclidean algorithm will solve all the problems listed above by solving a linear Diophantine equations.  The word \textbf{Diophantine} refers to the fact that we seek integer solutions (instead of, say, real number solutions).  In particular, it will solve
+The extended Euclidean algorithm will solve all the problems listed above by solving a linear Diophantine equation.  The word \textbf{Diophantine} refers to the fact that we seek integer solutions (instead of, say, real number solutions).  In particular, it will solve
 \[
 ax + by = \gcd(a,b)
 \]
@@ -3156,7 +3163,7 @@ The recipes for $0$ are particularly simple:
   \]
 for all $k \in \ZZ$.
 
-By adding these to a single solution $(x_0,y_0)$ found by the extended Euclidean algorithm (or some other method), we obtain the full set of solutions to $ax + by = \gcd(a,b)$ are given by
+By adding these to a single solution $(x_0,y_0)$ found by the extended Euclidean algorithm (or some other method), we obtain that the full set of solutions to $ax + by = \gcd(a,b)$ is given by
 \[
 	\{ (x_0, y_0) + k(-b/g,a/g) : k \in \ZZ \}
 \]
@@ -3209,7 +3216,7 @@ If we know information about an integer $x$ modulo $n$, do we know any informati
 \begin{enumerate}
 \item If $x \equiv a \pmod {nm}$, then $x \equiv a \pmod{n}$.
 \item If $x \equiv a \pmod{n}$, then the possible values of $x$ modulo $nm$ are restricted.  As an example, $x \equiv 1 \pmod{6}$ implies that $x \equiv 1$ or $7 \pmod{12}$ (it cannot be the case, for example, that $x \equiv 0 \pmod{12}$, since that would imply that $x \equiv 0 \pmod{6}$).  This is a sort of partial converse to the previous item.
-\item If $x \equiv 1 \pmod{n}$, then in general, we don't know anything about $x$ modulo $m$ for any $m$ coprime to $n$.  As an example, for the two coprime modulo $2$ and $3$, we can obtain examples of every possible pair:
+\item If $x \equiv 1 \pmod{n}$, then in general, we don't know anything about $x$ modulo $m$ for any $m$ coprime to $n$.  As an example, for the two coprime moduli $2$ and $3$, we can obtain examples of every possible pair:
 \begin{enumerate}
 \item $0$ is $0 \pmod 2$ and $0 \pmod 3$
 \item $1$ is $1 \pmod 2$ and $1 \pmod 3$
@@ -3217,7 +3224,7 @@ If we know information about an integer $x$ modulo $n$, do we know any informati
 \item $3$ is $1 \pmod 2$ and $0 \pmod 3$
 \item $4$ is $0 \pmod 2$ and $1 \pmod 3$
 \item $5$ is $1 \pmod 2$ and $2 \pmod 3$
-\end{enumerate}.
+\end{enumerate}
 \end{enumerate}
 
 Sunzi's theorem is a formalization of the final observation; namely, that information modulo $n$ and modulo $m$ are `independent' when $n$ and $m$ are coprime.
@@ -3232,7 +3239,7 @@ Suppose $\gcd(n,m)=1$, and let $a,b \in \ZZ$.  Then the system of equations
 \[
 x\equiv a \pmod{n}, \quad x \equiv b \pmod{m}
 \]
-has a unique solution modulo $nm$.  More precisely, there is a residue $c \pmod {nm}$ or which $x$ solves the above system of equations exactly when $x \equiv c \pmod{nm}$.
+has a unique solution modulo $nm$.  More precisely, there is a residue $c \pmod {nm}$ for which $x$ solves the above system of equations exactly when $x \equiv c \pmod{nm}$.
 \end{theorem}
 
 To see that we expect the solution to live modulo $nm$, suppose $x$ is a solution, and we have another $x_1$ which is congruent modulo $nm$:
@@ -3330,7 +3337,7 @@ f: \ZZ/nm\ZZ \rightarrow
 \ZZ/n\ZZ \times \ZZ/m\ZZ, \quad
 (c \pmod {nm}) \mapsto  (c \pmod{n}, c\pmod{m} )
 \]
-is a bijective ring homomorphism (AKA a ring isomorphism) and it restricts to the a bijective group homomorphism (AKA a group isomorphism)
+is a bijective ring homomorphism (AKA a ring isomorphism) and it restricts to a bijective group homomorphism (AKA a group isomorphism)
 \[
 f: (\ZZ/nm\ZZ)^* \rightarrow
 (\ZZ/n\ZZ)^* \times (\ZZ/m\ZZ)^*
@@ -3366,7 +3373,7 @@ x \equiv 2 \pmod{5}, \quad x \equiv 3 \pmod{7}.
 \]
 First, we solve the linear Diophantine equation
 \[
-7s + 5t \equiv 1
+7s + 5t = 1
 \]
 By previous methods, we find a solution $(s,t) = (3,-4)$.  Therefore we set
 \[
@@ -3411,7 +3418,7 @@ The last example is particularly interesting for us for what will come next.  No
 
 \subsection{Proof of the Euler Phi function formula}
 
-In a previous section, we left the proof of the Euler phi function's formula without proof.  Now, with the use of Chinese Remainder Theorem, we can prove it.  It comes down to the so-called \textbf{multiplicativity} of the Euler phi function. \KS{this was actually proven above when stating full CRT, reorganize}
+In a previous section, we stated the Euler phi function's formula without proof.  Now, with the use of Chinese Remainder Theorem, we can prove it.  It comes down to the so-called \textbf{multiplicativity} of the Euler phi function. \KS{this was actually proven above when stating full CRT, reorganize}
 
 \begin{theorem}
 Suppose that $\gcd(m,n)=1$.  Then $\varphi(nm) = \varphi(n)\varphi(m)$.
@@ -3422,7 +3429,7 @@ Suppose that $a \in \ZZ/nm\ZZ$.  Then $a$ is invertible modulo $nm$ if and only 
 \[
 ax \equiv 1 \pmod{m}, \quad ax \equiv 1 \pmod{n}
 \]
-has  solution.  This system will have a solution \emph{only if} $a$ is invertible modulo $n$ and modulo $m$.  But by the chinese remainder theorem, if the two equations individually have a solution, then the system does too.  So this system will have a solution if $a$ is invertible modulo $n$ and modulo $m$.
+has a solution.  This system will have a solution \emph{only if} $a$ is invertible modulo $n$ and modulo $m$.  But by the chinese remainder theorem, if the two equations individually have a solution, then the system does too.  So this system will have a solution if $a$ is invertible modulo $n$ and modulo $m$.
 
 Thus, we have shown that $a \pmod{nm}$ is invertible if and only if $a \pmod n$ and $a \pmod m$ are both invertible.  This shows that the chinese remainder theorem map $(a \pmod{nm}) \mapsto (a \pmod{n} , a \pmod{m})$ is a bijection 
 \[
@@ -3712,7 +3719,7 @@ In other words, $p$ divides that difference, but $q$ does not.  We don't have a 
 
 By the way, the idea of the turtle and hare as a way to find a cycle is called, by itself, \emph{Floyd's cycle finding algorithm}.  So Pollard's idea is to combine Floyd's cycle finding algorithm with Chinese remainder theorem.
 
-\subsubsection{Pollar's $p-1$ factoring method}
+\subsubsection{Pollard's $p-1$ factoring method}
 
 See the elliptic curve factoring section.\KS{fix}
 
@@ -3725,7 +3732,7 @@ Suppose that
 \[
 x^2 \equiv y^2 \pmod{n}, \quad x \not\equiv \pm y \pmod{n}.
 \]
-Then, be rearranging the first equation above,
+Then, by rearranging the first equation above,
 \[
 (x+y)(x-y) \equiv 0 \pmod{n},
 \]
@@ -3809,7 +3816,7 @@ The goal is to find a linear combination of these vectors which has only even en
 The remaining aspect of the quadratic sieve is how to find such relations.  Like for the index calculus, the second phase (using the relations found) is much easier than the first.   It is possible to approach this like the index calculus, and simply trial-division factor each square. 
  But it is costly to simply try to factor all those elements one-by-one in our factor base. If we can factor a large number of residues quickly, we can speed up the algorithm.  The method of doing so is called \textbf{sieving}.  Unfortunately, there isn't a sieving method for the index calculus.
 
- In order to sieve, 
+ In order to sieve, \todo{AI: this sentence is unfinished -- the quadratic sieve subsection ends here mid-thought.}
 
 \section{Finite Fields}
 \label{sec:finite-fields}
@@ -3929,7 +3936,7 @@ Here's a temporary addition and multiplication table for $\FF_2[x]/(x^2+x+1)$ (w
 	\begin{center}
 \includegraphics[width=0.7\textwidth]{curve-rainbow.png}
 	\end{center}
-	\caption{A variety of elliptic curves.  The rainbow colours vary with the coefficients $a,b,c$ of the Weiestrass equation $y^2 = x^3 + ax^2 + bx + c$}
+	\caption{A variety of elliptic curves.  The rainbow colours vary with the coefficients $a,b,c$ of the Weierstrass equation $y^2 = x^3 + ax^2 + bx + c$}
 \label{fig:ellcurve-rainbow}
 \end{figure}
 
@@ -3977,7 +3984,7 @@ In particular, the points $P = (0,2)$ and $Q = (2,4)$ used in the next example d
 
 For our purposes, an elliptic curve is an equation of the form $y^2 = x^3 + ax^2 + bx + c$ (this is called \textbf{Weierstrass form}).  Given an equation like this, we might be interested in the solutions, or \textbf{points} of the elliptic curve, over a particular field.  Over $\RR$, the points can be drawn with a graph, as in Figure~\ref{fig:ellcurve-eg}.
 
-One thing to notice about the graph is that there's a reflectional symmetry across the $x$-axis, thanks to the particular form the of the equation.  That is, if $(x,y)$ is a point, then so is $(x,-y)$.  This will be useful later.
+One thing to notice about the graph is that there's a reflectional symmetry across the $x$-axis, thanks to the particular form of the equation.  That is, if $(x,y)$ is a point, then so is $(x,-y)$.  This will be useful later.
 
 The other thing to notice about the curve is that when we intersect it with a line, we get three points, at least generically.  To see this, imagine combining a line $y = mx + n$ with the curve equation given above.  We would begin by substituting:
 \[
@@ -3996,7 +4003,7 @@ and this result is a cubic equation in $x$, which can have three solutions.  Ove
 However, there is a useful fact.
 
 \begin{fact}\label{fact:3pts}
-    If two points on the elliptic curve have coordinates in a field $F$ (for example, $F = \RR$ or $F = \CC$ or $F = \QQ$) lie on a non-vertical line $L$, then the line $L$ passes through exactly three points (the original two and one more), all with coordinates in $F$.
+    If two points on the elliptic curve with coordinates in a field $F$ (for example, $F = \RR$ or $F = \CC$ or $F = \QQ$) lie on a non-vertical line $L$, then the line $L$ passes through exactly three points (the original two and one more), all with coordinates in $F$.
 \end{fact}
 
 This fact allows us to create an \textbf{addition law} on the elliptic curve.  
@@ -4015,7 +4022,7 @@ The first thing we discover, as a consequence of our rules, is that:
     The points on any vertical line are $\infty$, $R$ and $-R$.
 \end{fact}
 
-This "fixes" Fact~\ref{fact:3pts} so that it's true for vertical lines also.  It also means that if we have $R$ and we want $-R$, we just need to draw a vertical line through $R$ and take the other intersection point.  By the symmetry we observed earlier, $R = (x,y)$, then $-R = (x,-y)$.
+This "fixes" Fact~\ref{fact:3pts} so that it's true for vertical lines also.  It also means that if we have $R$ and we want $-R$, we just need to draw a vertical line through $R$ and take the other intersection point.  By the symmetry we observed earlier, if $R = (x,y)$, then $-R = (x,-y)$.
 
 Now, suppose $P$, $Q$ and $R$ are points of the curve lying on a line.  Then, by our rules, $P+Q+R= \infty$, which means $R = -(P+Q)$.  Using the vertical line trick, we can get $P+Q$ from $R$.
 
@@ -4140,7 +4147,7 @@ Here's an example.  In $\PP^1_{\FF_5}$, we have the following elements (each ele
 &\{ [1,3], [2,1], [3,4], [4,2] \} \\
 &\{ [1,4], [2,3], [3,2], [4,1] \} 
 \end{align*}
-In other words, these are the six elements of $\PP^1_{\FF_5}$.  I write the vectors with square brackets to remind you we are using this equivalence relation and working in projective space, so when I write $[0,1]$ it is short form for the whole equivalent class listed in the first line above.  I can use any element of the equivalence class to denote the entire equivalence class.  In other words, it is perfectly meaningful and true to write
+In other words, these are the six elements of $\PP^1_{\FF_5}$.  I write the vectors with square brackets to remind you we are using this equivalence relation and working in projective space, so when I write $[0,1]$ it is short form for the whole equivalence class listed in the first line above.  I can use any element of the equivalence class to denote the entire equivalence class.  In other words, it is perfectly meaningful and true to write
 \[
 [0,1] = [0,2]
 \]
@@ -4220,7 +4227,7 @@ Let your inner destructive force emerge!
 
 Let $n = pq$ be an RSA modulus.  There is a factoring method of Pollard that works especially well when $p-1$ factors as a product of small primes, but $q-1$ does not.  It does not have to do with elliptic curves, but the elliptic curve method is based upon (in analogy to) this method.
 
-This is based on a common paradigm:  work modulo $n$, and you are working modulo $p$ and $q$ by the Chinese Remainder Theorem, although you cannot `see' this without knowing $p$ and $q$.  In this case, the algorithm is to compute a long sequence of powers of a residue $a$ modulo $m$:
+This is based on a common paradigm:  work modulo $n$, and you are working modulo $p$ and $q$ by the Chinese Remainder Theorem, although you cannot `see' this without knowing $p$ and $q$.  In this case, the algorithm is to compute a long sequence of powers of a residue $a$ modulo $n$:
 \begin{equation}
     \label{eqn:p-1seq}
 a \rightarrow a^2 
@@ -4235,7 +4242,7 @@ To compute this, we can first square, then cube, then raise to the fourth power,
 
 Behind the scenes, so to speak, the Chinese remainder theorem tells us that our arithmetic efforts are simultaneously reproduced modulo $p$ and modulo $q$.  Under the isomorphism of CRT,
 \[
-(\ZZ/n\ZZ)^* \cong (\ZZ/pZZ)^* \times (\ZZ/q\ZZ)^*, \quad a \mapsto (a_1,a_2).
+(\ZZ/n\ZZ)^* \cong (\ZZ/p\ZZ)^* \times (\ZZ/q\ZZ)^*, \quad a \mapsto (a_1,a_2).
 \]
 Note that in the map above, $a_1$ is just the residue of $a$ modulo $p$ and $a_2$ is just the residue of $a$ modulo $q$.
 Thus, there is an inaccessible isomorphic version of the sequence \eqref{eqn:p-1seq} above:
@@ -4302,10 +4309,10 @@ Choose an elliptic curve $E$ and point $P$ on $E$ modulo $n$.  An expedient way 
 
 We work on $E$ modulo $n$, but by CRT, since all our elliptic curve computations are modular arithmetic computations, this is `secretly' working on $E$ modulo $p$ and modulo $q$.  That is, a point $P =(x,y)$ on $E$ modulo $n$ maps to two points:
 \[
-P_1 = (x \pmod{p}, y \pmod{p}) \text{ on } E_1 \pmod{p}, \text{, and }
+P_1 = (x \pmod{p}, y \pmod{p}) \text{ on } E_1 \pmod{p}, \text{ and }
 P_2 = (x \pmod{q}, y \pmod{q}) \text{ on } E_2 \pmod{q}, 
 \]
-The curve $E_1$ and $E_2$ have the same equation as for $E$, just considered modulo $p$ and $q$ respectively.
+The curves $E_1$ and $E_2$ have the same equation as for $E$, just considered modulo $p$ and $q$ respectively.
 
 So, we compute a sequence of points on $E$ modulo $n$:
 \begin{equation}
@@ -4348,7 +4355,7 @@ gcd(d,n) = p.
 \]
 Thus, we simply try to compute $B!P$ and watch for a non-invertible element $d$; it will contain a common factor with $n$.
 
-\textbf{The algorithm:}  Compute the sequence \eqref{eqn:ecfactor}, until the algorithm fails because you try to invert something modulo $d$ which is not invertible.  (If doing this by hand, you'd be doing the extended euclidean algorithm to get an inverse modulo $n$ and get a gcd which is not $1$.)  Then that element will have a common factor with $n$, so compute $\gcd(d,n)$.  If you get $\gcd(d,n) = n$, you have failed and should re-start with another elliptic curve and point.
+\textbf{The algorithm:}  Compute the sequence \eqref{eqn:ecfactor}, until the algorithm fails because you try to invert something modulo $d$ which is not invertible.  (If doing this by hand, you'd be doing the extended euclidean algorithm to get an inverse modulo $n$ and get a gcd which is not $1$.)  Then that element will have a common factor with $n$, so compute $\gcd(d,n)$.  If you get $\gcd(d,n) = n$, you have failed and should re-start with another elliptic curve and point.  \todo{AI: the first sentence here reads oddly: it's the element $d$ being inverted \emph{modulo $n$} that fails (revealing a gcd), not inverting ``modulo $d$'' -- please rephrase.}
 
 \begin{example}
     Let's factor $n=18923$.  To find a random curve and point, it's actually easier to choose the point first!  Suppose we pick $P = (0,1)$.  Then we can look for a curve that has that point.  For example, we could start with $y^2 = x^3 + x + \cdots$ and fill in the constant term so that when we plug in $(0,1)$, it works.  That means we choose $y^2 = x^3 + x + 1$.  Now we compute the factorial multiples of $P$:
@@ -4463,7 +4470,7 @@ In what follows, it might help to observe that lowercase $a,b,k$ are integers an
 
 \subsubsection{Placing a message on a curve}
 
-In order to use the EC El Gamal protocol above, we need a way to put a point onto an elliptic curve.  We discuss a fairly simple way to do this here, although in practice \KS{add more}.
+In order to use the EC El Gamal protocol above, we need a way to put a message onto an elliptic curve.  We discuss a fairly simple way to do this here, although in practice \KS{add more}.
 
 Suppose our message $m$ is already turned into an integer.  We can block it into small parts to encrypt separately if it is too long.  We can take our message, append a small bit of padding (a predetermined number of bits, say), and then try to use it as an $x$-coordinate for a point on the curve.  To see if it is the $x$-coordinate of a valid point on the curve $y^2 = f(x)$, we need to plug it into $f(x)$ and see if the result is a square.  If so, then let $y = \sqrt{f(x)}$ (either of the two roots is fine), and we use $M = (x,y)$ as the "message" in the algorithm above.  If not, we can alter the padding and try again.
 
@@ -4590,9 +4597,9 @@ True randomness is hard to come by.  But we need it for cryptography:  for examp
 
 For many applications, it is sufficient that the result look fairly random.  For example, such algorithms are used to generate the position of cacti in the videogame Minecraft when the world is initialized.  As long as they are fairly randomly distributed, the game is perfectly playable.
 
-However, for a \textbf{cryptographic pseudo-random number generator}, the most important property of is that its outputs are \emph{not predictable}.  It is ok that they are in fact deterministic, if no adversary can guess the next output from known previous outputs.  The second most important property is that it can generate pseudo-random bits fairly quickly.
+However, for a \textbf{cryptographic pseudo-random number generator}, the most important property is that its outputs are \emph{not predictable}.  It is ok that they are in fact deterministic, if no adversary can guess the next output from known previous outputs.  The second most important property is that it can generate pseudo-random bits fairly quickly.
 
-The algorithm has an \textbf{internal state} $s_n$ which is updated as each time step.  For example, the RANDU algorithm used on mainframes in the 1960's and 70's has an update step of the form
+The algorithm has an \textbf{internal state} $s_n$ which is updated at each time step.  For example, the RANDU algorithm used on mainframes in the 1960's and 70's has an update step of the form
 \[
 s_{k+1} = 65539 s_k \pmod{2^{31}}.
 \]
@@ -4721,7 +4728,7 @@ In other words, a qubit's quantum state is a length one vector in the vector spa
 
 That's it -- a normalized complex linear combination of the two states.  (This is why you sometimes hear rather imprecise interpretations such as that a qubit can be `both $0$ and $1$ at the same time.')
 
-Physics tells us that multiplying a state by a complex vector of length $1$, like $e^{i\theta}$, produces another state which is physically indistinguishable from the first one.  (This factor is called a \emph{global phase}.)  So, mathematically, we should think of them as the same too.
+Physics tells us that multiplying a state by a complex number of length $1$, like $e^{i\theta}$, produces another state which is physically indistinguishable from the first one.  (This factor is called a \emph{global phase}.)  So, mathematically, we should think of them as the same too.
 
 
 
@@ -4834,7 +4841,7 @@ For the second state, $b/a = i$: this is exactly $|i\rangle$.  On the plane it i
 \end{aisolution}
 
 
-The six `corners' of the Bloch sphere, thought of as projective vectors, are labelled $| 0 \rangle$, $| 1 \rangle$, $| 1 \rangle$, $| -1 \rangle$ $| i \rangle$, and $| -i \rangle$, representing slopes of $0$, $\infty$, $1$, $-1$, $i$, and $-i$ respectively.  In physics language, these are written as
+The six `corners' of the Bloch sphere, thought of as projective vectors, are labelled $| 0 \rangle$, $| \infty \rangle$, $| 1 \rangle$, $| -1 \rangle$, $| i \rangle$, and $| -i \rangle$, representing slopes of $0$, $\infty$, $1$, $-1$, $i$, and $-i$ respectively.  In physics language, these are written as
 \[
 | 0 \rangle, | 1 \rangle, |+\rangle, |-\rangle, |i\rangle \text{ and } |-i \rangle
 \]
@@ -5042,7 +5049,7 @@ Write $|-\rangle$ as a linear combination of $|0\rangle$ and $|1\rangle$.
 
 \begin{solution}
 Because we are asking in terms of the basis $\zeroket$, $\oneket$, we can use the Bloch sphere.
-    We look on the Bloch sphere, and see that $|-\rangle$ lies at the equation, so that $\theta = \pi/2$, and is opposite $|+\rangle$, so that $\varphi = \pi$.  Plugging these into the Bloch sphere formula, we have
+    We look on the Bloch sphere, and see that $|-\rangle$ lies at the equator, so that $\theta = \pi/2$, and is opposite $|+\rangle$, so that $\varphi = \pi$.  Plugging these into the Bloch sphere formula, we have
     \[
      \cos(\theta/2) \zeroket
      + e^{i \varphi} \sin(\theta/2) \oneket
@@ -5076,9 +5083,9 @@ Write $|i\rangle$ as a linear combination of $|+\rangle$ and $|-\rangle$.
 		\[
 			\frac{1}{\sqrt{2}}\begin{pmatrix} 1 \\ i \end{pmatrix} =
 			a \frac{1}{\sqrt{2}}\begin{pmatrix} 1 \\ 1 \end{pmatrix} +
-			b \frac{1}{\sqrt{2}}\begin{pmatrix} 1 \\ -1 \end{pmatrix} =
+			b \frac{1}{\sqrt{2}}\begin{pmatrix} 1 \\ -1 \end{pmatrix}
 		\]
-		This is a linear system, 
+		This is a linear system,
 		\[
 			\frac{1}{\sqrt{2}}
 			\begin{pmatrix}
@@ -5296,11 +5303,11 @@ These bases have the following\footnote{I have ordered the bases so as to guaran
 \begin{align*}
 | \uparrow \rangle &= \frac{1}{\sqrt{2}} | \nearrow \rangle + \frac{1}{\sqrt{2}} | \nwarrow \rangle, \\
 | \rightarrow \rangle &= \frac{1}{\sqrt{2}} | \nearrow \rangle - \frac{1}{\sqrt{2}} | \nwarrow \rangle, \\
-| \nwarrow \rangle &= \frac{1}{\sqrt{2}} | \uparrow \rangle - \frac{1}{\sqrt{2}} | \rightarrow \rangle, \\\
+| \nwarrow \rangle &= \frac{1}{\sqrt{2}} | \uparrow \rangle - \frac{1}{\sqrt{2}} | \rightarrow \rangle, \\
 | \nearrow \rangle &= \frac{1}{\sqrt{2}} | \uparrow \rangle + \frac{1}{\sqrt{2}} | \rightarrow \rangle.
 \end{align*}
 (For example, we might identify the $L$ basis with $|0\rangle$, $|1 \rangle$ and the $V$ basis with $|+\rangle$, $|-\rangle$.\KS{check this})
-The really important thing about this setup is that if we measure either of the $L$ basis elements in the $V$ basis, we have a $50-50$ chance of obtaining $|\nwarrow\rangle$ or $|\nearrow\rangle$; and similarly for measuring $V$ basis elements in the $L$ basis.  The table below lists the complete the behaviour we obtain from this:
+The really important thing about this setup is that if we measure either of the $L$ basis elements in the $V$ basis, we have a $50-50$ chance of obtaining $|\nwarrow\rangle$ or $|\nearrow\rangle$; and similarly for measuring $V$ basis elements in the $L$ basis.  The table below lists the complete behaviour we obtain from this:
 \vspace{1em}
 
 \begin{center}
@@ -5420,7 +5427,7 @@ In order to detect Eve, Alice and Bob in Phase III will compare a small number o
 
 Thus, the security guarantee for this system depends on Phase III.  The level of confidence we can have that the quantum channel is secure depends on how many sample bits we compare.
 
-From the description above, if we assume Alice is using bases L and V randomly, then there is a 3/4 chance that she gets away with it, since she is only caught when she uses a mismatched bases (1/2 probability) and it affects Bob's bit (1/2 probability).  Thus each bit we check has a 3/4 chance of letting Alice get away with it.  But if we check $k$ bits, there's only a $(3/4)^k$ chance Alice gets away with it.  As $k$ increases, this probability decreases. Thus we tune $k$ to our required level of confidence.
+From the description above, if we assume Eve is using bases L and V randomly, then there is a 3/4 chance that she gets away with it, since she is only caught when she uses a mismatched basis (1/2 probability) and it affects Bob's bit (1/2 probability).  Thus each bit we check has a 3/4 chance of letting Eve get away with it.  But if we check $k$ bits, there's only a $(3/4)^k$ chance Eve gets away with it.  As $k$ increases, this probability decreases. Thus we tune $k$ to our required level of confidence.
 
 There are many many real-world considerations that get in the way of this nice mathematical system.  Some of them are:
 
@@ -5430,7 +5437,7 @@ There are many many real-world considerations that get in the way of this nice m
     \item Someone could shine a flashlight up the line to see what polarizer (basis) Bob is using.
     \item The system has some noise in it that must be accounted for.
     \item Eve may not eavesdrop throughout the entire Phase I, but only on some of the bits
-    \item Whether our bitstring must be entirely uncompromised or can allow for the leakage of a few bits depends on how it used after it is obtained.
+    \item Whether our bitstring must be entirely uncompromised or can allow for the leakage of a few bits depends on how it is used after it is obtained.
     \item etc.
 \end{enumerate}
 
@@ -5986,7 +5993,7 @@ There are some details missing, but in the end, it is possible to create a quant
 \]
 Note that here the first register is $n$ qubits, the second is $k$ qubits, and we are sometimes required to include some extra, or ancilla qubits to complete the task, shown here in a third register.  The mapping above doesn't tell us what the function does on inputs in which the second and third registers are not zero'ed out.  It is this freedom (to do other things on other inputs) that allows us to create a unitary (and in particular, reversible) transformation.
 
-This capabilities is a type of `massive parallelism': with one unitary transformation, we can `compute' $f(x)$ for all $2^n$ classical inputs simultaneously!  That is (ignoring the ancillary bits):
+This capability is a type of `massive parallelism': with one unitary transformation, we can `compute' $f(x)$ for all $2^n$ classical inputs simultaneously!  That is (ignoring the ancillary bits):
 \[
  U_f \left(
  \sum_{x \in \{0,1\}^n }
@@ -6209,7 +6216,7 @@ Another way to do this problem is to apply the CNOT rule to each classical state
 					\]
 					which is the state desired.  (You don't need to write the $\otimes$ in the middle, but it's common notation when we are separating qubits in a combined system.)
 
-					Another way to solve this problem is to find a $4 \times 4$ unitary gate which has first column consisting all of the same entry (say, all $1$'s up to normalization).   There are various ways one may do this, including for example:
+					Another way to solve this problem is to find a $4 \times 4$ unitary gate which has first column consisting of all the same entry (say, all $1$'s up to normalization).   There are various ways one may do this, including for example:
 					\[
 						\frac{1}{2}
 						\begin{pmatrix}
@@ -6331,8 +6338,7 @@ This is exactly the usual vector addition in $\CC^4$, which is why we regard the
 \end{example}
 % <<< END AI-GENERATED EXAMPLE <<<
 
-There is a very natural standard choice of basis for these functions, which, written as vectors, looks just like the usual standard basis.  That is, $f_i$ is the function which is $1$ at $i$ and $0$ everywhere else.  Explicitly, 
-There is a very natural standard choice of basis for these functions, which, written as vectors, looks just like the usual standard basis.  That is, $f_i$ is the function which is $1$ at $i$ and $0$ everywhere else.  Explicitly, 
+There is a very natural standard choice of basis for these functions, which, written as vectors, looks just like the usual standard basis.  That is, $f_i$ is the function which is $1$ at $i$ and $0$ everywhere else.  Explicitly,
 \[
 f_i(x) = \left\{
 \begin{array}{ll}
@@ -6552,7 +6558,7 @@ This has the form
  \]
 and it will have peaks when $\theta$ is near $2\pi \ZZ$, i.e. $y$ is near $\frac{m}{r} \ZZ$.
 
-In other words, the output state will tend to be measured near $\frac{m}{r}$ for some $m$, i.e. multiples of the frequency $1/r$.
+In other words, the output state will tend to be measured near $s\frac{m}{r}$ for some $s$, i.e. multiples of the frequency $1/r$.
 The offset $\ell$ is absorbed into the phase of the output state, not the magnitude of the amplitudes, so it won't be picked up by measurements.
 
 
@@ -6723,7 +6729,7 @@ We wish to factor $N = pq$, where $p$ and $q$ are prime.  In this case, finding 
 
 \subsubsection{From factoring to period finding}
 
-Shor's algorithm is based on a now-familiar principle of factoring.  We seek a `surprise square root' of $1$, i.e. an $x$ such that $x^2 \equiv 1 \pmod{N}$ but $x \not\equiv \pm \pmod{N}$.  Then taking $\gcd(x \pm 1,N)$ gives a proper factor.
+Shor's algorithm is based on a now-familiar principle of factoring.  We seek a `surprise square root' of $1$, i.e. an $x$ such that $x^2 \equiv 1 \pmod{N}$ but $x \not\equiv \pm 1 \pmod{N}$.  Then taking $\gcd(x \pm 1,N)$ gives a proper factor.
 
 To motivate our method for discovering this square root, let's do an example with $N=15$ so that $\varphi(N) = 8$.  The following table shows powers of $\alpha$ for various example $\alpha \in \ZZ/N\ZZ$.
 
@@ -6744,7 +6750,7 @@ The lesson we've learned is that if we can find the order of $\alpha$ modulo $N$
 
 \begin{enumerate}
     \item \textbf{Classical step:}  Take a random $\alpha \in \ZZ/N\ZZ$.  (Check that $\gcd(\alpha,N) = 1$.  If not, you have found a proper factor of $N$.)
-    \item \textbf{Quantum step:}  Find the multiplicative order of $r$, which is also known as the period of the function $f(x) = \alpha^x$ taking values in $\ZZ/N\ZZ$.
+    \item \textbf{Quantum step:}  Find the multiplicative order $r$ of $\alpha$, which is also known as the period of the function $f(x) = \alpha^x$ taking values in $\ZZ/N\ZZ$.
     \item \textbf{Classical step:}  Check if $r$ is even, and $\alpha^{r/2} \not\equiv \pm 1 \pmod{N}$.  If not, return to first step.
     \item \textbf{Classical step:}  Compute $\gcd(\alpha^{r/2}-1,N)$, which is a proper factor of $N$.
 \end{enumerate}
@@ -6785,7 +6791,7 @@ The first step \eqref{shor:QFT1} creates a superposition in the first register o
 \]
 i.e. counting up through all $m$ binary strings of length $m_0$.
 
-The second step \eqref{eqn:Uf} evaluates the classically evaluatable function $f(x)$ taking the first register as input and storing the second result in the second register.  As an example, if $f(x) = x+1$, it might look like
+The second step \eqref{shor:Uf} evaluates the classically evaluatable function $f(x)$ taking the first register as input and storing the result in the second register.  As an example, if $f(x) = x+1$, it might look like
 \begin{multline*}
  \frac{1}{\sqrt{m}}
      \sum_{x=0}^{m-1} | \vec{x} \rangle | \vec{f(x)} \rangle  =
@@ -6820,7 +6826,7 @@ The final problem is to recover $r$ from a value $y$ close to $sm/r$.  Note that
  \[ 
  \left| \frac{c}{r} - \frac{y}{m} \right| 
  \]
- is small.  More specifically, we want to find such rational numbers were $r$ is small.
+ is small.  More specifically, we want to find such rational numbers where $r$ is small.
 
  Fortunately, there's a special theory available just for this purpose, which is the theory of continued fractions.
 
@@ -6860,7 +6866,7 @@ The final problem is to recover $r$ from a value $y$ close to $sm/r$.  Note that
  Here are the truncations of $7/9$:
  \[
  0 , \frac{1}{ 1}
- , 0 + \frac{1}{7 + \frac{1}{ 3 }} 
+ , 0 + \frac{1}{1 + \frac{1}{ 3 }}
  \]
  Each of these can be simplified into a rational number:
   \[
@@ -6877,11 +6883,11 @@ The final problem is to recover $r$ from a value $y$ close to $sm/r$.  Note that
  f(x) = 2^x \pmod{7}.
  \]
 
- For this, let's initialize the quantum computer with two registers of two qubits each:
+ For this, let's initialize the quantum computer with two registers of three qubits each:
  \[
  | 000\rangle |000 \rangle.
  \]
- The $8 \times 8$ QFT is give by the matrix:
+ The $8 \times 8$ QFT is given by the matrix:
 	\[
 					F_8 = \frac{1}{\sqrt{8}}
 					\begin{pmatrix}
@@ -6939,7 +6945,7 @@ So, the entire state changes to
  |111\rangle |010\rangle \right).
  \]
  We computed this by simply deleting the other states and renormalizing.
- Now we perform the QFT on the first qubit.  The state above is the vector $(0,1,0,0,1,0,0,1)$.  We apply the QFT matrix:
+ Now we perform the QFT on the first register.  The state above is the vector $(0,1,0,0,1,0,0,1)$.  We apply the QFT matrix:
  	\begin{align*}
 					\frac{1}{\sqrt{8}}
 					\begin{pmatrix}
@@ -6987,11 +6993,11 @@ So, the entire state changes to
  f(x) = 2^x \pmod{5}.
  \]
 
- For this, let's initialize the quantum computer with two registers of two qubits each:
+ For this, let's initialize the quantum computer with two registers of three qubits each:
  \[
  | 000\rangle |000 \rangle.
  \]
- The $8 \times 8$ QFT is give by the matrix:
+ The $8 \times 8$ QFT is given by the matrix:
 	\[
 					F_8 = \frac{1}{\sqrt{8}}
 					\begin{pmatrix}
@@ -7106,7 +7112,7 @@ First, we try $\alpha = 27$.  Suppose when we make the final measurement in the 
 	\[
 		0, 0 + \frac{1}{6} = \frac{1}{6}, 0 + \frac{1}{ 6 + \frac{1}{10} } = \frac{10}{61}, \frac{21}{128}.
 	\]
-	The possibilities for $r$ are therefore $r=1$, $r=6$ and $r=61$ and $r=128$.  We need $r$ to be even, so we should probably try $r=6$.
+	The possibilities for $r$ are therefore $r=1$, $r=6$, $r=61$ and $r=128$.  We need $r$ to be even, so we should probably try $r=6$.
 
 	Since $27^{r/2} \equiv 27^3 \equiv 170 \pmod{247}$, we try
 	\[
@@ -7136,17 +7142,17 @@ First, we try $\alpha = 27$.  Suppose when we make the final measurement in the 
 \item Draw the state $\frac{i}{2} \zeroket + \frac{\sqrt{3}}{2} \oneket$ on the Bloch sphere.
 
 \begin{solution}
-To place a state on the Bloch sphere, we need to normalize it (by a global scaling factor) so that its first entry (the coefficient of $\zeroket$ is a positive real number.  Since it is currently $i/2$, we can do this by multiplying the entire state by $i^{-1} = -i$.  That is, we get
+To place a state on the Bloch sphere, we need to normalize it (by a global scaling factor) so that its first entry (the coefficient of $\zeroket$) is a positive real number.  Since it is currently $i/2$, we can do this by multiplying the entire state by $i^{-1} = -i$.  That is, we get
 \[
 -i \left( \frac{i}{2} \zeroket + \frac{\sqrt{3}}{2} \oneket \right)
-= \frac{1}{2} \zeroket - \frac{\sqrt{3i}}{2} \oneket.
+= \frac{1}{2} \zeroket - \frac{\sqrt{3}i}{2} \oneket.
 \]
 We need to solve for $\theta$ and $\varphi$ in the Bloch sphere coordinates:
 \[
 \cos\left( \frac{\theta}{2} \right) \zeroket
 + e^{i \varphi}
 \sin\left( \frac{\theta}{2} \right) \oneket =
-\frac{1}{2} \zeroket - \frac{\sqrt{3i}}{2} \oneket.
+\frac{1}{2} \zeroket - \frac{\sqrt{3}i}{2} \oneket.
 \]
 The solution to $\cos(\theta/2) = 1/2$ is $\theta= 2\pi/3$.  This has $\sin(\theta/2) = \sqrt{3}/2$.  Therefore, $e^{i\varphi} = -i$, which is solved by $\varphi = 3\pi/2$.
 
@@ -7156,8 +7162,8 @@ The solution to $\cos(\theta/2) = 1/2$ is $\theta= 2\pi/3$.  This has $\sin(\the
 \end{solution}
 
 \item Determine the expression for $| i \rangle$ in terms of the basis $\zeroket$, $\oneket$.  To do this, use the Bloch sphere (find $|i \rangle$ on the picture of the sphere and figure out the angles needed).
-\item Determine the expression for $| i \rangle$ in terms of the basis $\plusket$, $\minusket$.  To do this, use linear algebra, knowing already how to write $i\rangle$, $\plusket$ and $\minusket$ in terms of $\zeroket$ and $\oneket$.
-\item If $| i \rangle$ is measured in the basis $\plusket$, $\minusket$, what the probabilities and outcomes?  (use the last problem)
+\item Determine the expression for $| i \rangle$ in terms of the basis $\plusket$, $\minusket$.  To do this, use linear algebra, knowing already how to write $|i\rangle$, $\plusket$ and $\minusket$ in terms of $\zeroket$ and $\oneket$.
+\item If $| i \rangle$ is measured in the basis $\plusket$, $\minusket$, what are the probabilities and outcomes?  (use the last problem)
 \item Consider the following state:
 \[
 |\psi \rangle =
@@ -7262,7 +7268,7 @@ Outcomes:  If we measure $\zeroket$, then the state collapses to $\zeroket$.  If
     \item Be able to do QKD, e.g. play the role of Alice or Bob.
     \item Here is a quantum state in superposition.  What is the resulting state if I measure the second register?
     \[
-    \frac{1}{\sqrt{m}} \sum_{i=0}^{m-1} |x\rangle |f(x) \rangle.
+    \frac{1}{\sqrt{m}} \sum_{x=0}^{m-1} |x\rangle |f(x) \rangle.
     \]
     \item Compute the continued fraction expansion of $171/1024$, and the good approximations.
     % [0, 1/5, 1/6, 85/509, 171/1024]
@@ -7363,7 +7369,7 @@ Note here that the fraction of dot products is a scalar multiple, so we are taki
 Let us now describe lattice reduction in two dimensions.  Suppose we begin with a basis $\mathbf{v}_1$, $\mathbf{v}_2$.
 \begin{enumerate}
 \item Reorder the basis if necessary so that $||\mathbf{v}_1|| \le ||\mathbf{v}_2||$.
-\item We would like to replace $\mathbf{v}_2$ with $\mathbf{v}_2^*$ (to obtain a new basis $\mathbf{v}_1$, $\mathbf{v}_2^*$ which is `more perpendicular' to $\mathbf{v}_1$.  We might try $\mathbf{v}_2^* = \operatorname{oproj}_{\mathbf{v}_1}(\mathbf{v}_2)$, but the scalar multiple of $\mathbf{v}$ must be in the lattice, in order to obtain a new basis for the same lattice, and this is not guaranteed by the formula for projection.  Instead, we let
+\item We would like to replace $\mathbf{v}_2$ with $\mathbf{v}_2^*$ (to obtain a new basis $\mathbf{v}_1$, $\mathbf{v}_2^*$ which is `more perpendicular' to $\mathbf{v}_1$).  We might try $\mathbf{v}_2^* = \operatorname{oproj}_{\mathbf{v}_1}(\mathbf{v}_2)$, but the scalar multiple of $\mathbf{v}$ must be in the lattice, in order to obtain a new basis for the same lattice, and this is not guaranteed by the formula for projection.  Instead, we let
 \[
 \mathbf{v}_2^* := \mathbf{v}_2 - \left[ \frac{ \mathbf{v}_1 \cdot \mathbf{v}_2 }{ \mathbf{v}_1 \cdot \mathbf{v}_1 } \right] \mathbf{v}_1.
 \]
@@ -7462,7 +7468,7 @@ We should double-check the determinant is still correct:
 \textbf{Iteration 2}.  The squared lengths of the two vectors are $314$ (from before) and $2^2 + 5^2 = 29$.  Clearly the second is the shorter, so we will reorder to write:
 \[
 \mathbf{v}_1 = \begin{pmatrix} 2 \\ 5 \end{pmatrix}, 
-\mathbf{v}_2* = \begin{pmatrix} 17 \\ 5 \end{pmatrix}.
+\mathbf{v}_2 = \begin{pmatrix} 17 \\ 5 \end{pmatrix}.
 \]
 Then, as before, we compute $\mathbf{v}_2^*$:
 \[
@@ -7610,7 +7616,7 @@ The public key is $A, b:= As + e \in \FF_p^k$.
 \subsubsection{Simple example}
 
 \begin{enumerate}
-    \item Let's let $p=7$, $n=2$, $m=3$.  
+    \item Let's let $p=7$, $n=2$, $k=3$.
     \item Suppose Alice wishes to send the message bit $1$.
     \item Bob chooses random private key $s = \begin{pmatrix}1\\4\end{pmatrix} \in \FF_7^2$.
     \item Bob chooses random \textbf{small} error vector $e = \begin{pmatrix} -1 \\ 0 \\ 1 \end{pmatrix} \in \FF_7^3$.
@@ -7628,7 +7634,7 @@ The public key is $A, b:= As + e \in \FF_p^k$.
     \item Alice sends $(d,c)$ to Bob.
     \item Bob computes his version of the mask $ds = \begin{pmatrix} 5 & 6 \end{pmatrix} \begin{pmatrix} 1 \\ 4 \end{pmatrix} = 1$.
     \item Bob subtracts the mask from the ciphertext: $c-ds = 4 - 1 = 3$.
-    \item Bob find that this is closer to $(p-1)/2$ than to $0$ on the mod $7$ ``cycle" so he rounds this to recover the message bit, i.e. $1$.
+    \item Bob finds that this is closer to $(p-1)/2$ than to $0$ on the mod $7$ ``cycle" so he rounds this to recover the message bit, i.e. $1$.
 \end{enumerate}
 
 
@@ -7654,19 +7660,19 @@ Some observations on this problem:
     \item In high dimensions, the volume of this small region is exponentially large.
 \end{enumerate}
 
-\textbf{The Search Learning-with-Errors Problem}.  Suppose we are given a $k \times n$ matrix $A$ with entries in $\FF_p$, such that $k > n$, and a vector $\mathbf{b} \in \FF_p^k$, such that $A \mathbf{s} = \mathbf{b} + \mathbf{e}$ for some $\mathbf{s} \in \FF_p^n$ and $\mathbf{e} \in \FF_p^n$ with small entries.  Find $\mathbf{s}$.
+\textbf{The Search Learning-with-Errors Problem}.  Suppose we are given a $k \times n$ matrix $A$ with entries in $\FF_p$, such that $k > n$, and a vector $\mathbf{b} \in \FF_p^k$, such that $A \mathbf{s} = \mathbf{b} + \mathbf{e}$ for some $\mathbf{s} \in \FF_p^n$ and $\mathbf{e} \in \FF_p^n$ with small entries.  Find $\mathbf{s}$.  \todo{AI: should $\mathbf{e}$ live in $\FF_p^k$ rather than $\FF_p^n$?  $A\mathbf{s}$ and $\mathbf{b}$ are length $k$.  Same question in the decisional variant below.}
 
 There is also a decisional variant.
 
 \textbf{The Decision Learning-with-Errors Problem}.  Suppose we are (repeatedly) given a $k \times n$ matrix $A$ with entries in $\FF_p$, such that $k > n$, and a vector $\mathbf{b} \in \FF_p^k$, such that either (a) $A \mathbf{s} = \mathbf{b} + \mathbf{e}$ for some $\mathbf{s} \in \FF_p^n$ and $\mathbf{e} \in \FF_p^n$ with small entries, or (b) $A$ and $\mathbf{b}$ are unrelated and uniformly random.   Be able to determine, under repeated trials, with probability significantly greater than $1/2$, which of these is the case (i.e. whether $\mathbf{s}$ exists for each pair $(A, \mathbf{b})$).
 
-In fact, there are reductions both direction between certain precise versions of Learning with Errors and the standard lattice problems like SVP.
+In fact, there are reductions in both directions between certain precise versions of Learning with Errors and the standard lattice problems like SVP.
 
 
 Some ways we might na\"ively attack this problem:
 \begin{enumerate}
 \item Search for $\mathbf{s}$ exhaustively.  The secret $\mathbf{s}$ could be any vector in $\FF_p^n$, i.e. there are $p^n$ possibilities.
-\item Search for $\mathbf{e}$ exhaustively; for each possibility for $\mathbf{e}$, check if the system is consistent (i.e. there exists a solution $\mathbf{s}$).  Since $k > n$, for most choices of $\mathbf{e}$, there is likely no solution to this overdetermined system.  There are $k^n$ possibilities for $\mathbf{e}$, where $k$ is the number of possibilities for each entry.  For example, if `small' means entries from $\{ -1, 0, 1 \}$, then we will have $3^n$ possibilities.  This is still exponential in the dimension.
+\item Search for $\mathbf{e}$ exhaustively; for each possibility for $\mathbf{e}$, check if the system is consistent (i.e. there exists a solution $\mathbf{s}$).  Since $k > n$, for most choices of $\mathbf{e}$, there is likely no solution to this overdetermined system.  There are $k^n$ possibilities for $\mathbf{e}$, where $k$ is the number of possibilities for each entry.  For example, if `small' means entries from $\{ -1, 0, 1 \}$, then we will have $3^n$ possibilities.  This is still exponential in the dimension.  \todo{AI: this count reuses $k$ (already the number of rows of $A$), and since $\mathbf{e}$ has $k$ entries, $c$ choices per entry gives $c^k$ -- neither $k^n$ nor the $3^n$ matches.  Please pick consistent letters.}
 \end{enumerate}
 
 There are other attacks on this problem, including reductions to the more standard lattice problems.  For example, if we consider the lattice
@@ -7721,7 +7727,7 @@ Key exchange proceeds as follows:
 \item Bob creates and shares a public key:
 \begin{enumerate}
 \item Bob creates a private key $b \in R_p$ which is small and random.
-\item Bob creates a public key $(g, B = gb + e)$ where $g \in R_p$ is random and $e_1$ is an error (small and random).
+\item Bob creates a public key $(g, B = gb + e_1)$ where $g \in R_p$ is random and $e_1$ is an error (small and random).
 \end{enumerate}
 \item Alice encrypts using Bob's public key:
 \begin{enumerate}
@@ -7732,7 +7738,7 @@ Key exchange proceeds as follows:
 C = Bk + e_3 + m\ell
 \]
 where $Bk+e_3$ plays the role of a shared Diffie-Hellman-like key which masks the message $m\ell$ (we'll see in a moment why $m$ is stored as a multiple of $\ell$).
-\item Alice sends $(K,c)$ as the encrypted message.
+\item Alice sends $(K,C)$ as the encrypted message.
 \end{enumerate}
 \item Bob decrypts Alice's message using his private key:
 \begin{enumerate}
@@ -7767,7 +7773,7 @@ In particular,
 \[
 R_p = \FF_p[x]/(x^4+1),
 \]
-whose elements looks like polynomials in $x$ with degree at most $3$ and coefficients modulo $p$.
+whose elements look like polynomials in $x$ with degree at most $3$ and coefficients modulo $p$.
 
 For this example, the meaning of small will be coefficients from $\{1,0,-1\}$.  Therefore, the small elements of $R_p$ are
 \[
@@ -7807,7 +7813,7 @@ e_2 = x^2
 Ephemeral public key:
 \begin{align*}
 	K &= gk + e_2 = 27x^3 + 75x^2 + 6x + 5 \end{align*}
-\item Create error for us in ciphertext:
+\item Create error for use in ciphertext:
 \[
 e_3 = 100x^2 + x
 \]
@@ -7952,6 +7958,7 @@ For example, the next proposition states that a linear code's minimum distance c
     \[
     d(\mathcal{C}) = \{ wt(u) : u \in \mathcal{C}, u \neq 0\}.
     \]
+    \todo{AI: missing $\min$ -- as written this equates a number to a set.}
 \end{proposition}
 
 This means that instead of comparing all possible pairs of codewords to find the minimum distance, we need only look at the individual codewords themselves.
@@ -7963,7 +7970,7 @@ Consider this code in the vector space $\FF_2^4$:
 \]
 We will adopt the convention of writing vectors as strings (without the parentheses and commas) to save space.
 
-This is a linear code.  This can be checked adding the vectors in all possible pairs to check they remain in the code\footnote{Another way to see this is to observe that $\mathbf{C}$ is exactly all the strings satisfying the linear conditions $v_1 = v_4$, $v_2+v_3+v_4 = 0$.}.
+This is a linear code.  This can be checked by adding the vectors in all possible pairs to check they remain in the code\footnote{Another way to see this is to observe that $\mathbf{C}$ is exactly all the strings satisfying the linear conditions $v_1 = v_4$, $v_2+v_3+v_4 = 0$.}.
 \end{example}
 
 \subsubsection{Cosets}
@@ -8034,8 +8041,9 @@ Cosets have some very nice properties.
                           & & $= (xG_1+e)P^{-1}$ \\
                           & & $= xSG+e'$ \\
                           & & Decode $y$ to get $x_1 = xSG$ \\
-                          & & Compute $x = x_0 S^{-1}$ 
+                          & & Compute $x = x_0 S^{-1}$
       \end{tabular}
+      \todo{AI: variable mixups in this table: the message is introduced as $m$ but encryption/decryption use $x$ (undefined); $e$ and $y_1$ should live in $\FF_p^n$ (ciphertext length), not $\FF_p^k$; ``Decode $y$'' should decode $y_1$; and $x_0$ is undefined (presumably decode $y_1$ to the codeword $x_1 = xSG$, recover $xS$, then $x = (xS)S^{-1}$).}
       \vspace{3em}
 
 \subsection{Review Problems for Codes}
