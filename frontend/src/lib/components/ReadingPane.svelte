@@ -27,6 +27,7 @@
   import { chatStore } from '../stores/chatStore.js';
   import { builtinApplets } from '../builtinApplets.js';
   import { bespokeDemos } from '../bespokeDemos.js';
+  import { wireRefPreviews } from '../refPreviews.js';
   import { mountEditableCell } from '../sageCell.js';
   import { mountDesmosCalculator } from '../desmos.js';
   import { mountGeoGebra } from '../geogebra.js';
@@ -89,6 +90,7 @@
     hydrateChapterContent(n);
     injectBuiltinApplets();
     injectBespokeDemos();
+    wireRefPreviews(containerEl, n);
     if (scrollTo) {
       const el = document.getElementById(scrollTo);
       if (el) el.scrollIntoView({ block: 'start' });
@@ -274,6 +276,12 @@
       title.textContent = app.title;
       bar.appendChild(caret);
       bar.appendChild(title);
+      // Same "AI-created" pill the bespoke tools carry (author request).
+      const aiTag = document.createElement('span');
+      aiTag.className = 'bespoke-ai-tag in-bar';
+      aiTag.title = 'This interactive applet was created by AI.';
+      aiTag.textContent = '✦ AI-created';
+      bar.appendChild(aiTag);
       const host = document.createElement('div');
       host.className = 'applet-host';
       // Reserve the applet's height up front with a loading placeholder, so
@@ -326,7 +334,20 @@
       a.replaceWith(host);
       const mount = bespokeDemos[name];
       if (mount) {
-        try { mount(host); }
+        try {
+          mount(host);
+          // Fold-out tools carry an "AI-created" pill in their DemoShell bar;
+          // the figure demos (hover-highlight squares, wheel, …) have no shell,
+          // so label those here (author request: every AI-made interactive
+          // must say so).
+          if (!host.querySelector('.ai-tag')) {
+            const tag = document.createElement('span');
+            tag.className = 'bespoke-ai-tag';
+            tag.title = 'This interactive figure was created by AI.';
+            tag.textContent = '✦ AI-created';
+            host.appendChild(tag);
+          }
+        }
         catch (err) { host.textContent = `Could not load demo “${name}”.`; }
       } else {
         host.textContent = `[unknown demo: ${name}]`;
