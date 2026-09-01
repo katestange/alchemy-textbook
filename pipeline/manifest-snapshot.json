@@ -1,7 +1,7 @@
 {
- "total_blocks": 1001,
- "total_sections": 155,
- "duplicate_hash_groups": 4,
+ "total_blocks": 1048,
+ "total_sections": 159,
+ "duplicate_hash_groups": 6,
  "chapters": {
   "1": {
    "aisolution": 16,
@@ -13,20 +13,19 @@
    "theorem": 1
   },
   "2": {
-   "aisolution": 17,
-   "checkin": 20,
-   "corollary": 1,
-   "definition": 10,
+   "aisolution": 16,
+   "checkin": 23,
+   "definition": 12,
    "example": 3,
-   "paragraph": 177,
+   "paragraph": 218,
    "philosophy": 1,
    "problem": 2,
    "proof": 7,
    "proposition": 4,
    "question": 1,
    "remark": 1,
-   "solution": 6,
-   "theorem": 6
+   "solution": 7,
+   "theorem": 8
   },
   "3": {
    "aisolution": 1,
