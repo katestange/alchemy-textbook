@@ -8,7 +8,9 @@
 #                                diffs automatically (new ERRORS still abort)
 #
 # What it does, in order:
-#   1. rebuilds the web textbook from textbook_source/ (~5-7 minutes)
+#   1. rebuilds the web textbook from textbook_source/ (~3 minutes; longer
+#      when figures changed or the figure cache is cold — see
+#      pipeline/figure-cache/README.md)
 #   2. runs all regression gates (LaTeXML errors, math-parse warnings,
 #      structural snapshot)
 #   3. NEW ERRORS -> aborts, nothing committed (fix the LaTeX first)
@@ -57,7 +59,7 @@ fi
 
 # --- build + gates -----------------------------------------------------------
 echo
-echo "===== building and checking (~5-7 minutes) ====="
+echo "===== building and checking (~3 minutes; longer if figures changed) ====="
 CHECK_OUT="$(mktemp)"
 trap 'rm -f "$CHECK_OUT"' EXIT
 CHECK_RC=0
@@ -100,6 +102,9 @@ fi
 echo
 echo "===== committing ====="
 git add textbook_source/
+# Newly rendered figure fragments (pipeline/figures.py) ride along so other
+# checkouts and CI reuse them instead of re-rendering (~40s/figure).
+git add pipeline/figure-cache/
 if [ "$BASELINES_TOUCHED" -eq 1 ]; then
     git add pipeline/error-baseline.txt pipeline/warning-baseline.txt pipeline/manifest-snapshot.json
 fi

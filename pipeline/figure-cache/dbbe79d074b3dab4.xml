@@ -1,0 +1,101 @@
+<picture xmlns="http://dlmf.nist.gov/LaTeXML" xmlns:svg="http://www.w3.org/2000/svg" height="62.15" tex="\hbox to236.02pt{\vbox to44.92pt{\pgfpicture\makeatletter\raise-22.4587pt\hbox%&#10;{\hskip 5.08301pt\lower-32.51802pt\hbox to 0.0pt{\pgfsys@beginscope%&#10;\pgfsys@invoke{ }\definecolor{pgfstrokecolor}{rgb}{0,0,0}%&#10;\pgfsys@color@rgb@stroke{0}{0}{0}\pgfsys@invoke{ }\pgfsys@color@rgb@fill{0}{0}%&#10;{0}\pgfsys@invoke{ }\pgfsys@setlinewidth{0.4pt}\pgfsys@invoke{ }\nullfont\hbox&#10;to%&#10; 0.0pt{\pgfsys@beginscope\pgfsys@invoke{ }\pgfsys@setlinewidth{0.8pt}%&#10;\pgfsys@invoke{ }&#10;{{}}\hbox{\hbox{{\pgfsys@beginscope\pgfsys@invoke{ }{{}{}{{&#10;{}{}}}{&#10;{}{}}&#10;{{}{{}}}{{}{}}{}{{}{}}&#10;{&#10;}{{{{}}\pgfsys@beginscope\pgfsys@invoke{ }\pgfsys@transformcm{1.0}{0.0}{0.0}{1%&#10;.0}{-1.75pt}{-2.25555pt}\pgfsys@invoke{ }\hbox{{\definecolor{pgfstrokecolor}{%&#10;rgb}{0,0,0}\pgfsys@color@rgb@stroke{0}{0}{0}\pgfsys@invoke{ }%&#10;\pgfsys@color@rgb@fill{0}{0}{0}\pgfsys@invoke{ }\hbox{{\scriptsize$1$}}&#10;}}\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope}}}&#10;\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope}}}&#10;{{}}\hbox{\hbox{{\pgfsys@beginscope\pgfsys@invoke{ }{{}{}{{&#10;{}{}}}{&#10;{}{}}&#10;{{}{{}}}{{}{}}{}{{}{}}&#10;{&#10;}{{{{}}\pgfsys@beginscope\pgfsys@invoke{ }\pgfsys@transformcm{1.0}{0.0}{0.0}{1%&#10;.0}{40.92914pt}{-2.25555pt}\pgfsys@invoke{ }\hbox{{\definecolor{pgfstrokecolor%&#10;}{rgb}{0,0,0}\pgfsys@color@rgb@stroke{0}{0}{0}\pgfsys@invoke{ }%&#10;\pgfsys@color@rgb@fill{0}{0}{0}\pgfsys@invoke{ }\hbox{{\scriptsize$2$}}&#10;}}\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope}}}&#10;\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope}}}&#10;{{}}\hbox{\hbox{{\pgfsys@beginscope\pgfsys@invoke{ }{{}{}{{&#10;{}{}}}{&#10;{}{}}&#10;{{}{{}}}{{}{}}{}{{}{}}&#10;{&#10;}{{{{}}\pgfsys@beginscope\pgfsys@invoke{ }\pgfsys@transformcm{1.0}{0.0}{0.0}{1%&#10;.0}{83.60828pt}{-2.25555pt}\pgfsys@invoke{ }\hbox{{\definecolor{pgfstrokecolor%&#10;}{rgb}{0,0,0}\pgfsys@color@rgb@stroke{0}{0}{0}\pgfsys@invoke{ }%&#10;\pgfsys@color@rgb@fill{0}{0}{0}\pgfsys@invoke{ }\hbox{{\scriptsize$3$}}&#10;}}\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope}}}&#10;\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope}}}&#10;{{}}\hbox{\hbox{{\pgfsys@beginscope\pgfsys@invoke{ }{{}{}{{&#10;{}{}}}{&#10;{}{}}&#10;{{}{{}}}{{}{}}{}{{}{}}&#10;{&#10;}{{{{}}\pgfsys@beginscope\pgfsys@invoke{ }\pgfsys@transformcm{1.0}{0.0}{0.0}{1%&#10;.0}{126.28741pt}{-2.25555pt}\pgfsys@invoke{ }\hbox{{\definecolor{%&#10;pgfstrokecolor}{rgb}{0,0,0}\pgfsys@color@rgb@stroke{0}{0}{0}\pgfsys@invoke{ }%&#10;\pgfsys@color@rgb@fill{0}{0}{0}\pgfsys@invoke{ }\hbox{{\scriptsize$4$}}&#10;}}\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope}}}&#10;\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope}}}&#10;{{}}\hbox{\hbox{{\pgfsys@beginscope\pgfsys@invoke{ }{{}{}{{&#10;{}{}}}{&#10;{}{}}&#10;{{}{{}}}{{}{}}{}{{}{}}&#10;{&#10;}{{{{}}\pgfsys@beginscope\pgfsys@invoke{ }\pgfsys@transformcm{1.0}{0.0}{0.0}{1%&#10;.0}{168.96655pt}{-2.25555pt}\pgfsys@invoke{ }\hbox{{\definecolor{%&#10;pgfstrokecolor}{rgb}{0,0,0}\pgfsys@color@rgb@stroke{0}{0}{0}\pgfsys@invoke{ }%&#10;\pgfsys@color@rgb@fill{0}{0}{0}\pgfsys@invoke{ }\hbox{{\scriptsize$5$}}&#10;}}\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope}}}&#10;\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope}}}&#10;{{}}\hbox{\hbox{{\pgfsys@beginscope\pgfsys@invoke{ }{{}{}{{&#10;{}{}}}{&#10;{}{}}&#10;{{}{{}}}{{}{}}{}{{}{}}&#10;{&#10;}{{{{}}\pgfsys@beginscope\pgfsys@invoke{ }\pgfsys@transformcm{1.0}{0.0}{0.0}{1%&#10;.0}{211.64569pt}{-2.25555pt}\pgfsys@invoke{ }\hbox{{\definecolor{%&#10;pgfstrokecolor}{rgb}{0,0,0}\pgfsys@color@rgb@stroke{0}{0}{0}\pgfsys@invoke{ }%&#10;\pgfsys@color@rgb@fill{0}{0}{0}\pgfsys@invoke{ }\hbox{{\scriptsize$6$}}&#10;}}\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope}}}&#10;\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope}}}&#10;{&#10;{}{}{}}{}\hbox{\hbox{{\pgfsys@beginscope\pgfsys@invoke{ }{&#10;{}{}{}}{}&#10;{{}{{}{}}{}}{{}{{}{}}{}}{{}{}}{{}}&#10;{{}{{}{}}{}}{{{}}{{}}}{{}}{{}{{}{}}{}}{{{}}{{}}}{&#10;{}{}{}}{}{{}}{{{{{}}{&#10;{}{}}{}{}{{}{}}}}}{{}}{}{{{{{{}}{&#10;{}{}}{}{}{{}{}}}}}{}{}{}{}}{}{{&#10;{{}}&#10;{\pgfsys@beginscope&#10;\pgfsys@setdash{}{0.0pt}\pgfsys@miterjoin{}&#10;{}{}{}&#10;{}&#10;{}{}{}&#10;\pgfsys@moveto{4.60002pt}{0.0pt}\pgfsys@curveto{4.03513pt}{0.1386pt}{1.55199pt%&#10;}{0.92393pt}{0.0pt}{1.77858pt}\pgfsys@lineto{0.0pt}{-1.77858pt}\pgfsys@curveto%&#10;{1.55199pt}{-0.92393pt}{4.03513pt}{-0.1386pt}{4.60002pt}{0.0pt}%&#10;\pgfsys@closepath\pgfsys@fillstroke\pgfsys@endscope}}&#10;}{}{}{{}}{}{}{{}}\pgfsys@moveto{7.53085pt}{-5.27295pt}\pgfsys@curveto{17.13658%&#10;pt}{-11.99936pt}{17.13658pt}{11.99936pt}{12.60951pt}{8.82932pt}\pgfsys@stroke%&#10;\pgfsys@invoke{ }{{}{{}}{}{}{{}}{{{}}{{{}}{\pgfsys@beginscope\pgfsys@invoke{ }%&#10;\pgfsys@transformcm{-0.81914}{-0.57361}{0.57361}{-0.81914}{12.60953pt}{8.82933%&#10;pt}\pgfsys@invoke{ }\pgfsys@invoke{    \lxSVG@closescope  }\pgfsys@invoke{%&#10;\lxSVG@closescope }\pgfsys@endscope}}{{}}}}&#10;\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope}}}&#10;{&#10;{}{}{}}{}\hbox{\hbox{{\pgfsys@beginscope\pgfsys@invoke{ }{&#10;{}{}{}}{}&#10;{{}{{}{}}{}}{{}{{}{}}{}}{{}{}}{{}}&#10;{{}{{}{}}{}}{{{}}{{}}}{{}}{{}{{}{}}{}}{{{}}{{}}}{&#10;{}{}{}}{}{{}}{{{{{}}{&#10;{}{}}{}{}{{}{}}}}}{{}}{}{{{{{{}}{&#10;{}{}}{}{}{{}{}}}}}{}{}{}{}}{}{}{}{}{{}}{}{}{{}}\pgfsys@moveto{50.20999pt}{-5.2%&#10;7295pt}\pgfsys@curveto{59.81572pt}{-11.99936pt}{59.81572pt}{11.99936pt}{55.288%&#10;65pt}{8.82932pt}\pgfsys@stroke\pgfsys@invoke{ }{{}{{}}{}{}{{}}{{{}}{{{}}{%&#10;\pgfsys@beginscope\pgfsys@invoke{ }\pgfsys@transformcm{-0.81914}{-0.57361}{0.5%&#10;7361}{-0.81914}{55.28867pt}{8.82933pt}\pgfsys@invoke{ }\pgfsys@invoke{    %&#10;\lxSVG@closescope  }\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope}}{{}}}}&#10;\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope}}}&#10;{&#10;{}{}{}}{}\hbox{\hbox{{\pgfsys@beginscope\pgfsys@invoke{ }{&#10;{}{}{}}{}&#10;{{}{{}{}}{}}{{}{{}{}}{}}{{}{}}{{}}&#10;{{}{{}{}}{}}{{{}}{{}}}{{}}{{}{{}{}}{}}{{{}}{{}}}{&#10;{}{}{}}{}{{}}{{{{{}}{&#10;{}{}}{}{}{{}{}}}}}{{}}{}{{{{{{}}{&#10;{}{}}{}{}{{}{}}}}}{}{}{}{}}{}{}{}{}{{}}{}{}{{}}\pgfsys@moveto{92.88913pt}{-5.2%&#10;7295pt}\pgfsys@curveto{102.49486pt}{-11.99936pt}{102.49486pt}{11.99936pt}{97.9%&#10;6779pt}{8.82932pt}\pgfsys@stroke\pgfsys@invoke{ }{{}{{}}{}{}{{}}{{{}}{{{}}{%&#10;\pgfsys@beginscope\pgfsys@invoke{ }\pgfsys@transformcm{-0.81914}{-0.57361}{0.5%&#10;7361}{-0.81914}{97.9678pt}{8.82933pt}\pgfsys@invoke{ }\pgfsys@invoke{    %&#10;\lxSVG@closescope  }\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope}}{{}}}}&#10;\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope}}}&#10;{&#10;{}{}{}}{}\hbox{\hbox{{\pgfsys@beginscope\pgfsys@invoke{ }{&#10;{}{}{}}{}&#10;{{}{{}{}}{}}{{}{{}{}}{}}{{}{}}{{}}&#10;{{}{{}{}}{}}{{{}}{{}}}{{}}{{}{{}{}}{}}{{{}}{{}}}{&#10;{}{}{}}{}{{}}{{{{{}}{&#10;{}{}}{}{}{{}{}}}}}{{}}{}{{{{{{}}{&#10;{}{}}{}{}{{}{}}}}}{}{}{}{}}{}{}{}{}{{}}{}{}{{}}\pgfsys@moveto{135.56827pt}{-5.%&#10;27295pt}\pgfsys@curveto{145.174pt}{-11.99936pt}{145.174pt}{11.99936pt}{140.646%&#10;93pt}{8.82932pt}\pgfsys@stroke\pgfsys@invoke{ }{{}{{}}{}{}{{}}{{{}}{{{}}{%&#10;\pgfsys@beginscope\pgfsys@invoke{ }\pgfsys@transformcm{-0.81914}{-0.57361}{0.5%&#10;7361}{-0.81914}{140.64694pt}{8.82933pt}\pgfsys@invoke{ }\pgfsys@invoke{    %&#10;\lxSVG@closescope  }\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope}}{{}}}}&#10;\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope}}}&#10;{&#10;{}{}{}}{}\hbox{\hbox{{\pgfsys@beginscope\pgfsys@invoke{ }{&#10;{}{}{}}{}&#10;{{}{{}{}}{}}{{}{{}{}}{}}{{}{}}{{}}&#10;{{}{{}{}}{}}{{{}}{{}}}{{}}{{}{{}{}}{}}{{{}}{{}}}{&#10;{}{}{}}{}{{}}{{{{{}}{&#10;{}{}}{}{}{{}{}}}}}{{}}{}{{{{{{}}{&#10;{}{}}{}{}{{}{}}}}}{}{}{}{}}{}{}{}{}{{}}{}{}{{}}\pgfsys@moveto{178.2474pt}{-5.2%&#10;7295pt}\pgfsys@curveto{187.85313pt}{-11.99936pt}{187.85313pt}{11.99936pt}{183.%&#10;32607pt}{8.82932pt}\pgfsys@stroke\pgfsys@invoke{ }{{}{{}}{}{}{{}}{{{}}{{{}}{%&#10;\pgfsys@beginscope\pgfsys@invoke{ }\pgfsys@transformcm{-0.81914}{-0.57361}{0.5%&#10;7361}{-0.81914}{183.32608pt}{8.82933pt}\pgfsys@invoke{ }\pgfsys@invoke{    %&#10;\lxSVG@closescope  }\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope}}{{}}}}&#10;\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope}}}&#10;{&#10;{}{}{}}{}\hbox{\hbox{{\pgfsys@beginscope\pgfsys@invoke{ }{&#10;{}{}{}}{}&#10;{{}{{}{}}{}}{{}{{}{}}{}}{{}{}}{{}}&#10;{{}{{}{}}{}}{{{}}{{}}}{{}}{{}{{}{}}{}}{{{}}{{}}}{&#10;{}{}{}}{}{{}}{{{{{}}{&#10;{}{}}{}{}{{}{}}}}}{{}}{}{{{{{{}}{&#10;{}{}}{}{}{{}{}}}}}{}{}{}{}}{}{}{}{}{{}}{}{}{{}}\pgfsys@moveto{220.92654pt}{-5.%&#10;27295pt}\pgfsys@curveto{230.53227pt}{-11.99936pt}{230.53227pt}{11.99936pt}{226%&#10;.0052pt}{8.82932pt}\pgfsys@stroke\pgfsys@invoke{ }{{}{{}}{}{}{{}}{{{}}{{{}}{%&#10;\pgfsys@beginscope\pgfsys@invoke{ }\pgfsys@transformcm{-0.81914}{-0.57361}{0.5%&#10;7361}{-0.81914}{226.00522pt}{8.82933pt}\pgfsys@invoke{ }\pgfsys@invoke{    %&#10;\lxSVG@closescope  }\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope}}{{}}}}&#10;\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope}}}&#10;{{}}\hbox{\hbox{{\pgfsys@beginscope\pgfsys@invoke{ }{{}{}{{&#10;{}{}}}{&#10;{}{}}&#10;{{}{{}}}{{}{}}{}{{}{}}&#10;{&#10;}{{{{}}\pgfsys@beginscope\pgfsys@invoke{ }\pgfsys@transformcm{1.0}{0.0}{0.0}{1%&#10;.0}{80.58676pt}{-26.68501pt}\pgfsys@invoke{ }\hbox{{\definecolor{%&#10;pgfstrokecolor}{rgb}{0,0,0}\pgfsys@color@rgb@stroke{0}{0}{0}\pgfsys@invoke{ }%&#10;\pgfsys@color@rgb@fill{0}{0}{0}\pgfsys@invoke{ }\hbox{{$\times 1\pmod{7}$}}&#10;}}\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope}}}&#10;\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope}}}&#10;\pgfsys@invoke{\lxSVG@closescope }\pgfsys@endscope{{&#10;{}{}{}{}{}}}{}{}\hss}\pgfsys@discardpath\pgfsys@invoke{\lxSVG@closescope }%&#10;\pgfsys@endscope\hss}}\lxSVG@closescope\endpgfpicture}}" width="326.57" xml:id="p1.pic1">
+      <svg:svg height="62.15" overflow="visible" version="1.1" width="326.57">
+        <svg:g color="#000000" fill="#000000" stroke="#000000" stroke-width="0.8pt" transform="translate(0,62.15) matrix(1 0 0 -1 0 0) translate(0,-31.08) translate(7.03,0) translate(0,45)">
+          <svg:g fill="#000000" stroke="#000000" transform="matrix(1.0 0.0 0.0 1.0 -2.42 -3.12)">
+            <svg:foreignObject height="6.24" overflow="visible" transform="matrix(1 0 0 -1 0 16.6)" width="4.84"><Math mode="inline" tex="1" text="1" xml:id="p1.pic1.m1">
+                <XMath>
+                  <XMTok fontsize="70%" meaning="1" role="NUMBER">1</XMTok>
+                </XMath>
+              </Math></svg:foreignObject>
+          </svg:g>
+          <svg:g fill="#000000" stroke="#000000" transform="matrix(1.0 0.0 0.0 1.0 56.63 -3.12)">
+            <svg:foreignObject height="6.24" overflow="visible" transform="matrix(1 0 0 -1 0 16.6)" width="4.84"><Math mode="inline" tex="2" text="2" xml:id="p1.pic1.m2">
+                <XMath>
+                  <XMTok fontsize="70%" meaning="2" role="NUMBER">2</XMTok>
+                </XMath>
+              </Math></svg:foreignObject>
+          </svg:g>
+          <svg:g fill="#000000" stroke="#000000" transform="matrix(1.0 0.0 0.0 1.0 115.69 -3.12)">
+            <svg:foreignObject height="6.24" overflow="visible" transform="matrix(1 0 0 -1 0 16.6)" width="4.84"><Math mode="inline" tex="3" text="3" xml:id="p1.pic1.m3">
+                <XMath>
+                  <XMTok fontsize="70%" meaning="3" role="NUMBER">3</XMTok>
+                </XMath>
+              </Math></svg:foreignObject>
+          </svg:g>
+          <svg:g fill="#000000" stroke="#000000" transform="matrix(1.0 0.0 0.0 1.0 174.74 -3.12)">
+            <svg:foreignObject height="6.24" overflow="visible" transform="matrix(1 0 0 -1 0 16.6)" width="4.84"><Math mode="inline" tex="4" text="4" xml:id="p1.pic1.m4">
+                <XMath>
+                  <XMTok fontsize="70%" meaning="4" role="NUMBER">4</XMTok>
+                </XMath>
+              </Math></svg:foreignObject>
+          </svg:g>
+          <svg:g fill="#000000" stroke="#000000" transform="matrix(1.0 0.0 0.0 1.0 233.8 -3.12)">
+            <svg:foreignObject height="6.24" overflow="visible" transform="matrix(1 0 0 -1 0 16.6)" width="4.84"><Math mode="inline" tex="5" text="5" xml:id="p1.pic1.m5">
+                <XMath>
+                  <XMTok fontsize="70%" meaning="5" role="NUMBER">5</XMTok>
+                </XMath>
+              </Math></svg:foreignObject>
+          </svg:g>
+          <svg:g fill="#000000" stroke="#000000" transform="matrix(1.0 0.0 0.0 1.0 292.85 -3.12)">
+            <svg:foreignObject height="6.24" overflow="visible" transform="matrix(1 0 0 -1 0 16.6)" width="4.84"><Math mode="inline" tex="6" text="6" xml:id="p1.pic1.m6">
+                <XMath>
+                  <XMTok fontsize="70%" meaning="6" role="NUMBER">6</XMTok>
+                </XMath>
+              </Math></svg:foreignObject>
+          </svg:g>
+          <svg:path d="M 10.42 -7.3 C 23.71 -16.6 23.71 16.6 17.45 12.22" style="fill:none" />
+          <svg:g stroke-dasharray="none" stroke-dashoffset="0.0pt" stroke-linejoin="miter" transform="matrix(-0.81914 -0.57361 0.57361 -0.81914 17.45 12.22)">
+            <svg:path d="M 6.37 0 C 5.58 0.19 2.15 1.28 0 2.46 L 0 -2.46 C 2.15 -1.28 5.58 -0.19 6.37 0 Z" />
+          </svg:g>
+          <svg:path d="M 69.48 -7.3 C 82.77 -16.6 82.77 16.6 76.5 12.22" style="fill:none" />
+          <svg:g stroke-dasharray="none" stroke-dashoffset="0.0pt" stroke-linejoin="miter" transform="matrix(-0.81914 -0.57361 0.57361 -0.81914 76.5 12.22)">
+            <svg:path d="M 6.37 0 C 5.58 0.19 2.15 1.28 0 2.46 L 0 -2.46 C 2.15 -1.28 5.58 -0.19 6.37 0 Z" />
+          </svg:g>
+          <svg:path d="M 128.53 -7.3 C 141.82 -16.6 141.82 16.6 135.56 12.22" style="fill:none" />
+          <svg:g stroke-dasharray="none" stroke-dashoffset="0.0pt" stroke-linejoin="miter" transform="matrix(-0.81914 -0.57361 0.57361 -0.81914 135.56 12.22)">
+            <svg:path d="M 6.37 0 C 5.58 0.19 2.15 1.28 0 2.46 L 0 -2.46 C 2.15 -1.28 5.58 -0.19 6.37 0 Z" />
+          </svg:g>
+          <svg:path d="M 187.59 -7.3 C 200.88 -16.6 200.88 16.6 194.61 12.22" style="fill:none" />
+          <svg:g stroke-dasharray="none" stroke-dashoffset="0.0pt" stroke-linejoin="miter" transform="matrix(-0.81914 -0.57361 0.57361 -0.81914 194.61 12.22)">
+            <svg:path d="M 6.37 0 C 5.58 0.19 2.15 1.28 0 2.46 L 0 -2.46 C 2.15 -1.28 5.58 -0.19 6.37 0 Z" />
+          </svg:g>
+          <svg:path d="M 246.64 -7.3 C 259.93 -16.6 259.93 16.6 253.67 12.22" style="fill:none" />
+          <svg:g stroke-dasharray="none" stroke-dashoffset="0.0pt" stroke-linejoin="miter" transform="matrix(-0.81914 -0.57361 0.57361 -0.81914 253.67 12.22)">
+            <svg:path d="M 6.37 0 C 5.58 0.19 2.15 1.28 0 2.46 L 0 -2.46 C 2.15 -1.28 5.58 -0.19 6.37 0 Z" />
+          </svg:g>
+          <svg:path d="M 305.7 -7.3 C 318.99 -16.6 318.99 16.6 312.72 12.22" style="fill:none" />
+          <svg:g stroke-dasharray="none" stroke-dashoffset="0.0pt" stroke-linejoin="miter" transform="matrix(-0.81914 -0.57361 0.57361 -0.81914 312.72 12.22)">
+            <svg:path d="M 6.37 0 C 5.58 0.19 2.15 1.28 0 2.46 L 0 -2.46 C 2.15 -1.28 5.58 -0.19 6.37 0 Z" />
+          </svg:g>
+          <svg:g fill="#000000" stroke="#000000" transform="matrix(1.0 0.0 0.0 1.0 111.51 -36.92)">
+            <svg:foreignObject height="13.84" overflow="visible" transform="matrix(1 0 0 -1 0 16.6)" width="72.26"><Math mode="inline" tex="\times 1\pmod{7}" text="absent * annotated@(1, pmod@(7))" xml:id="p1.pic1.m7">
+                <XMath>
+                  <XMApp>
+                    <XMTok meaning="times" role="MULOP">×</XMTok>
+                    <XMTok meaning="absent" />
+                    <XMApp>
+                      <XMTok meaning="annotated" />
+                      <XMTok meaning="1" role="NUMBER">1</XMTok>
+                      <XMDual role="MODIFIER">
+                        <XMApp role="MODIFIER">
+                          <XMTok name="pmod" role="UNKNOWN" />
+                          <XMRef idref="p1.pic1.m7.1" />
+                        </XMApp>
+                        <XMWrap>
+                          <XMTok lpadding="5.6pt" role="OPEN" stretchy="false">(</XMTok>
+                          <XMApp xml:id="p1.pic1.m7.2">
+                            <XMTok role="BIGOP" scriptpos="post">mod</XMTok>
+                            <XMTok meaning="7" role="NUMBER" xml:id="p1.pic1.m7.1">7</XMTok>
+                          </XMApp>
+                          <XMTok role="CLOSE" stretchy="false">)</XMTok>
+                        </XMWrap>
+                      </XMDual>
+                    </XMApp>
+                  </XMApp>
+                </XMath>
+              </Math></svg:foreignObject>
+          </svg:g>
+        </svg:g>
+      </svg:svg>
+    </picture>
+  

@@ -40,6 +40,17 @@ echo "===== [1/5] pre-process ====="
 python3 pipeline/preprocess.py
 
 echo
+echo "===== [1b] figure cache (pipeline/figures.py) ====="
+# Replaces each tikzpicture in book-clean.tex with a marker, rendering any
+# figure not already in pipeline/figure-cache/ standalone (parallel latexml
+# runs).  The cached <picture> fragments are spliced back into book.xml right
+# after step 2, so everything downstream sees an identical document.  This is
+# what keeps the main latexml run to ~2 min instead of ~14: LaTeXML spends
+# ~40s interpreting each tikzpicture.  FIGURE_CACHE=off restores the old
+# all-inline behavior (and is the first thing to try if a figure looks wrong).
+python3 pipeline/figures.py substitute
+
+echo
 echo "===== [2/5] latexml -> semantic XML ====="
 # --path (book.toml [source] images) lets latexml resolve \includegraphics
 # files and records that search path in book.xml, so latexmlpost can copy
@@ -49,18 +60,28 @@ echo "===== [2/5] latexml -> semantic XML ====="
 # Error:-level messages occur* (check.sh gates on those via the log);
 # nonzero only on fatal problems (1) or timeout (124).  So any nonzero
 # exit is fatal here -- no need to tolerate a "nonzero on warnings" case.
+# With the figure cache (step 1b) the measured run is ~2 min; the cap keeps
+# headroom for FIGURE_CACHE=off builds, where LaTeXML interprets every
+# tikzpicture inline (~40s each, ~14 min measured 2026-08).
 start=$SECONDS
 latexml_status=0
-timeout 600 latexml --dest=build/book.xml --path="$IMAGES_PATH" build/book-clean.tex \
+# build/figure-dummies holds the 1x1 pngs the figure-cache markers point at
+# (step 1b); the extra --path lets latexml resolve them without warnings.
+mkdir -p build/figure-dummies
+timeout 1800 latexml --dest=build/book.xml --path="$IMAGES_PATH" \
+    --path=build/figure-dummies build/book-clean.tex \
     > build/latexml.log 2>&1 || latexml_status=$?
 if [ "$latexml_status" -ne 0 ]; then
-    [ "$latexml_status" -eq 124 ] && echo "FATAL: latexml timed out after 600s" \
+    [ "$latexml_status" -eq 124 ] && echo "FATAL: latexml timed out after 1800s" \
                                   || echo "FATAL: latexml exited with status $latexml_status"
     echo "  see build/latexml.log (a partially written book.xml, if any, is not trusted)"
     exit 1
 fi
 [ -s build/book.xml ] || { echo "FATAL: book.xml not produced — see build/latexml.log"; exit 1; }
 echo "  book.xml: $(du -h build/book.xml | cut -f1)  in $((SECONDS-start))s"
+# Splice the cached figure fragments back in (and replay their logged
+# LaTeXML messages into latexml.log) before anything reads book.xml.
+python3 pipeline/figures.py splice
 echo "  latexml errors: $(grep -c '^Error:' build/latexml.log)   warnings: $(grep -c '^Warning:' build/latexml.log)"
 
 echo
