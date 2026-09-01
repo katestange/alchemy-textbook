@@ -95,6 +95,13 @@ def main() -> int:
             tmap = own if target == "" else fragmap.get(Path(target).stem, {})
             return f'href="{target}#{tmap.get(frag, frag)}"'
         text = HREF_RE.sub(fix_href, text)
+
+        # LaTeXML emits \ast (e.g. the ^* in $(\ZZ/n\ZZ)^*$) as an ASCII
+        # asterisk <mo>*</mo>, which the reader's Garamond-Math draws as a
+        # tiny raised dot at superscript size (author feedback).  U+2217
+        # ASTERISK OPERATOR is the correct MathML operator and renders at
+        # the size print readers expect.
+        text = text.replace(">*</mo>", ">∗</mo>")
         path.write_text(text, encoding="utf-8")
 
     # ---- chapters.json -----------------------------------------------------

@@ -66,6 +66,17 @@ SUBSTITUTIONS = [
     # mention NiceTabular.  \2 keeps begin/end as matched.
     (r"(?m)^([^%\n]*?)\\(begin|end)\{NiceTabular\}", r"\1\\\2{tabular}",
      "map NiceTabular env -> tabular", 2, None),
+    # LaTeXML 0.8.7 renders tikz `baseline=(current bounding box.center)` as
+    # a translate(0,-height/2) INSIDE the SVG canvas, shoving the drawing's
+    # lower half out of its box and over the following text (the 2.4.x
+    # dynamical portraits).  In print the option only center-aligns
+    # side-by-side pictures on the text line; dropping it for the web build
+    # keeps every drawing inside its canvas (figures then sit on the text
+    # baseline, which reads fine).  min_count=0: it's cosmetic, so a source
+    # without the option is not an error.
+    (r"(?m)^([^%\n]*?),[ \t]*baseline=\(current bounding box\.center\)",
+     r"\1", "drop tikz baseline=(...center) (LaTeXML shifts content out of canvas)",
+     0, None),
 ]
 
 

@@ -312,6 +312,17 @@ button {
 .reading-pane .ltx_page_content :is(img, table, .ltx_picture, .ltx_tabular) {
   max-width: 100%;
 }
+/* Text inside TikZ figures (svg foreignObject). LaTeXML computes each
+   label's box and position for its default rendering context (16px font,
+   normal line-height); the reader's 1.15rem/1.6 body text inherited into
+   the svg made every label render larger and lower than the drawn arrows,
+   circles, and slashes expect (author screenshot: sieve cross-outs riding
+   high above their numbers). Pin figure text to the calibrated metrics --
+   the font family still inherits, so labels stay in the book's face. */
+.ltx_picture foreignObject {
+  font-size: 16px;
+  line-height: normal;
+}
 /* Displayed math stays within the column width. Only math that is GENUINELY
    wider than the column gets a horizontal scrollbar (added as .math-scroll by
    wireWideMath in ReadingPane) -- a blanket overflow-x:auto produced 1-2px
