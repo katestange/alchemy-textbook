@@ -338,7 +338,7 @@
 
     <svg bind:this={svgEl} viewBox="0 0 {W} {H}" role="img"
          aria-label="Graph of f and g with draggable constants M and C"
-         class:dragging={!!drag}
+         class:dragging={!!drag} class:ok
          on:pointermove={moveDrag} on:pointerup={endDrag} on:pointercancel={endDrag} on:lostpointercapture={endDrag}>
       <defs>
         <clipPath id="bigoh-clip">
@@ -362,7 +362,7 @@
       {#if ready}
         <g clip-path="url(#bigoh-clip)">
           <!-- the part of the axis that matters: x > M -->
-          <rect class="beyond" x={sx(M)} y={PAD.t} width={Math.max(0, sx(xmax) - sx(M))} height={plotH} />
+          <rect class="beyond" class:ok x={sx(M)} y={PAD.t} width={Math.max(0, sx(xmax) - sx(M))} height={plotH} />
           <!-- the tube |y| <= C·big(x), x > M -->
           <path class="tube" class:ok d={tubePath} />
           <path class="tube-edge" class:ok d={tubeEdge} />
@@ -379,7 +379,7 @@
 
         <!-- M handle: a vertical line with a grip on the axis -->
         <g class="handle m" on:pointerdown={(e) => startDrag('M', e)}>
-          <line class="m-line" x1={sx(M)} x2={sx(M)} y1={PAD.t} y2={H - PAD.b} />
+          <line class="m-line" class:ok x1={sx(M)} x2={sx(M)} y1={PAD.t} y2={H - PAD.b} />
           <rect class="hit" x={sx(M) - 9} y={PAD.t} width="18" height={plotH + 14} />
           <circle class="grip" cx={sx(M)} cy={H - PAD.b} r="7" />
           <text class="handle-label" x={sx(M)} y={H - PAD.b + 30}>M = {fmt(M)}</text>
@@ -469,17 +469,22 @@
         background: var(--color-bg, #f4ecd8); border: 1px solid var(--color-rule, #d9c9a3);
         touch-action: none; user-select: none; }
   svg.dragging { cursor: grabbing; }
+  svg.ok { border-color: var(--accent-green, #5b6f3a); border-width: 2px;
+           box-shadow: 0 0 0 4px var(--wash-green, #e6ecda), 0 0 18px 2px var(--accent-green, #5b6f3a);
+           transition: border-color 0.3s, box-shadow 0.3s; }
   .grid { stroke: var(--color-rule, #d9c9a3); stroke-width: 0.6; stroke-dasharray: 2 4; }
   .axis { stroke: var(--color-ink-soft, #55493a); stroke-width: 1; }
   .tick { font-size: 10px; fill: var(--color-ink-soft, #55493a); }
   .tick.y { text-anchor: end; }
   .tick.x { text-anchor: middle; }
   .axis-name { font-size: 12px; font-style: italic; text-anchor: end; fill: var(--color-ink-soft, #55493a); }
-  .beyond { fill: var(--color-ink, #2b2117); opacity: 0.045; }
-  .tube { fill: var(--accent-teal, #2b6b66); opacity: 0.14; transition: fill 0.2s, opacity 0.2s; }
-  .tube.ok { fill: var(--accent-green, #5b6f3a); opacity: 0.26; }
-  .tube-edge { fill: none; stroke: var(--accent-teal, #2b6b66); stroke-width: 1.4; stroke-dasharray: 6 4; opacity: 0.8; }
-  .tube-edge.ok { stroke: var(--accent-green, #5b6f3a); }
+  .beyond { fill: var(--color-ink, #2b2117); opacity: 0.045; transition: fill 0.3s, opacity 0.3s; }
+  .beyond.ok { fill: var(--accent-green, #5b6f3a); opacity: 0.16; }
+  .tube { fill: var(--accent-grey, #55524c); opacity: 0.13; transition: fill 0.3s, opacity 0.3s; }
+  .tube.ok { fill: var(--accent-green, #5b6f3a); opacity: 0.6; }
+  .tube-edge { fill: none; stroke: var(--accent-grey, #55524c); stroke-width: 1.4; stroke-dasharray: 6 4; opacity: 0.9;
+               transition: stroke 0.3s, stroke-width 0.3s; }
+  .tube-edge.ok { stroke: var(--accent-green, #5b6f3a); stroke-width: 3; stroke-dasharray: none; opacity: 1; }
   .curve { fill: none; stroke-width: 2.2; stroke-linejoin: round; }
   .curve.f { stroke: var(--accent-red, #a23c3c); }
   .curve.g { stroke: var(--accent-teal, #2b6b66); }
@@ -494,12 +499,15 @@
   .handle .hit { fill: transparent; }
   .handle .grip { fill: var(--color-bg-raised, #ede2c8); stroke: var(--accent-gold, #a97917); stroke-width: 2.2; }
   .handle:hover .grip { fill: var(--accent-gold, #a97917); }
-  .handle.c .grip { stroke: var(--accent-teal, #2b6b66); }
-  .handle.c:hover .grip { fill: var(--accent-teal, #2b6b66); }
-  .m-line { stroke: var(--accent-gold, #a97917); stroke-width: 1.6; stroke-dasharray: 5 3; }
+  .handle.c .grip { stroke: var(--accent-grey, #55524c); }
+  .handle.c:hover .grip { fill: var(--accent-grey, #55524c); }
+  svg.ok .handle.c .grip { stroke: var(--accent-green, #5b6f3a); }
+  svg.ok .handle-label.c { fill: var(--accent-green, #5b6f3a); }
+  .m-line { stroke: var(--accent-gold, #a97917); stroke-width: 1.6; stroke-dasharray: 5 3; transition: stroke 0.3s; }
+  .m-line.ok { stroke: var(--accent-green, #5b6f3a); stroke-width: 2.4; }
   .handle-label { font-size: 11px; text-anchor: middle; fill: var(--color-ink, #2b2117); paint-order: stroke;
                   stroke: var(--color-bg, #f4ecd8); stroke-width: 3; pointer-events: none; }
-  .handle-label.c { fill: var(--accent-teal, #2b6b66); }
+  .handle-label.c { fill: var(--accent-grey, #55524c); }
 
   .sliders { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem 1.5rem; }
   .sliders label { display: flex; flex-direction: column; gap: 0.15rem; font-size: 0.9rem;
@@ -512,10 +520,13 @@
   .status { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem;
             padding: 0.6rem 0.9rem; border-radius: 8px; border: 1px solid var(--color-rule, #d9c9a3);
             background: var(--wash-grey, #e7e5e0); transition: background 0.25s, border-color 0.25s; }
-  .status.ok { background: var(--wash-green, #e6ecda); border-color: var(--accent-green, #5b6f3a); }
+  .status.ok { background: var(--wash-green, #e6ecda); border: 2px solid var(--accent-green, #5b6f3a);
+               box-shadow: 0 0 14px var(--wash-green, #e6ecda); }
   .lamp { display: inline-flex; align-items: baseline; gap: 0.35rem; font-size: 1.35rem; font-style: italic;
           color: var(--color-ink-soft, #55493a); opacity: 0.55; transition: opacity 0.25s, color 0.25s; }
-  .lamp.ok { opacity: 1; color: var(--accent-green, #5b6f3a); }
+  .lamp.ok { opacity: 1; color: var(--accent-green, #5b6f3a); font-weight: 700; font-size: 1.6rem;
+             animation: bigoh-pop 0.45s ease-out; }
+  @keyframes bigoh-pop { 0% { transform: scale(0.85); } 60% { transform: scale(1.12); } 100% { transform: scale(1); } }
   .tick-mark { font-style: normal; font-weight: 700; }
   .q { font-style: normal; }
   .status-text { flex: 1 1 16rem; font-size: 0.88rem; color: var(--color-ink-soft, #55493a); }
