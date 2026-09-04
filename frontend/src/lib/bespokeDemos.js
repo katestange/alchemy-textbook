@@ -26,6 +26,7 @@ import FrequencyTool from './demos/FrequencyTool.svelte';
 import OtpTool from './demos/OtpTool.svelte';
 import CryptogramTool from './demos/CryptogramTool.svelte';
 import EnigmaTool from './demos/EnigmaTool.svelte';
+import BigOhTool from './demos/BigOhTool.svelte';
 
 const make = (Component, props = {}) => (host) => new Component({ target: host, props });
 
@@ -48,5 +49,6 @@ export const bespokeDemos = {
   'frequency-tool': make(FrequencyTool),
   'otp-tool': make(OtpTool),
   'cryptogram-tool': make(CryptogramTool),
-  'enigma-tool': make(EnigmaTool)
+  'enigma-tool': make(EnigmaTool),
+  'big-oh-tool': make(BigOhTool)
 };

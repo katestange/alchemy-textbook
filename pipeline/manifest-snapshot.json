@@ -1,5 +1,5 @@
 {
- "total_blocks": 1048,
+ "total_blocks": 1049,
  "total_sections": 159,
  "duplicate_hash_groups": 6,
  "chapters": {
@@ -17,7 +17,7 @@
    "checkin": 23,
    "definition": 12,
    "example": 3,
-   "paragraph": 218,
+   "paragraph": 219,
    "philosophy": 1,
    "problem": 2,
    "proof": 7,
