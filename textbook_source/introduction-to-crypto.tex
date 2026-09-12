@@ -2734,7 +2734,7 @@ Let's collect lots more examples to consider.
 % >>> AI-GENERATED FIGURE (dynamical portraits of x -> ax mod n; requested by todo note) >>>
 \begin{center}
 % portrait n=7 a=3 units=False
-\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt, baseline=(current bounding box.center)]
+\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt]
   \node (n0) at (3.65,0.00) {\small $0$};
   \node (n1) at (1.07,1.24) {\small $1$};
   \node (n2) at (2.15,-0.62) {\small $2$};
@@ -2750,9 +2750,10 @@ Let's collect lots more examples to consider.
   \path (n5) edge[bend left=12] (n1);
   \path (n6) edge[bend left=12] (n4);
   \node at (1.82,-2.09) {$x \mapsto 3x \pmod{7}$};
+  \draw[-, gray!50, thin, shorten >=0pt, shorten <=0pt, rounded corners=4pt] ([xshift=-14pt,yshift=-6pt]current bounding box.south west) rectangle ([xshift=14pt,yshift=6pt]current bounding box.north east);
 \end{tikzpicture}\qquad
 % portrait n=10 a=3 units=False
-\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt, baseline=(current bounding box.center)]
+\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt]
   \node (n0) at (6.51,0.00) {\small $0$};
   \node (n1) at (0.88,0.88) {\small $1$};
   \node (n2) at (4.13,0.88) {\small $2$};
@@ -2774,12 +2775,13 @@ Let's collect lots more examples to consider.
   \path (n8) edge[bend left=12] (n4);
   \path (n9) edge[bend left=12] (n7);
   \node at (4.00,-1.73) {$x \mapsto 3x \pmod{10}$};
+  \draw[-, gray!50, thin, shorten >=0pt, shorten <=0pt, rounded corners=4pt] ([xshift=-14pt,yshift=-6pt]current bounding box.south west) rectangle ([xshift=14pt,yshift=6pt]current bounding box.north east);
 \end{tikzpicture}
 
-\vspace{1.2em}
+\vspace{1.5em}
 
 % portrait n=8 a=2 units=False
-\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt, baseline=(current bounding box.center)]
+\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt]
   \node (n0) at (1.46,0.00) {\small $0$};
   \node (n1) at (2.92,2.84) {\small $1$};
   \node (n2) at (1.99,2.17) {\small $2$};
@@ -2797,9 +2799,10 @@ Let's collect lots more examples to consider.
   \path (n6) edge (n4);
   \path (n7) edge (n6);
   \node at (1.46,-0.85) {$x \mapsto 2x \pmod{8}$};
+  \draw[-, gray!50, thin, shorten >=0pt, shorten <=0pt, rounded corners=4pt] ([xshift=-14pt,yshift=-6pt]current bounding box.south west) rectangle ([xshift=14pt,yshift=6pt]current bounding box.north east);
 \end{tikzpicture}\qquad
 % portrait n=12 a=2 units=False
-\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt, baseline=(current bounding box.center)]
+\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt]
   \node (n0) at (3.08,0.00) {\small $0$};
   \node (n1) at (0.00,-2.72) {\small $1$};
   \node (n2) at (0.53,-1.70) {\small $2$};
@@ -2825,9 +2828,10 @@ Let's collect lots more examples to consider.
   \path (n10) edge (n8);
   \path (n11) edge (n10);
   \node at (1.80,-3.57) {$x \mapsto 2x \pmod{12}$};
+  \draw[-, gray!50, thin, shorten >=0pt, shorten <=0pt, rounded corners=4pt] ([xshift=-14pt,yshift=-6pt]current bounding box.south west) rectangle ([xshift=14pt,yshift=6pt]current bounding box.north east);
 \end{tikzpicture}
 
-\vspace{1.2em}
+\vspace{1.5em}
 \end{center}
 % <<< END AI-GENERATED FIGURE <<<
 
@@ -2838,7 +2842,7 @@ As we have seen in the last section, the subset of units $(\ZZ/n\ZZ)^*$ forms a 
 % >>> AI-GENERATED FIGURE (dynamical portraits of unit groups; requested by todo note) >>>
 \begin{center}
 % portrait n=10 a=3 units=True
-\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt, baseline=(current bounding box.center)]
+\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt]
   \node (n1) at (0.88,0.88) {\small $1$};
   \node (n3) at (1.75,0.00) {\small $3$};
   \node (n7) at (0.00,-0.00) {\small $7$};
@@ -2847,10 +2851,11 @@ As we have seen in the last section, the subset of units $(\ZZ/n\ZZ)^*$ forms a 
   \path (n3) edge[bend left=12] (n9);
   \path (n7) edge[bend left=12] (n1);
   \path (n9) edge[bend left=12] (n7);
-  \node at (0.88,-1.73) {$x \mapsto 3x \pmod{10}$ on $(\ZZ/10\ZZ)^*$};
+  \node at (0.88,-1.73) {$x \mapsto 3x \text{ on } (\ZZ/10\ZZ)^*$};
+  \draw[-, gray!50, thin, shorten >=0pt, shorten <=0pt, rounded corners=4pt] ([xshift=-14pt,yshift=-6pt]current bounding box.south west) rectangle ([xshift=14pt,yshift=6pt]current bounding box.north east);
 \end{tikzpicture}\qquad
 % portrait n=8 a=3 units=True
-\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt, baseline=(current bounding box.center)]
+\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt]
   \node (n1) at (0.00,-0.55) {\small $1$};
   \node (n3) at (0.00,0.55) {\small $3$};
   \node (n5) at (1.50,-0.55) {\small $5$};
@@ -2859,13 +2864,14 @@ As we have seen in the last section, the subset of units $(\ZZ/n\ZZ)^*$ forms a 
   \path (n3) edge[bend left=25] (n1);
   \path (n5) edge[bend left=25] (n7);
   \path (n7) edge[bend left=25] (n5);
-  \node at (0.75,-1.40) {$x \mapsto 3x \pmod{8}$ on $(\ZZ/8\ZZ)^*$};
+  \node at (0.75,-1.40) {$x \mapsto 3x \text{ on } (\ZZ/8\ZZ)^*$};
+  \draw[-, gray!50, thin, shorten >=0pt, shorten <=0pt, rounded corners=4pt] ([xshift=-14pt,yshift=-6pt]current bounding box.south west) rectangle ([xshift=14pt,yshift=6pt]current bounding box.north east);
 \end{tikzpicture}
 
-\vspace{1.2em}
+\vspace{1.5em}
 
 % portrait n=12 a=5 units=True
-\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt, baseline=(current bounding box.center)]
+\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt]
   \node (n1) at (0.00,-0.55) {\small $1$};
   \node (n5) at (0.00,0.55) {\small $5$};
   \node (n7) at (1.50,-0.55) {\small $7$};
@@ -2874,10 +2880,11 @@ As we have seen in the last section, the subset of units $(\ZZ/n\ZZ)^*$ forms a 
   \path (n5) edge[bend left=25] (n1);
   \path (n7) edge[bend left=25] (n11);
   \path (n11) edge[bend left=25] (n7);
-  \node at (0.75,-1.40) {$x \mapsto 5x \pmod{12}$ on $(\ZZ/12\ZZ)^*$};
+  \node at (0.75,-1.40) {$x \mapsto 5x \text{ on } (\ZZ/12\ZZ)^*$};
+  \draw[-, gray!50, thin, shorten >=0pt, shorten <=0pt, rounded corners=4pt] ([xshift=-14pt,yshift=-6pt]current bounding box.south west) rectangle ([xshift=14pt,yshift=6pt]current bounding box.north east);
 \end{tikzpicture}\qquad
 % portrait n=9 a=2 units=True
-\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt, baseline=(current bounding box.center)]
+\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt]
   \node (n1) at (1.07,1.24) {\small $1$};
   \node (n2) at (2.15,0.62) {\small $2$};
   \node (n4) at (2.15,-0.62) {\small $4$};
@@ -2890,10 +2897,11 @@ As we have seen in the last section, the subset of units $(\ZZ/n\ZZ)^*$ forms a 
   \path (n5) edge[bend left=12] (n1);
   \path (n7) edge[bend left=12] (n5);
   \path (n8) edge[bend left=12] (n7);
-  \node at (1.07,-2.09) {$x \mapsto 2x \pmod{9}$ on $(\ZZ/9\ZZ)^*$};
+  \node at (1.07,-2.09) {$x \mapsto 2x \text{ on } (\ZZ/9\ZZ)^*$};
+  \draw[-, gray!50, thin, shorten >=0pt, shorten <=0pt, rounded corners=4pt] ([xshift=-14pt,yshift=-6pt]current bounding box.south west) rectangle ([xshift=14pt,yshift=6pt]current bounding box.north east);
 \end{tikzpicture}
 
-\vspace{1.2em}
+\vspace{1.5em}
 \end{center}
 % <<< END AI-GENERATED FIGURE <<<
 
@@ -2913,7 +2921,7 @@ This very heavily restricts what the pictures can look like.  Here are all the p
 % >>> AI-GENERATED FIGURE (all six portraits of the unit group modulo 7; requested by todo note) >>>
 \begin{center}
 % portrait n=7 a=1 units=True
-\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt, baseline=(current bounding box.center)]
+\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt]
   \node (n1) at (0.00,0.00) {\scriptsize $1$};
   \node (n2) at (1.50,0.00) {\scriptsize $2$};
   \node (n3) at (3.00,0.00) {\scriptsize $3$};
@@ -2927,9 +2935,10 @@ This very heavily restricts what the pictures can look like.  Here are all the p
   \path (n5) edge[loop right, min distance=5mm, in=35, out=-35] (n5);
   \path (n6) edge[loop right, min distance=5mm, in=35, out=-35] (n6);
   \node at (3.75,-0.85) {$\times 1 \pmod{7}$};
+  \draw[-, gray!50, thin, shorten >=0pt, shorten <=0pt, rounded corners=4pt] ([xshift=-14pt,yshift=-6pt]current bounding box.south west) rectangle ([xshift=14pt,yshift=6pt]current bounding box.north east);
 \end{tikzpicture}\qquad
 % portrait n=7 a=2 units=True
-\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt, baseline=(current bounding box.center)]
+\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt]
   \node (n1) at (0.65,0.75) {\scriptsize $1$};
   \node (n2) at (1.30,-0.37) {\scriptsize $2$};
   \node (n3) at (3.45,0.75) {\scriptsize $3$};
@@ -2943,12 +2952,13 @@ This very heavily restricts what the pictures can look like.  Here are all the p
   \path (n5) edge[bend left=12] (n3);
   \path (n6) edge[bend left=12] (n5);
   \node at (2.05,-1.23) {$\times 2 \pmod{7}$};
+  \draw[-, gray!50, thin, shorten >=0pt, shorten <=0pt, rounded corners=4pt] ([xshift=-14pt,yshift=-6pt]current bounding box.south west) rectangle ([xshift=14pt,yshift=6pt]current bounding box.north east);
 \end{tikzpicture}
 
-\vspace{1.2em}
+\vspace{1.5em}
 
 % portrait n=7 a=3 units=True
-\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt, baseline=(current bounding box.center)]
+\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt]
   \node (n1) at (1.07,1.24) {\scriptsize $1$};
   \node (n2) at (2.15,-0.62) {\scriptsize $2$};
   \node (n3) at (2.15,0.62) {\scriptsize $3$};
@@ -2962,9 +2972,10 @@ This very heavily restricts what the pictures can look like.  Here are all the p
   \path (n5) edge[bend left=12] (n1);
   \path (n6) edge[bend left=12] (n4);
   \node at (1.07,-2.09) {$\times 3 \pmod{7}$};
+  \draw[-, gray!50, thin, shorten >=0pt, shorten <=0pt, rounded corners=4pt] ([xshift=-14pt,yshift=-6pt]current bounding box.south west) rectangle ([xshift=14pt,yshift=6pt]current bounding box.north east);
 \end{tikzpicture}\qquad
 % portrait n=7 a=4 units=True
-\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt, baseline=(current bounding box.center)]
+\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt]
   \node (n1) at (0.65,0.75) {\scriptsize $1$};
   \node (n2) at (0.00,-0.38) {\scriptsize $2$};
   \node (n3) at (3.45,0.75) {\scriptsize $3$};
@@ -2978,12 +2989,13 @@ This very heavily restricts what the pictures can look like.  Here are all the p
   \path (n5) edge[bend left=12] (n6);
   \path (n6) edge[bend left=12] (n3);
   \node at (2.05,-1.23) {$\times 4 \pmod{7}$};
+  \draw[-, gray!50, thin, shorten >=0pt, shorten <=0pt, rounded corners=4pt] ([xshift=-14pt,yshift=-6pt]current bounding box.south west) rectangle ([xshift=14pt,yshift=6pt]current bounding box.north east);
 \end{tikzpicture}
 
-\vspace{1.2em}
+\vspace{1.5em}
 
 % portrait n=7 a=5 units=True
-\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt, baseline=(current bounding box.center)]
+\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt]
   \node (n1) at (1.07,1.24) {\scriptsize $1$};
   \node (n2) at (0.00,-0.62) {\scriptsize $2$};
   \node (n3) at (0.00,0.62) {\scriptsize $3$};
@@ -2997,9 +3009,10 @@ This very heavily restricts what the pictures can look like.  Here are all the p
   \path (n5) edge[bend left=12] (n4);
   \path (n6) edge[bend left=12] (n2);
   \node at (1.07,-2.09) {$\times 5 \pmod{7}$};
+  \draw[-, gray!50, thin, shorten >=0pt, shorten <=0pt, rounded corners=4pt] ([xshift=-14pt,yshift=-6pt]current bounding box.south west) rectangle ([xshift=14pt,yshift=6pt]current bounding box.north east);
 \end{tikzpicture}\qquad
 % portrait n=7 a=6 units=True
-\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt, baseline=(current bounding box.center)]
+\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt]
   \node (n1) at (0.00,-0.55) {\scriptsize $1$};
   \node (n2) at (1.50,-0.55) {\scriptsize $2$};
   \node (n3) at (3.00,-0.55) {\scriptsize $3$};
@@ -3013,9 +3026,10 @@ This very heavily restricts what the pictures can look like.  Here are all the p
   \path (n5) edge[bend left=25] (n2);
   \path (n6) edge[bend left=25] (n1);
   \node at (1.50,-1.40) {$\times 6 \pmod{7}$};
+  \draw[-, gray!50, thin, shorten >=0pt, shorten <=0pt, rounded corners=4pt] ([xshift=-14pt,yshift=-6pt]current bounding box.south west) rectangle ([xshift=14pt,yshift=6pt]current bounding box.north east);
 \end{tikzpicture}
 
-\vspace{1.2em}
+\vspace{1.5em}
 \end{center}
 % <<< END AI-GENERATED FIGURE <<<
 

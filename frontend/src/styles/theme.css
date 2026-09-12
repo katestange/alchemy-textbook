@@ -323,6 +323,24 @@ button {
   font-size: 16px;
   line-height: normal;
 }
+/* One-line, centred figure labels (wrapper added by wireFigureLabels in
+   ReadingPane): the foreignObject keeps LaTeXML's estimated width, the label
+   is centred on it and may overhang symmetrically instead of wrapping. */
+.ltx_picture foreignObject > .fig-label {
+  display: inline-block;
+  white-space: nowrap;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+/* Side-by-side TikZ pictures (the dynamical portraits in 2.4): LaTeXML drops
+   the \qquad between pictures on one line, so without this the framed
+   portraits touch edge to edge (author feedback: portraits running into one
+   another). The vertical margin also keeps wrapped rows apart on narrow
+   screens. */
+.reading-pane .ltx_page_content .ltx_align_center > .ltx_picture {
+  margin: 0.4rem 0.6rem;
+}
 /* Displayed math stays within the column width. Only math that is GENUINELY
    wider than the column gets a horizontal scrollbar (added as .math-scroll by
    wireWideMath in ReadingPane) -- a blanket overflow-x:auto produced 1-2px

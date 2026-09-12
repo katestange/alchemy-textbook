@@ -87,6 +87,7 @@
     wireAiSolutions();
     wireProofs();
     wireWideMath();
+    wireFigureLabels();
     hydrateChapterContent(n);
     injectBuiltinApplets();
     injectBespokeDemos();
@@ -247,6 +248,26 @@
         el.parentNode.insertBefore(wrap, el);
         wrap.appendChild(el);
       }
+    });
+  }
+
+  // TikZ figure labels live in svg <foreignObject> boxes that LaTeXML sized
+  // with its own (TeX-metric) width estimate. In Chrome the label -- MathML
+  // in Garamond-Math, \pmod spacing -- comes out wider than that estimate,
+  // and a fixed-width foreignObject then wraps mixed text+math labels onto
+  // extra lines that spill out of the drawing (the framed dynamical-portrait
+  // captions in 2.4.2 broke after "on") and renders pure-math labels
+  // left-anchored, i.e. off-centre. Wrapping the
+  // contents in a nowrap block centred on the box keeps every label on one
+  // line, centred where TikZ meant it. Idempotent (guarded by the class).
+  function wireFigureLabels() {
+    if (!containerEl) return;
+    containerEl.querySelectorAll('.ltx_picture foreignObject').forEach((fo) => {
+      if (fo.firstElementChild?.classList.contains('fig-label')) return;
+      const wrap = document.createElement('div');
+      wrap.className = 'fig-label';
+      while (fo.firstChild) wrap.appendChild(fo.firstChild);
+      fo.appendChild(wrap);
     });
   }
 
