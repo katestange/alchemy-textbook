@@ -29,6 +29,7 @@
   import { bespokeDemos } from '../bespokeDemos.js';
   import { wireRefPreviews } from '../refPreviews.js';
   import { wireChapterToc } from '../chapterToc.js';
+  import { fitFigures, fitFigureLabels } from '../figureFit.js';
   import { mountEditableCell } from '../sageCell.js';
   import { mountDesmosCalculator } from '../desmos.js';
   import { mountGeoGebra } from '../geogebra.js';
@@ -89,7 +90,14 @@
     wireAiSolutions();
     wireProofs();
     wireWideMath();
+    fitFigures(containerEl, parseFloat(getComputedStyle(containerEl).fontSize) || 16);
     wireFigureLabels();
+    fitFigureLabels(containerEl);
+    // Label boxes were measured in whatever font was available; re-measure
+    // once the bundled math/text fonts are in (no-op if they already were).
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => fitFigureLabels(containerEl));
+    }
     hydrateChapterContent(n);
     injectBuiltinApplets();
     injectBespokeDemos();

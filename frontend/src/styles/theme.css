@@ -320,7 +320,7 @@ button {
    high above their numbers). Pin figure text to the calibrated metrics --
    the font family still inherits, so labels stay in the book's face. */
 .ltx_picture foreignObject {
-  font-size: 16px;
+  font-size: var(--fig-font, 16px);
   line-height: normal;
 }
 /* One-line, centred figure labels (wrapper added by wireFigureLabels in
@@ -332,6 +332,12 @@ button {
   position: relative;
   left: 50%;
   transform: translateX(-50%);
+  /* Pictures scaled up by fitFigures (figureFit.js) get a smaller label font
+     (--fig-font) so labels end up near body-text size on screen. LaTeXML
+     placed each box for a 16px font whose baseline sits 16px below the box
+     top (measured: baseline offset == font size); pad the difference so the
+     baseline stays where TikZ put it. */
+  padding-top: calc(16px - var(--fig-font, 16px));
 }
 /* Side-by-side TikZ pictures (the dynamical portraits in 2.4): LaTeXML drops
    the \qquad between pictures on one line, so without this the framed
