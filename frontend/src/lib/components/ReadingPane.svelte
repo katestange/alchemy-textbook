@@ -266,6 +266,12 @@
       if (fo.firstElementChild?.classList.contains('fig-label')) return;
       const wrap = document.createElement('div');
       wrap.className = 'fig-label';
+      // A coloured TikZ node (\node[gray] ...) becomes an SVG <g fill="#808080">
+      // around the foreignObject, but MathML inside a foreignObject takes its
+      // colour from CSS `color`, not from the SVG fill, so carry it across.
+      // Black stays unset so the theme's ink colour applies (dark mode).
+      const fill = fo.closest('g[fill]')?.getAttribute('fill');
+      if (fill && !/^#0{6}$|^black$/i.test(fill)) wrap.style.color = fill;
       while (fo.firstChild) wrap.appendChild(fo.firstChild);
       fo.appendChild(wrap);
     });

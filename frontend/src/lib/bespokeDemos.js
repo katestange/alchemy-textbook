@@ -27,6 +27,7 @@ import OtpTool from './demos/OtpTool.svelte';
 import CryptogramTool from './demos/CryptogramTool.svelte';
 import EnigmaTool from './demos/EnigmaTool.svelte';
 import BigOhTool from './demos/BigOhTool.svelte';
+import PrimitiveRootClock from './demos/PrimitiveRootClock.svelte';
 
 const make = (Component, props = {}) => (host) => new Component({ target: host, props });
 
@@ -50,5 +51,6 @@ export const bespokeDemos = {
   'otp-tool': make(OtpTool),
   'cryptogram-tool': make(CryptogramTool),
   'enigma-tool': make(EnigmaTool),
-  'big-oh-tool': make(BigOhTool)
+  'big-oh-tool': make(BigOhTool),
+  'primitive-root-clock': make(PrimitiveRootClock)
 };
