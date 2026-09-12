@@ -28,6 +28,7 @@
   import { builtinApplets } from '../builtinApplets.js';
   import { bespokeDemos } from '../bespokeDemos.js';
   import { wireRefPreviews } from '../refPreviews.js';
+  import { wireChapterToc } from '../chapterToc.js';
   import { mountEditableCell } from '../sageCell.js';
   import { mountDesmosCalculator } from '../desmos.js';
   import { mountGeoGebra } from '../geogebra.js';
@@ -84,6 +85,7 @@
     // After the chapter HTML is in the DOM, surface any existing AI content
     // for this chapter (one request, not one per block).
     await tick();
+    wireChapterToc(containerEl);
     wireAiSolutions();
     wireProofs();
     wireWideMath();
@@ -409,7 +411,7 @@
     // that summoned the box often stays highlighted, clicking a control like
     // "Show solution" is seen as a fresh selection and re-hydrates the box,
     // wiping the reveal (the "flicker in and out" bug).
-    if (e && e.target && e.target.closest && e.target.closest('.ai-item, .builtin-applet')) {
+    if (e && e.target && e.target.closest && e.target.closest('.ai-item, .builtin-applet, .chapter-toc')) {
       return;
     }
     const selection = window.getSelection();

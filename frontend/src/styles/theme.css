@@ -1544,3 +1544,72 @@ button {
 .ephemeral-ok:hover {
   filter: brightness(0.96);
 }
+
+/* ---- Per-chapter table of contents (chapterToc.js) ----
+   Inserted under the chapter title: a collapsible list of the chapter's
+   sections and subsections, each a plain in-page link. Numbers sit in a
+   narrow column so titles align; math in titles is real MathML. */
+.chapter-toc {
+  margin: 0 0 2rem;
+  padding: 0.6rem 1rem 0.8rem;
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-rule);
+  border-radius: 6px;
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+.chapter-toc-summary {
+  cursor: pointer;
+  font-variant-caps: small-caps;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+  user-select: none;
+}
+.chapter-toc-summary:hover {
+  color: var(--color-ink);
+}
+.chapter-toc-list {
+  list-style: none;
+  margin: 0.4rem 0 0;
+  padding: 0;
+}
+.chapter-toc-depth1 > li {
+  margin-top: 0.3rem;
+}
+.chapter-toc-depth2 {
+  margin: 0.1rem 0 0.35rem;
+  padding-left: 2.6rem;
+  font-size: 0.9em;
+}
+.chapter-toc-depth2 > li {
+  margin-top: 0.1rem;
+}
+.chapter-toc a {
+  display: grid;
+  grid-template-columns: 2.6rem 1fr;
+  column-gap: 0;
+  color: var(--color-ink);
+  text-decoration: none;
+}
+.chapter-toc-depth2 a {
+  grid-template-columns: 3.1rem 1fr;
+}
+.chapter-toc a:hover .chapter-toc-text {
+  color: var(--accent-teal);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+.chapter-toc-num {
+  color: var(--color-ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+/* Unnumbered heading: let the title take the whole row. */
+.chapter-toc a > .chapter-toc-text:first-child {
+  grid-column: 1 / -1;
+}
+/* Jumping to a section from the list: leave a little air above the heading. */
+.ltx_subsection,
+.ltx_subsubsection {
+  scroll-margin-top: 1rem;
+}
