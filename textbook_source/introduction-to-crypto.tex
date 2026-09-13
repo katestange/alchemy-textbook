@@ -3247,173 +3247,7 @@ For use in cryptography, the unit group dynamical portrait that we like best is 
     \end{enumerate}
 
 We are interested in using $(\ZZ/p\ZZ)^*$ as a number system in which to build cryptography, in particular Diffie-Hellman Key Exchange and ElGamal Encryption.\todo{AI: spelling: the book uses both `ElGamal' (Section titles) and `El Gamal' (later chapters); the new text had `El-Gamal' -- unify?}
-
-\subsection{Diffie-Hellman Key Exchange}
-
-This is our first example of public key cryptography.  This is an example of a \textbf{key exchange protocol}, in which two parties can determine a shared secret piece of information, without having a private communication channel.  In other words, you could imagine these two parties, typically called \textbf{Alice} and \textbf{Bob} in cryptography literature, shouting at each other across a crowded room, never having met before, and nevertheless being able to complete their interaction with a piece of secret information only the two of them have access to.
-
-
-The setup of this protocol involves choosing a large prime number $p$ (nowadays of 2048 bits), and a primitive root $g \in (\ZZ/p\ZZ)^*$.  The group $(\ZZ/p\ZZ)^*$ is the number system in which all the computations of the protocol take place.  This setup is publicly known (for example, Alice and Bob agree upon it on the open channel).  The group $(\ZZ/p\ZZ)^*$ can be visualized as a big cycle of powers of $g$, using the ideas of multiplicative dynamics above:
-
-% >>> AI-GENERATED FIGURE (the unit group as one big cycle of powers of a primitive root; requested by placeholder) >>>
-\begin{center}
-\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt]
-  \node (c0) at (2.07,4.07) {\small $1$};
-  \node (c1) at (3.42,3.58) {\small $g$};
-  \node (c2) at (4.14,2.34) {\small $g^2$};
-  \node (c3) at (3.89,0.92) {\small $g^3$};
-  \node (c4) at (2.79,0.00) {\small $g^4$};
-  \node (c5) at (1.35,0.00) {\small $\cdots$};
-  \node (c6) at (0.25,0.92) {\small $g^{p-4}$};
-  \node (c7) at (0.00,2.34) {\small $g^{p-3}$};
-  \node (c8) at (0.72,3.58) {\small $g^{p-2}$};
-  \path (c0) edge[bend left=10] (c1);
-  \path (c1) edge[bend left=10] (c2);
-  \path (c2) edge[bend left=10] (c3);
-  \path (c3) edge[bend left=10] (c4);
-  \path (c4) edge[bend left=10, dashed] (c5);
-  \path (c5) edge[bend left=10, dashed] (c6);
-  \path (c6) edge[bend left=10] (c7);
-  \path (c7) edge[bend left=10] (c8);
-  \path (c8) edge[bend left=10] (c0);
-  \node at (2.07,-0.95) {$x \mapsto gx \text{ on } (\ZZ/p\ZZ)^*$};
-  \draw[-, gray!50, thin, shorten >=0pt, shorten <=0pt, rounded corners=4pt] ([xshift=-14pt,yshift=-6pt]current bounding box.south west) rectangle ([xshift=14pt,yshift=6pt]current bounding box.north east);
-\end{tikzpicture}
-\end{center}
-% <<< END AI-GENERATED FIGURE <<<
-
-Each position $g^x$ on this big cycle is actually just a residue modulo $p$, and when we write it as an integer, it is not clear what value of $x$ produced it.  For example, here is the cycle for $p = 23$ and $g = 5$, drawn as a clock: the grey label outside each position is the power $5^x$, and the residue $5^x \pmod{23}$ sits at that position.  \webonly{Play with the little web application below, which allows you to change the prime, and primitive root, and displays the cycle.  }Notice that the residues modulo $p$ which you see on this clock appear to be in random order.
-
-% >>> AI-GENERATED FIGURE (the cycle of powers of 5 modulo 23, drawn as a clock; requested by placeholder) >>>
-\begin{center}
-\begin{tikzpicture}[->, >={Latex[length=1.6mm]}, semithick, shorten >=2pt, shorten <=2pt]
-  \node (r0) at (4.01,7.55) {\scriptsize $1$};
-  \node (r1) at (4.99,7.41) {\scriptsize $5$};
-  \node (r2) at (5.90,6.99) {\scriptsize $2$};
-  \node (r3) at (6.65,6.34) {\scriptsize $10$};
-  \node (r4) at (7.19,5.50) {\scriptsize $4$};
-  \node (r5) at (7.47,4.55) {\scriptsize $20$};
-  \node (r6) at (7.47,3.55) {\scriptsize $8$};
-  \node (r7) at (7.19,2.60) {\scriptsize $17$};
-  \node (r8) at (6.65,1.76) {\scriptsize $16$};
-  \node (r9) at (5.90,1.11) {\scriptsize $11$};
-  \node (r10) at (4.99,0.69) {\scriptsize $9$};
-  \node (r11) at (4.01,0.55) {\scriptsize $22$};
-  \node (r12) at (3.02,0.69) {\scriptsize $18$};
-  \node (r13) at (2.12,1.11) {\scriptsize $21$};
-  \node (r14) at (1.36,1.76) {\scriptsize $13$};
-  \node (r15) at (0.83,2.60) {\scriptsize $19$};
-  \node (r16) at (0.54,3.55) {\scriptsize $3$};
-  \node (r17) at (0.54,4.55) {\scriptsize $15$};
-  \node (r18) at (0.83,5.50) {\scriptsize $6$};
-  \node (r19) at (1.36,6.34) {\scriptsize $7$};
-  \node (r20) at (2.12,6.99) {\scriptsize $12$};
-  \node (r21) at (3.02,7.41) {\scriptsize $14$};
-  \node[gray] at (4.01,8.50) {\scriptsize $5^{0}$};
-  \node[gray] at (5.26,8.32) {\scriptsize $5^{1}$};
-  \node[gray] at (6.42,7.79) {\scriptsize $5^{2}$};
-  \node[gray] at (7.37,6.96) {\scriptsize $5^{3}$};
-  \node[gray] at (8.06,5.90) {\scriptsize $5^{4}$};
-  \node[gray] at (8.41,4.68) {\scriptsize $5^{5}$};
-  \node[gray] at (8.41,3.42) {\scriptsize $5^{6}$};
-  \node[gray] at (8.06,2.20) {\scriptsize $5^{7}$};
-  \node[gray] at (7.37,1.14) {\scriptsize $5^{8}$};
-  \node[gray] at (6.42,0.31) {\scriptsize $5^{9}$};
-  \node[gray] at (5.26,-0.22) {\scriptsize $5^{10}$};
-  \node[gray] at (4.01,-0.40) {\scriptsize $5^{11}$};
-  \node[gray] at (2.76,-0.22) {\scriptsize $5^{12}$};
-  \node[gray] at (1.60,0.31) {\scriptsize $5^{13}$};
-  \node[gray] at (0.65,1.14) {\scriptsize $5^{14}$};
-  \node[gray] at (-0.04,2.20) {\scriptsize $5^{15}$};
-  \node[gray] at (-0.39,3.42) {\scriptsize $5^{16}$};
-  \node[gray] at (-0.39,4.68) {\scriptsize $5^{17}$};
-  \node[gray] at (-0.04,5.90) {\scriptsize $5^{18}$};
-  \node[gray] at (0.65,6.96) {\scriptsize $5^{19}$};
-  \node[gray] at (1.60,7.79) {\scriptsize $5^{20}$};
-  \node[gray] at (2.76,8.32) {\scriptsize $5^{21}$};
-  \path (r0) edge[bend left=8] (r1);
-  \path (r1) edge[bend left=8] (r2);
-  \path (r2) edge[bend left=8] (r3);
-  \path (r3) edge[bend left=8] (r4);
-  \path (r4) edge[bend left=8] (r5);
-  \path (r5) edge[bend left=8] (r6);
-  \path (r6) edge[bend left=8] (r7);
-  \path (r7) edge[bend left=8] (r8);
-  \path (r8) edge[bend left=8] (r9);
-  \path (r9) edge[bend left=8] (r10);
-  \path (r10) edge[bend left=8] (r11);
-  \path (r11) edge[bend left=8] (r12);
-  \path (r12) edge[bend left=8] (r13);
-  \path (r13) edge[bend left=8] (r14);
-  \path (r14) edge[bend left=8] (r15);
-  \path (r15) edge[bend left=8] (r16);
-  \path (r16) edge[bend left=8] (r17);
-  \path (r17) edge[bend left=8] (r18);
-  \path (r18) edge[bend left=8] (r19);
-  \path (r19) edge[bend left=8] (r20);
-  \path (r20) edge[bend left=8] (r21);
-  \path (r21) edge[bend left=8] (r0);
-  \node at (4.01,-1.15) {$x \mapsto 5x \text{ on } (\ZZ/23\ZZ)^*$};
-  \draw[-, gray!50, thin, shorten >=0pt, shorten <=0pt, rounded corners=4pt] ([xshift=-14pt,yshift=-6pt]current bounding box.south west) rectangle ([xshift=14pt,yshift=6pt]current bounding box.north east);
-\end{tikzpicture}
-\end{center}
-% <<< END AI-GENERATED FIGURE <<<
-
-\webonly{\bespokedemo{primitive-root-clock}}
-
-\subsubsection{The protocol}
-
-In the protocol, both Alice and Bob choose secret exponents:  Alice chooses $a$ and Bob chooses $b$, in the range $1$ to $p-2$.  They keep this information to themselves, but they can compute and share $A := g^a$ and $B := g^b$, respectively.  Because the residues $A = g^a$ and $B = g^b$ on the clock do not apparently divulge the values of $a$ and $b$, they can trade these pieces of information without revealing their secret exponents.
-
-
-
-Having traded this info, Alice now computes $B^a$ and Bob computes $A^b$.  Notice that in this computation, each person combines the public information shared by the other with their own secret information.  In both cases, the answer comes out the same:
-
-$$ 
-B^a = (g^b)^a = g^{ab} = (g^a)^b = A^b 
-$$
-
-Thus, Alice and Bob have shared the secret information $g^{ab}$.  Notice that they can't control what this secret information comes out to.  It might as well be a random number, in terms of its use to them.  But a shared secret, even if it appears random, is actually very useful:  typically one uses it as a secret key for a symmetric encryption protocol.  That explains the name ``Key Exchange''.
-
-
-Here is the protocol, schematically:
-\begin{center}
-     {\bf Setup:}  $p$ (modulus), $g$
-     \vspace{1em}
-
-     \begin{tabular}{ccc}
-       Alice & & Bob \\
-       \hline
-       Secret: $a$ & &  Secret: $b$ \\
-       $g^a$ & $\longrightarrow$ & $g^a$ \\
-       $g^b$ & $\longleftarrow$ & $g^b$ \\
-       Compute: $(g^b)^a \equiv g^{ab}$ & & Compute: $(g^a)^b \equiv g^{ab}$
-      \end{tabular}
-      \vspace{3em}
-    \end{center}
-
-
-    \subsubsection{Security}
-
-
-      An eavesdropper Eve knows the prime $p$ and primitive root $g$, and can see $g^a$ and $g^b$ during the protocol.  If Eve wants to obtain the shared secret, she must use this information to compute $g^{ab}$.  We formalize this as the following problem.
-
-
-\begin{definition}
- The \textbf{Computational Diffie-Hellman Problem} is the following task:  given a prime $p$, primitive root $g$ modulo $p$, and values $g^a$ and $g^b$ modulo $p$, compute $g^{ab}$.
-\end{definition}
-
-Note that $a$ and $b$ are \emph{not} given in this problem.  Just the residues $g^a$ and $g^b$, in the form of integers from $0$ to $p-1$.  One way to solve the Computational Diffie-Hellman Problem is to find $a$ and $b$, from which one can compute $g^{ab}$.  It's not necessarily the only way to solve it, but it seems the most promising, so it has its own name, as follows.
-
-\begin{definition}
-The \textbf{Discrete Logarithm Problem} is the following task:  given a prime $p$, primitive root $g$ modulo $p$, and value $g^a$ modulo $p$, compute $a$ modulo $p-1$.
-\end{definition}
-
-The Discrete Logarithm Problem is the more famous problem, and the one that gets all the attention.  However, it is not known that the \emph{only} way to solve the Computational Diffie-Hellman Problem is by solving the Discrete Logarithm Problem.
-
-In later sections of this Chapter, we will study algorithms for solving the Discrete Logarithm Problem.  We will find that they are \emph{not} very efficient, which gives us confidence that an attacker cannot break the Diffie-Hellman Protocol to recover the shared secret.  However, these are just \emph{attempts} to solve the problem.  Perhaps tomorrow, someone will come up with a better, faster, algorithm, and thereby break Diffie-Hellman Key Exchange!
-
-      
+     
 \subsection{Efficient arithmetic modulo $n$ (a first introduction to complexity)}
 
 \subsubsection{The role of modular exponentiation}
@@ -3608,6 +3442,155 @@ Thus the runtime is a polynomial (in fact, linear) number of multiplications.  H
 
 So, overall, the runtime of modular exponentiation is polynomial time.  I have a computer demo for this (`Runtimes') on the cryptography website.
 
+\subsection{Diffie-Hellman Key Exchange}
+
+This is our first example of public key cryptography.  This is an example of a \textbf{key exchange protocol}, in which two parties can determine a shared secret piece of information, without having a private communication channel.  In other words, you could imagine these two parties, typically called \textbf{Alice} and \textbf{Bob} in cryptography literature, shouting at each other across a crowded room, never having met before, and nevertheless being able to complete their interaction with a piece of secret information only the two of them have access to.
+
+
+The setup of this protocol involves choosing a large prime number $p$ (nowadays of 2048 bits), and a primitive root $g \in (\ZZ/p\ZZ)^*$.  The group $(\ZZ/p\ZZ)^*$ is the number system in which all the computations of the protocol take place.  This setup is publicly known (for example, Alice and Bob agree upon it on the open channel).  The group $(\ZZ/p\ZZ)^*$ can be visualized as a big cycle of powers of $g$, using the ideas of multiplicative dynamics above:
+
+% >>> AI-GENERATED FIGURE (the unit group as one big cycle of powers of a primitive root; requested by placeholder) >>>
+\begin{center}
+\begin{tikzpicture}[->, >=Latex, thick, shorten >=2.5pt, shorten <=2.5pt]
+  \node (c0) at (2.07,4.07) {\small $1$};
+  \node (c1) at (3.42,3.58) {\small $g$};
+  \node (c2) at (4.14,2.34) {\small $g^2$};
+  \node (c3) at (3.89,0.92) {\small $g^3$};
+  \node (c4) at (2.79,0.00) {\small $g^4$};
+  \node (c5) at (1.35,0.00) {\small $\cdots$};
+  \node (c6) at (0.25,0.92) {\small $g^{p-4}$};
+  \node (c7) at (0.00,2.34) {\small $g^{p-3}$};
+  \node (c8) at (0.72,3.58) {\small $g^{p-2}$};
+  \path (c0) edge[bend left=10] (c1);
+  \path (c1) edge[bend left=10] (c2);
+  \path (c2) edge[bend left=10] (c3);
+  \path (c3) edge[bend left=10] (c4);
+  \path (c4) edge[bend left=10, dashed] (c5);
+  \path (c5) edge[bend left=10, dashed] (c6);
+  \path (c6) edge[bend left=10] (c7);
+  \path (c7) edge[bend left=10] (c8);
+  \path (c8) edge[bend left=10] (c0);
+  \node at (2.07,-0.95) {$x \mapsto gx \text{ on } (\ZZ/p\ZZ)^*$};
+  \draw[-, gray!50, thin, shorten >=0pt, shorten <=0pt, rounded corners=4pt] ([xshift=-14pt,yshift=-6pt]current bounding box.south west) rectangle ([xshift=14pt,yshift=6pt]current bounding box.north east);
+\end{tikzpicture}
+\end{center}
+% <<< END AI-GENERATED FIGURE <<<
+
+Each position $g^x$ on this big cycle is actually just a residue modulo $p$, and when we write it as an integer, it is not clear what value of $x$ produced it.  For example, here is the cycle for $p = 23$ and $g = 5$, drawn as a clock: the grey label outside each position is the power $5^x$, and the residue $5^x \pmod{23}$ sits at that position.  \webonly{Play with the little web application below, which allows you to change the prime, and primitive root, and displays the cycle.  }Notice that the residues modulo $p$ which you see on this clock appear to be in random order.
+
+% >>> AI-GENERATED FIGURE (the cycle of powers of 5 modulo 23, drawn as a clock; requested by placeholder) >>>
+\begin{center}
+\begin{tikzpicture}[->, >={Latex[length=1.6mm]}, semithick, shorten >=2pt, shorten <=2pt]
+  \node (r0) at (4.01,7.55) {\scriptsize $1$};
+  \node (r1) at (4.99,7.41) {\scriptsize $5$};
+  \node (r2) at (5.90,6.99) {\scriptsize $2$};
+  \node (r3) at (6.65,6.34) {\scriptsize $10$};
+  \node (r4) at (7.19,5.50) {\scriptsize $4$};
+  \node (r5) at (7.47,4.55) {\scriptsize $20$};
+  \node (r6) at (7.47,3.55) {\scriptsize $8$};
+  \node (r7) at (7.19,2.60) {\scriptsize $17$};
+  \node (r8) at (6.65,1.76) {\scriptsize $16$};
+  \node (r9) at (5.90,1.11) {\scriptsize $11$};
+  \node (r10) at (4.99,0.69) {\scriptsize $9$};
+  \node (r11) at (4.01,0.55) {\scriptsize $22$};
+  \node (r12) at (3.02,0.69) {\scriptsize $18$};
+  \node (r13) at (2.12,1.11) {\scriptsize $21$};
+  \node (r14) at (1.36,1.76) {\scriptsize $13$};
+  \node (r15) at (0.83,2.60) {\scriptsize $19$};
+  \node (r16) at (0.54,3.55) {\scriptsize $3$};
+  \node (r17) at (0.54,4.55) {\scriptsize $15$};
+  \node (r18) at (0.83,5.50) {\scriptsize $6$};
+  \node (r19) at (1.36,6.34) {\scriptsize $7$};
+  \node (r20) at (2.12,6.99) {\scriptsize $12$};
+  \node (r21) at (3.02,7.41) {\scriptsize $14$};
+  \node[gray] at (4.01,8.50) {\scriptsize $5^{0}$};
+  \node[gray] at (5.26,8.32) {\scriptsize $5^{1}$};
+  \node[gray] at (6.42,7.79) {\scriptsize $5^{2}$};
+  \node[gray] at (7.37,6.96) {\scriptsize $5^{3}$};
+  \node[gray] at (8.06,5.90) {\scriptsize $5^{4}$};
+  \node[gray] at (8.41,4.68) {\scriptsize $5^{5}$};
+  \node[gray] at (8.41,3.42) {\scriptsize $5^{6}$};
+  \node[gray] at (8.06,2.20) {\scriptsize $5^{7}$};
+  \node[gray] at (7.37,1.14) {\scriptsize $5^{8}$};
+  \node[gray] at (6.42,0.31) {\scriptsize $5^{9}$};
+  \node[gray] at (5.26,-0.22) {\scriptsize $5^{10}$};
+  \node[gray] at (4.01,-0.40) {\scriptsize $5^{11}$};
+  \node[gray] at (2.76,-0.22) {\scriptsize $5^{12}$};
+  \node[gray] at (1.60,0.31) {\scriptsize $5^{13}$};
+  \node[gray] at (0.65,1.14) {\scriptsize $5^{14}$};
+  \node[gray] at (-0.04,2.20) {\scriptsize $5^{15}$};
+  \node[gray] at (-0.39,3.42) {\scriptsize $5^{16}$};
+  \node[gray] at (-0.39,4.68) {\scriptsize $5^{17}$};
+  \node[gray] at (-0.04,5.90) {\scriptsize $5^{18}$};
+  \node[gray] at (0.65,6.96) {\scriptsize $5^{19}$};
+  \node[gray] at (1.60,7.79) {\scriptsize $5^{20}$};
+  \node[gray] at (2.76,8.32) {\scriptsize $5^{21}$};
+  \path (r0) edge[bend left=8] (r1);
+  \path (r1) edge[bend left=8] (r2);
+  \path (r2) edge[bend left=8] (r3);
+  \path (r3) edge[bend left=8] (r4);
+  \path (r4) edge[bend left=8] (r5);
+  \path (r5) edge[bend left=8] (r6);
+  \path (r6) edge[bend left=8] (r7);
+  \path (r7) edge[bend left=8] (r8);
+  \path (r8) edge[bend left=8] (r9);
+  \path (r9) edge[bend left=8] (r10);
+  \path (r10) edge[bend left=8] (r11);
+  \path (r11) edge[bend left=8] (r12);
+  \path (r12) edge[bend left=8] (r13);
+  \path (r13) edge[bend left=8] (r14);
+  \path (r14) edge[bend left=8] (r15);
+  \path (r15) edge[bend left=8] (r16);
+  \path (r16) edge[bend left=8] (r17);
+  \path (r17) edge[bend left=8] (r18);
+  \path (r18) edge[bend left=8] (r19);
+  \path (r19) edge[bend left=8] (r20);
+  \path (r20) edge[bend left=8] (r21);
+  \path (r21) edge[bend left=8] (r0);
+  \node at (4.01,-1.15) {$x \mapsto 5x \text{ on } (\ZZ/23\ZZ)^*$};
+  \draw[-, gray!50, thin, shorten >=0pt, shorten <=0pt, rounded corners=4pt] ([xshift=-14pt,yshift=-6pt]current bounding box.south west) rectangle ([xshift=14pt,yshift=6pt]current bounding box.north east);
+\end{tikzpicture}
+\end{center}
+% <<< END AI-GENERATED FIGURE <<<
+
+\webonly{\bespokedemo{primitive-root-clock}}
+
+\subsubsection{The protocol}
+
+In the protocol, both Alice and Bob choose secret exponents:  Alice chooses $a$ and Bob chooses $b$, in the range $1$ to $p-2$.  They keep this information to themselves, but they can compute and share $A := g^a$ and $B := g^b$, respectively.  Because the residues $A = g^a$ and $B = g^b$ on the clock do not apparently divulge the values of $a$ and $b$, they can trade these pieces of information without revealing their secret exponents.
+
+
+
+Having traded this info, Alice now computes $B^a$ and Bob computes $A^b$.  Notice that in this computation, each person combines the public information shared by the other with their own secret information.  In both cases, the answer comes out the same:
+
+$$ 
+B^a = (g^b)^a = g^{ab} = (g^a)^b = A^b 
+$$
+
+Thus, Alice and Bob have shared the secret information $g^{ab}$.  Notice that they can't control what this secret information comes out to.  It might as well be a random number, in terms of its use to them.  But a shared secret, even if it appears random, is actually very useful:  typically one uses it as a secret key for a symmetric encryption protocol.  That explains the name ``Key Exchange''.
+
+
+Here is the protocol, schematically:
+\begin{center}
+     {\bf Setup:}  $p$ (modulus), $g$
+     \vspace{1em}
+
+     \begin{tabular}{ccc}
+       Alice & & Bob \\
+       \hline
+       Secret: $a$ & &  Secret: $b$ \\
+       $g^a$ & $\longrightarrow$ & $g^a$ \\
+       $g^b$ & $\longleftarrow$ & $g^b$ \\
+       Compute: $(g^b)^a \equiv g^{ab}$ & & Compute: $(g^a)^b \equiv g^{ab}$
+      \end{tabular}
+      \vspace{3em}
+    \end{center}
+
+
+
+      An eavesdropper Eve knows the prime $p$ and primitive root $g$, and can see $g^a$ and $g^b$ during the protocol.  If Eve wants to obtain the shared secret, she must use this information to compute $g^{ab}$.  In the next two sections we will formalize this as a hard problem that Eve must solve.
+
+ 
 \subsection{The Discrete Logarithm}
 
 When working in the multiplicative group $(\ZZ/n\ZZ)^*$, we will use the notation $L_g(h)$ for the exponent to which one must raise $g \in (\ZZ/n\ZZ)^*$ to get the value $h \in (\ZZ/n\ZZ)^*$.  This is called the \textbf{discrete logarithm of $h$ to the base $g$}.  In other words, $L_g(h) = x$ if and only if $g^x \equiv h \pmod n$.  If no power of $g$ gives $h$, then this is not defined.
@@ -3635,7 +3618,7 @@ using $L_2(2) = 1$ (as $2^1 = 2$) and the given $L_2(3) = 69$.  The value $L_2(5
 
 
 
-\subsection{The Discrete Logarithm Problem}
+\subsection{The Computational Diffe-Hellman Problem and Discrete Logarithm Problem}
 
 The security of the Diffie-Hellman Key Exchange relies on Eve not being able to discern the key from the public information.  This can be encapsulated as a hard problem in the following way:
 
@@ -3643,7 +3626,7 @@ The security of the Diffie-Hellman Key Exchange relies on Eve not being able to 
 	Given a prime $p$, a primitive root $g$, and the values $g^a$ and $g^b$ modulo $p$, find $g^{ab} \pmod p$.
 \end{problem}
 
-One way to solve the CDHP would be to figure out $a$ and $b$ and then compute $g^{ab}$.  We believe this is essentially the \emph{only} way to solve CDHP, but do not have a proof of that fact.  The problem of computing $a$ or $b$ is an example of the following problem.
+Note that $a$ and $b$ are \emph{not} given in this problem.  Just the residues $g^a$ and $g^b$, in the form of integers from $0$ to $p-1$.  One way to solve the CDHP would be to figure out $a$ and $b$ and then compute $g^{ab}$.  We believe this is essentially the \emph{only} way to solve CDHP, but do not have a proof of that fact.  The problem of computing $a$ or $b$ is an example of the following problem.
 
 \begin{problem}[The Discrete Logarithm Problem (DLP)]
 	Given a prime $p$, a primitive root $g$, and the value $h = g^a$ modulo $p$, find $a$ modulo $p-1$.
@@ -3651,15 +3634,17 @@ One way to solve the CDHP would be to figure out $a$ and $b$ and then compute $g
 
 Notice that the exponent lives modulo $p-1$, so we can't really ask for $a$ more specifically than that (if $a$ works, then so does $a + p-1$).  We often assume we are looking for the smallest positive $a$, i.e. $0 \le a < p-1$.
 
-The CDHP and DLP are believed to be equivalent, but this is only known in certain special cases.  It was shown by den Boer that there is a reduction when $\varphi(p-1)$ is smooth (\emph{smooth} means it is divisible by only fairly small primes), and this method was extended by Maurer to the situation where there is an efficiently constructible elliptic curve of smooth order over $\FF_q$ for each $q$ dividing $p-1$.  For recent progress on a quantum analogue, see Galbraith-Panny-Smith-Vercauteren\footnote{To dive deeper, see B. den Boer, ``Diffie--Hellman is as strong as
+The Discrete Logarithm Problem is the more famous problem, and the one that gets all the attention.  However, it is not known that the \emph{only} way to solve the Computational Diffie-Hellman Problem is by solving the Discrete Logarithm Problem.  But many people believe the CDHP and DLP are \textbf{equivalent}.  We say that one hard problem $A$ \textbf{reduces to} another problem $B$, if you can solve $A$ using polynomial time work plus polynomially many on-demand free solutions of $B$.  Two problems are \emph{equivalent} if they reduce to each other.
+
+The equivalence of CDHP and DLP is only known in certain special cases.  It was shown by den Boer that there is a reduction when $\varphi(p-1)$ is smooth (\emph{smooth} means it is divisible by only fairly small primes), and this method was extended by Maurer to the situation where there is an efficiently constructible elliptic curve of smooth order over $\FF_q$ for each $q$ dividing $p-1$.  For recent progress on a quantum analogue, see Galbraith-Panny-Smith-Vercauteren\footnote{To dive deeper, see B. den Boer, ``Diffie--Hellman is as strong as
 discrete log for certain primes,'' CRYPTO~'88, LNCS 403, pp.~530--539.
 U. Maurer, ``Towards the equivalence of breaking the Diffie--Hellman protocol
 and computing discrete logarithms,'' CRYPTO~'94, LNCS 839, pp.~271--281.
 S. Galbraith, L. Panny, B. Smith, F. Vercauteren, ``Quantum equivalence of the
 DLP and CDHP for group actions,'' Mathematical Cryptology 1(1) (2021), 40--44
-(preprint: Cryptology ePrint 2018/1199).}
+(preprint: Cryptology ePrint 2018/1199).}.
 
-The DLP has therefore been the focus of cryptanalytic attacks on Diffie-Hellman Key Exchange.
+The DLP has therefore been the focus of cryptanalytic attacks on Diffie-Hellman Key Exchange.  In later sections of this Chapter, we will study algorithms for solving the Discrete Logarithm Problem.  We will find that they are \emph{not} very efficient, which gives us confidence that an attacker cannot break the Diffie-Hellman Protocol to recover the shared secret.  However, these are just \emph{attempts} to solve the problem.  Perhaps tomorrow, someone will come up with a better, faster, algorithm, and thereby break Diffie-Hellman Key Exchange!  This murky state of affairs is standard in cryptography.
 
 
 
