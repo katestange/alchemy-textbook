@@ -1,6 +1,6 @@
 {
- "total_blocks": 1063,
- "total_sections": 159,
+ "total_blocks": 1067,
+ "total_sections": 161,
  "duplicate_hash_groups": 5,
  "chapters": {
   "1": {
@@ -15,9 +15,9 @@
   "2": {
    "aisolution": 16,
    "checkin": 23,
-   "definition": 12,
+   "definition": 14,
    "example": 3,
-   "paragraph": 233,
+   "paragraph": 235,
    "philosophy": 1,
    "problem": 2,
    "proof": 7,

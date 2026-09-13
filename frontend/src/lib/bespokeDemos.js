@@ -28,6 +28,7 @@ import CryptogramTool from './demos/CryptogramTool.svelte';
 import EnigmaTool from './demos/EnigmaTool.svelte';
 import BigOhTool from './demos/BigOhTool.svelte';
 import PrimitiveRootClock from './demos/PrimitiveRootClock.svelte';
+import BabyGiantClock from './demos/BabyGiantClock.svelte';
 
 const make = (Component, props = {}) => (host) => new Component({ target: host, props });
 
@@ -52,5 +53,6 @@ export const bespokeDemos = {
   'cryptogram-tool': make(CryptogramTool),
   'enigma-tool': make(EnigmaTool),
   'big-oh-tool': make(BigOhTool),
-  'primitive-root-clock': make(PrimitiveRootClock)
+  'primitive-root-clock': make(PrimitiveRootClock),
+  'baby-giant-clock': make(BabyGiantClock)
 };
