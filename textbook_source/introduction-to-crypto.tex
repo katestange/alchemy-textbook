@@ -3396,7 +3396,7 @@ Here is the protocol, schematically:
     \subsubsection{Security}
 
 
-      An eavesdropper Eve knows the prime $p$ and primtive root $g$, and can see $g^a$ and $g^b$ during the protocol.  If Eve wants to obtain the shared secret, she must use this information to compute $g^{ab}$.  We formalize this as the following problem.
+      An eavesdropper Eve knows the prime $p$ and primitive root $g$, and can see $g^a$ and $g^b$ during the protocol.  If Eve wants to obtain the shared secret, she must use this information to compute $g^{ab}$.  We formalize this as the following problem.
 
 
 \begin{definition}
@@ -3409,7 +3409,7 @@ Note that $a$ and $b$ are \emph{not} given in this problem.  Just the residues $
 The \textbf{Discrete Logarithm Problem} is the following task:  given a prime $p$, primitive root $g$ modulo $p$, and value $g^a$ modulo $p$, compute $a$ modulo $p-1$.
 \end{definition}
 
-The Discrete Logarithm Problem is the more famous problem, and the one that gets all the attention.  However, it is not known that the \emph{only} way to solve the Computational Diffie-Hellman Problem is by solving the Dicrete Logarithm Problem.
+The Discrete Logarithm Problem is the more famous problem, and the one that gets all the attention.  However, it is not known that the \emph{only} way to solve the Computational Diffie-Hellman Problem is by solving the Discrete Logarithm Problem.
 
 In later sections of this Chapter, we will study algorithms for solving the Discrete Logarithm Problem.  We will find that they are \emph{not} very efficient, which gives us confidence that an attacker cannot break the Diffie-Hellman Protocol to recover the shared secret.  However, these are just \emph{attempts} to solve the problem.  Perhaps tomorrow, someone will come up with a better, faster, algorithm, and thereby break Diffie-Hellman Key Exchange!
 
