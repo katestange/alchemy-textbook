@@ -3361,7 +3361,7 @@ Each position $g^x$ on this big cycle is actually just a residue modulo $p$, and
 
 \webonly{\bespokedemo{primitive-root-clock}}
 
-
+\subsubsection{The protocol}
 
 In the protocol, both Alice and Bob choose secret exponents:  Alice chooses $a$ and Bob chooses $b$, in the range $1$ to $p-2$.  They keep this information to themselves, but they can compute and share $A := g^a$ and $B := g^b$, respectively.  Because the residues $A = g^a$ and $B = g^b$ on the clock do not apparently divulge the values of $a$ and $b$, they can trade these pieces of information without revealing their secret exponents.
 
@@ -3377,7 +3377,7 @@ Thus, Alice and Bob have shared the secret information $g^{ab}$.  Notice that th
 
 
 Here is the protocol, schematically:
-
+\begin{center}
      {\bf Setup:}  $p$ (modulus), $g$
      \vspace{1em}
 
@@ -3390,9 +3390,28 @@ Here is the protocol, schematically:
        Compute: $(g^b)^a \equiv g^{ab}$ & & Compute: $(g^a)^b \equiv g^{ab}$
       \end{tabular}
       \vspace{3em}
-      
-      An eavesdropper Eve can see $g^a$ and $g^b$ and must compute $g^{ab}$.
+    \end{center}
 
+
+    \subsubsection{Security}
+
+
+      An eavesdropper Eve knows the prime $p$ and primtive root $g$, and can see $g^a$ and $g^b$ during the protocol.  If Eve wants to obtain the shared secret, she must use this information to compute $g^{ab}$.  We formalize this as the following problem.
+
+
+\begin{definition}
+ The \textbf{Computational Diffie-Hellman Problem} is the following task:  given a prime $p$, primitive root $g$ modulo $p$, and values $g^a$ and $g^b$ modulo $p$, compute $g^{ab}$.
+\end{definition}
+
+Note that $a$ and $b$ are \emph{not} given in this problem.  Just the residues $g^a$ and $g^b$, in the form of integers from $0$ to $p-1$.  One way to solve the Computational Diffie-Hellman Problem is to find $a$ and $b$, from which one can compute $g^{ab}$.  It's not necessarily the only way to solve it, but it seems the most promising, so it has its own name, as follows.
+
+\begin{definition}
+The \textbf{Discrete Logarithm Problem} is the following task:  given a prime $p$, primitive root $g$ modulo $p$, and value $g^a$ modulo $p$, compute $a$ modulo $p-1$.
+\end{definition}
+
+The Discrete Logarithm Problem is the more famous problem, and the one that gets all the attention.  However, it is not known that the \emph{only} way to solve the Computational Diffie-Hellman Problem is by solving the Dicrete Logarithm Problem.
+
+In later sections of this Chapter, we will study algorithms for solving the Discrete Logarithm Problem.  We will find that they are \emph{not} very efficient, which gives us confidence that an attacker cannot break the Diffie-Hellman Protocol to recover the shared secret.  However, these are just \emph{attempts} to solve the problem.  Perhaps tomorrow, someone will come up with a better, faster, algorithm, and thereby break Diffie-Hellman Key Exchange!
 
       
 \subsection{Efficient arithmetic modulo $n$ (a first introduction to complexity)}
@@ -3642,7 +3661,9 @@ DLP and CDHP for group actions,'' Mathematical Cryptology 1(1) (2021), 40--44
 
 The DLP has therefore been the focus of cryptanalytic attacks on Diffie-Hellman Key Exchange.
 
-\subsection{Parity of discrete log}
+
+
+\subsubsection{Parity of discrete log}
 
 \begin{question}
 This exercise shows that the parity (even or oddness) of the discrete log in $(\ZZ/p\ZZ)^*$, $p$ an odd prime, can be discovered easily.
@@ -3887,7 +3908,7 @@ If we want to compute another discrete log with the same $g$ and $p$, we need on
 \]
 which gives $L_g(h) = 87 + 84 - 29  = 16$. 
 
-\subsubsection{Runtime}
+\subsubsection{Runtime of Index Calculus}
 
 This analysis will necessarily lack some details, as the full analysis is very complex.  
 There are two modes to this algorithm:  finding relations, and linear algebra.  As it turns out, the linear algebra is not the bottleneck.  Therefore we will focus on the relation-finding phase, whose runtime is controlled by the bound $B$, which is referred to as the \textbf{smoothness bound}.  (A `smooth' number is one which has only small prime factors.)  Roughly speaking, if $B$ is larger, then we are more likely to find relations (the value $g^k$ is more likely to be written as a product of the primes in the factor base), but at the same time, factoring each $g^k$ in terms of the factor base is more work (recall that we only need to factor it partially, namely, we need only identify the part of the prime decomposition that consists of primes from the factor base). 
