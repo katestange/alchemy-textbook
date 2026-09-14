@@ -3971,7 +3971,7 @@ Observe that most of the work in this algorithm lies in the precomputation phase
 This led to the famous \textbf{Logjam attack}\footnote{D. Adrian et al., ``Imperfect Forward Secrecy: How Diffie--Hellman Fails in Practice,'' ACM CCS 2015, pp.~5--17 (Best Paper Award); website \texttt{weakdh.org}}, revealed publicly on May 20, 2015.  This attack consisted of two components.  The first was a weakness in the $TLS$ handshake protocol between client and server that allowed a \textbf{man-in-the-middle} (someone altering messages passing between client and server) to force the server to use a relatively weak (but still built-in) $512$-bit prime, even when server settings dictated the use of a stronger prime.  The second component was a large precomputation for the number field sieve for the most commonly used prime(s) $p$.  It turns out that some $8.4\%$ of the top 1 million websites were using this most popular prime number.  By running the precomputation offline before the attack, the online, active phase of the attack could be made very quick (a matter of around a minute).  The researchers who created and revealed the Logjam attack speculated that a nation state agency such as the National Security Agency may have the server power and money (in the hundreds of millions) to run pre-computations for the most common $1024$-bit prime, obviating the need for the first component, and allowing them to decrypt a significant portion of internet traffic (around a quarter of websites and two thirds of VPNs).  The researchers released instructions to server administrators on how to avoid this attack.
 
 
-\subsection{A lower bound on solving discrete log}
+\subsubsection{A lower bound on solving discrete log}
 
 At this point in our discussion, I have emphasized several times that the only reason we have confidence in our cryptographic protocols is that many highly trained human beings have spent a lot of mental energy trying to come up with faster discrete log algorithms, and have failed to find anything faster than subexponential.  We can't provide a lower-bound on the runtime of discrete logarithm algorithms -- besides trivial ones, such as the time it takes to write down an answer.
 
@@ -4074,7 +4074,7 @@ Summarizing the discussion, we have the following algorithm:
 
       Besides encryption and key exchange, there is a third cryptographic task that is particularly important to the modern world.  That is \textbf{signatures}.  \KS{more}
 
-\subsection{ElGamal Signature}
+\subsubsection{ElGamal Signature}
 
 The ElGamal signature scheme is a modification of ElGamal encryption (which is, as we saw, a modification of Diffie-Hellman Key Exchange).  
 
